@@ -62,16 +62,16 @@
                                                    value="entered"/>
                                             <input type="submit" class="btn btn-success w-100" value="Вошёл">
                                         </form>
-                                        <form id="decline-form" class="d-none"
-                                              action="{{route('leads.decline',$lead->id)}}"
-                                              method="post">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input placeholder="Укажите причину отказа" class="form-control" name="note"
-                                                   type="text"/>
-                                            <input type="submit" class="my-2 btn btn-danger w-100" value="Отказ">
-                                        </form>
-                                        <button id="decline" class="my-2 btn btn-danger w-100">Отказ</button>
+                                        {{--                                        <form id="decline-form" class="d-none"--}}
+                                        {{--                                              action="{{route('leads.decline',$lead->id)}}"--}}
+                                        {{--                                              method="post">--}}
+                                        {{--                                            @csrf--}}
+                                        {{--                                            @method('PATCH')--}}
+                                        {{--                                            <input placeholder="Укажите причину отказа" class="form-control" name="note"--}}
+                                        {{--                                                   type="text"/>--}}
+                                        {{--                                            <input type="submit" class="my-2 btn btn-danger w-100" value="Отказ">--}}
+                                        {{--                                        </form>--}}
+                                        {{--                                        <button id="decline" class="my-2 btn btn-danger w-100">Отказ</button>--}}
                                     @elseif(!$lead->exited)
                                         <form action="{{route('leads.status',$lead->id)}}" method="post">
                                             @csrf
@@ -81,18 +81,18 @@
                                             <input type="submit" class="btn btn-success w-100" value="Вышел">
                                         </form>
                                     @elseif(!$lead->check)
-                                        <button id="success" class="my-2 btn btn-success w-100">Успешно</button>
-                                        <button id="otkaz" class="my-2 btn btn-danger w-100">Отказ</button>
-                                        <form id="decline-form-second" class="d-none"
-                                              action="{{route('leads.decline',$lead->id)}}"
-                                              method="post">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input placeholder="Укажите причину отказа" class="form-control" name="note"
-                                                   type="text"/>
-                                            <input type="submit" class="my-2 btn btn-danger w-100" value="Отказ">
-                                        </form>
-                                        <form id="success-form" class="flex d-none flex-column"
+                                        {{--                                        <button id="success" class="my-2 btn btn-success w-100">Успешно</button>--}}
+                                        {{--                                        <button id="otkaz" class="my-2 btn btn-danger w-100">Отказ</button>--}}
+                                        {{--                                        <form id="decline-form-second" class="d-none"--}}
+                                        {{--                                              action="{{route('leads.decline',$lead->id)}}"--}}
+                                        {{--                                              method="post">--}}
+                                        {{--                                            @csrf--}}
+                                        {{--                                            @method('PATCH')--}}
+                                        {{--                                            <input placeholder="Укажите причину отказа" class="form-control" name="note"--}}
+                                        {{--                                                   type="text"/>--}}
+                                        {{--                                            <input type="submit" class="my-2 btn btn-danger w-100" value="Отказ">--}}
+                                        {{--                                        </form>--}}
+                                        <form id="success-form" class="flex d-flex flex-column"
                                               enctype="multipart/form-data"
                                               action="{{route('leads.close',$lead->id)}}"
                                               method="post">
@@ -101,14 +101,14 @@
                                             <div class="form-group d-flex flex-column">
                                                 <label for="check">Сумма</label>
                                                 <input class="form-control w-100 my-2" name="check" type="number"/>
-                                                <label for="note">Примечание</label>
-                                                <textarea class="form-control w-100 my-2" name="note"
-                                                          type="text"></textarea>
-                                                <label for="documents">Документы</label>
-                                                <input enctype="multipart/form-data" type="file"
-                                                       class="my-2 form-control"
-                                                       name="documents[]"
-                                                       placeholder="Документы" multiple>
+                                                {{--                                                <label for="note">Примечание</label>--}}
+                                                {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
+                                                {{--                                                          type="text"></textarea>--}}
+                                                {{--                                                <label for="documents">Документы</label>--}}
+                                                {{--                                                <input enctype="multipart/form-data" type="file"--}}
+                                                {{--                                                       class="my-2 form-control"--}}
+                                                {{--                                                       name="documents[]"--}}
+                                                {{--                                                       placeholder="Документы" multiple>--}}
                                                 <input type="submit" class="btn btn-success w-auto"
                                                        value="Закрыть встречу">
                                             </div>

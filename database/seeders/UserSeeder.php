@@ -71,76 +71,88 @@ class UserSeeder extends Seeder
         $admin = Role::where('slug', 'admin')->first();
 
 
-//        $tempOperator = new User();
-//        $tempOperator->name = 'Пробный оператор';
-//        $tempOperator->email = 'operator@gmail.com';
-//        $tempOperator->password = bcrypt('secret');
-//        $tempOperator->save();
-//        $tempOperator->roles()->attach($operator);
-//        $tempOperator->permissions()->attach($createLead);
+        $tempOperator = new User();
+        $tempOperator->name = 'Пробный оператор';
+        $tempOperator->email = 'operator@gmail.com';
+        $tempOperator->password = bcrypt('secret');
+        $tempOperator->city = 1;
+        $tempOperator->save();
+        $tempOperator->roles()->attach($operator);
+        $tempOperator->permissions()->attach($createLead);
 
-//        $tempManager = new User();
-//        $tempManager->name = 'Пробный менеджер';
-//        $tempManager->email = 'manager@gmail.com';
-//        $tempManager->password = bcrypt('secret');
-//        $tempManager->save();
-//        $tempManager->roles()->attach($manager);
-//        $tempManager->permissions()->attach($readLead);
+        $tempManager = new User(); //2
+        $tempManager->name = 'Пробный менеджер';
+        $tempManager->email = 'manager@gmail.com';
+        $tempManager->password = bcrypt('secret');
 
-        $tempManager2 = new User();
+        $tempManager->city = 1;
+        $tempManager->save();
+        $tempManager->roles()->attach($manager);
+        $tempManager->permissions()->attach($readLead);
+
+        $tempManager2 = new User(); //3
         $tempManager2->name = 'Наталья Агафонова';
         $tempManager2->email = 'manager2@gmail.com';
         $tempManager2->password = bcrypt('secret');
+
+        $tempManager2->city = 1;
         $tempManager2->save();
         $tempManager2->roles()->attach($manager);
         $tempManager2->permissions()->attach($readLead);
 
-        $tempManager3 = new User();
+        $tempManager3 = new User(); //4
         $tempManager3->name = 'Иван Дулин';
         $tempManager3->email = 'manager3@gmail.com';
         $tempManager3->password = bcrypt('secret');
+
+        $tempManager3->city = 2;
         $tempManager3->save();
         $tempManager3->roles()->attach($manager);
         $tempManager3->permissions()->attach($readLead);
 
-        $tempManager4 = new User();
+        $tempManager4 = new User(); //5
         $tempManager4->name = 'Артём Леонтьев';
         $tempManager4->email = 'manager4@gmail.com';
         $tempManager4->password = bcrypt('secret');
+
+        $tempManager4->city = 3;
         $tempManager4->save();
         $tempManager4->roles()->attach($manager);
         $tempManager4->permissions()->attach($readLead);
 
 
-//        $tempMaster = new User();
-//        $tempMaster->name = 'Пробный мастер';
-//        $tempMaster->email = 'master@gmail.com';
-//        $tempMaster->password = bcrypt('secret');
-//        $tempMaster->save();
-//        $tempMaster->roles()->attach($master);
-//        $tempMaster->permissions()->attach($readSelfSalary);
-//
-//        $tempCoordinator = new User();
-//        $tempCoordinator->name = 'Пробный координатор';
-//        $tempCoordinator->email = 'coordinator@gmail.com';
-//        $tempCoordinator->password = bcrypt('secret');
-//        $tempCoordinator->save();
-//        $tempCoordinator->roles()->attach($coordinator);
-//        $tempCoordinator->permissions()->attach(
-//            $readSelfSalary,
-//        );
-//
-//        $tempDirector = new User();
-//        $tempDirector->name = 'Пробный директор';
-//        $tempDirector->email = 'director@gmail.com';
-//        $tempDirector->password = bcrypt('secret');
-//        $tempDirector->save();
-//        $tempDirector->roles()->attach($director);
-//        $tempDirector->permissions()->attach(
-//            $createLead,
-//
-//        );
+        $tempMaster = new User();
+        $tempMaster->name = 'Пробный мастер';
+        $tempMaster->email = 'master@gmail.com';
+        $tempMaster->password = bcrypt('secret');
+        $tempMaster->city = 1;
+        $tempMaster->save();
+        $tempMaster->roles()->attach($master);
+        $tempMaster->permissions()->attach($readSelfSalary);
 
-        //
+        $tempCoordinator = new User(); //6
+        $tempCoordinator->name = 'Пробный координатор';
+        $tempCoordinator->email = 'coordinator@gmail.com';
+        $tempCoordinator->password = bcrypt('secret');
+        $tempCoordinator->city = 1;
+        $tempCoordinator->save();
+        $tempCoordinator->roles()->attach($coordinator);
+        $tempCoordinator->permissions()->attach(
+            $readSelfSalary,
+        );
+
+        $tempDirector = new User();
+        $tempDirector->name = 'Пробный директор';
+        $tempDirector->email = 'director@gmail.com';
+        $tempDirector->password = bcrypt('secret');
+        $tempDirector->city = 1;
+        $tempDirector->save();
+        $tempDirector->roles()->attach($director);
+        $tempDirector->permissions()->attach(
+            $createLead,
+
+        );
+
+
     }
 }

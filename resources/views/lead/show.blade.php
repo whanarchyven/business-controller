@@ -109,7 +109,7 @@
                             </th>
                             <th class="fw-bold text-left" scope="col">
                                 @if($lead->check)
-                                    <p class="fw-normal">{{$lead->chech}}</p>
+                                    <p class="fw-normal"></p>
                                 @else
                                     <p class="fw-normal"></p>
                                 @endif

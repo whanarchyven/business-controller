@@ -111,7 +111,7 @@
                             0
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$totalSuccessful*120}}
+                            {{$totalSuccessful*150}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
                             {{$totalWorkDays*200}}

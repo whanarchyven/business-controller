@@ -149,6 +149,22 @@
                                         <p class="m-0">Менеджер: {{$lead->getManagerId->name}}</p>
                                         <p class="m-0">Сумма: {{$lead->check}}</p>
                                     </div>
+                                    <div class="d-flex">
+                                        <div id="control-panel" class="d-flex flex-row gap-2">
+                                            <div class="d-flex flex-row gap-2 w-100">
+                                                <button id="decline-btn"
+                                                        class="btn btn-danger text-white w-50 rounded-2  p-2">
+                                                    Отказ
+                                                </button>
+                                                <button
+                                                    onclick="window.location='{{route('coordinator.leads.edit',$lead->id)}}'"
+                                                    class="btn btn-warning text-white w-75 rounded-2  p-2">
+                                                    Редатировать
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 @endif
 
 

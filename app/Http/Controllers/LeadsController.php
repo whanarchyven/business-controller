@@ -51,7 +51,13 @@ class LeadsController extends Controller
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
-        return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+        $user = Auth::user();
+
+        if ($user->hasRole('operator')) {
+            return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['operator_id', '=', $user->id]])->get();
+        } else {
+            return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+        }
     }
 
     public function getOperatorMonthLeads($year, $month, $type, $operator_id)
@@ -78,7 +84,12 @@ class LeadsController extends Controller
         } else {
             $date = Carbon::now()->toDateString();
         }
-        $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined']])->get();
+        $user = Auth::user();
+        if ($user->hasRole('coordinator')) {
+            $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined']])->get();
+        } else {
+            $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined'], ['operator_id', '=', $user->id]])->get();
+        }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -448,7 +459,6 @@ class LeadsController extends Controller
         if (isset($data['range'])) {
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
-        dd($data);
         $lead->update($data);
         if (Auth::user()->hasRole('operator')) {
             return redirect()->route('leads.index');
@@ -476,6 +486,7 @@ class LeadsController extends Controller
         ]);
 
         $manager = $lead->getManagerId;
+        $operator = $lead->getOperatorId;
 
         $lead->update([$data['status'] => Carbon::now()->toTimeString()]);
         if ($data['status'] == 'accepted') {
@@ -486,6 +497,8 @@ class LeadsController extends Controller
             $lead->update(['status' => 'in-work']);
             $manager->status = 'on-meeting';
             $manager->save();
+            $operator->salary += 150;
+            $operator->save();
         } else if ($data['status'] == 'exited') {
             $manager->status = 'free';
             $manager->save();
@@ -497,19 +510,20 @@ class LeadsController extends Controller
     public function closeLeadMeeting(Lead $lead, Request $request)
     {
         $data = \request()->all();
-        $documents = array();
-        if ($files = $request->file('documents')) {
-            $i = 1;
-            foreach ($files as $file) {
-                $name = Carbon::now()->toDateString() . '-' . $lead->client_fullname . '-' . Auth::user()->name . '-' . $i . '.' . $file->extension();
-//                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
-                $file->move('documents', $name);
-                $documents[] = $name;
-                $i++;
-            }
-        }
+//        $documents = array();
+//        if ($files = $request->file('documents')) {
+//            $i = 1;
+//            foreach ($files as $file) {
+//                $name = Carbon::now()->toDateString() . '-' . $lead->client_fullname . '-' . Auth::user()->name . '-' . $i . '.' . $file->extension();
+////                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
+//                $file->move('documents', $name);
+//                $documents[] = $name;
+//                $i++;
+//            }
+//        }
 
-        $lead->update(['documents' => implode("|", $documents), 'check' => $data['check'], 'status' => 'in-work', 'note' => $data['note']]);
+//        $lead->update(['documents' => implode("|", $documents), 'check' => $data['check'], 'status' => 'in-work', 'note' => $data['note']]);
+        $lead->update(['check' => $data['check'], 'status' => 'in-work',]);
         return redirect(route('manager.leads'));
     }
 
