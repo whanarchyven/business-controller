@@ -53,4 +53,9 @@ Route::group(['middleware' => 'role:coordinator'], function () {
     Route::patch('/coordinator/leads/{lead}', [App\Http\Controllers\CoordinatorController::class, 'update'])->name('coordinator.leads.update');
     Route::patch('/coordinator/leads/decline/{lead}', [App\Http\Controllers\CoordinatorController::class, 'declineLead'])->name('coordinator.leads.decline');
     Route::patch('/coordinator/leads/{lead}/manage', [App\Http\Controllers\CoordinatorController::class, 'manageLead'])->name('coordinator.leads.manage');
+    Route::get('/coordinator/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('coordinator.managercard');
+    Route::patch('/coordinator/managers/{manager}/status', [\App\Http\Controllers\ManagerController::class, 'changeManagerStatus'])->name('coordinator.manager.status');
+    Route::patch('/coordinator/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('coordinator.manager.leads.status');
+    Route::patch('/coordinator/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('coordinator.manager.leads.close');
+
 });

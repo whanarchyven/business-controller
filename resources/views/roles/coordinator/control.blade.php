@@ -78,7 +78,8 @@
                 </div>
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
-                    <button class="btn manager-{{$manager->status}}">{{$manager->name}}</button>
+                    <button onclick="window.location.href='{{route('coordinator.managercard',$manager)}}'"
+                            class="btn manager-{{$manager->status}}">{{$manager->name}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">

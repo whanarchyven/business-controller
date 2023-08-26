@@ -9,6 +9,7 @@ use App\Models\Lead;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\CoordinatorController;
 
 class LeadsController extends Controller
 {
@@ -504,7 +505,7 @@ class LeadsController extends Controller
             $manager->save();
         }
 
-        return redirect(route('manager.leads'));
+        return redirect()->back();
     }
 
     public function closeLeadMeeting(Lead $lead, Request $request)
@@ -524,7 +525,7 @@ class LeadsController extends Controller
 
 //        $lead->update(['documents' => implode("|", $documents), 'check' => $data['check'], 'status' => 'in-work', 'note' => $data['note']]);
         $lead->update(['check' => $data['check'], 'status' => 'in-work',]);
-        return redirect(route('manager.leads'));
+        return redirect()->back();
     }
 
     public function getManagerDaysInMonthWithWeekdays($month, $year)
@@ -589,7 +590,7 @@ class LeadsController extends Controller
         return redirect(route('manager.leads'));
     }
 
-    public function managerCard(Request $request)
+    public function managerCard(User $manager, Request $request)
     {
 
         if ($request->query('date')) {
@@ -598,7 +599,13 @@ class LeadsController extends Controller
             $date = Carbon::now()->toDateString();
         }
 
-        $user = Auth::user();
+        if (!$manager->id) {
+            $manager = Auth::user();
+        }
+
+
+        [$manager, $manager_statuses] = app('App\Http\Controllers\CoordinatorController')->getManagerCard($manager->id);
+
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -649,9 +656,9 @@ class LeadsController extends Controller
 
         $days = $this->getManagerDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
-        $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $user->id);
-        $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $user->id);
-        $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $user->id);
+        $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $manager->id);
+        $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $manager->id);
+        $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $manager->id);
 
         $totalMeetings = 0;
         $totalDeclined = 0;
@@ -709,8 +716,13 @@ class LeadsController extends Controller
             $totalSelled += $day['products_selled'];
         }
 
+        $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
 
-        return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled'));
+
+        if ($manager->hasRole('manager')) {
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads'));
+        }
+
 
     }
 

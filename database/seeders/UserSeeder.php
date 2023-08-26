@@ -84,17 +84,16 @@ class UserSeeder extends Seeder
         $tempManager->name = 'Пробный менеджер';
         $tempManager->email = 'manager@gmail.com';
         $tempManager->password = bcrypt('secret');
-
         $tempManager->city = 1;
         $tempManager->save();
         $tempManager->roles()->attach($manager);
         $tempManager->permissions()->attach($readLead);
 
+
         $tempManager2 = new User(); //3
         $tempManager2->name = 'Наталья Агафонова';
         $tempManager2->email = 'manager2@gmail.com';
         $tempManager2->password = bcrypt('secret');
-
         $tempManager2->city = 1;
         $tempManager2->save();
         $tempManager2->roles()->attach($manager);
@@ -104,7 +103,6 @@ class UserSeeder extends Seeder
         $tempManager3->name = 'Иван Дулин';
         $tempManager3->email = 'manager3@gmail.com';
         $tempManager3->password = bcrypt('secret');
-
         $tempManager3->city = 2;
         $tempManager3->save();
         $tempManager3->roles()->attach($manager);
@@ -114,7 +112,6 @@ class UserSeeder extends Seeder
         $tempManager4->name = 'Артём Леонтьев';
         $tempManager4->email = 'manager4@gmail.com';
         $tempManager4->password = bcrypt('secret');
-
         $tempManager4->city = 3;
         $tempManager4->save();
         $tempManager4->roles()->attach($manager);

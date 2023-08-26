@@ -172,4 +172,26 @@ class CoordinatorController extends Controller
         return redirect(route('coordinator.managers'));
 
     }
+
+    public function getStatuses()
+    {
+        return [
+            "free" => "Свободен",
+            "dinner" => "Обед",
+            "weekend" => "Выходной",
+            "meeting-managed" => "Встреча назначена",
+            "meeting-accepted" => "Встреча принята",
+            "on-meeting" => "На встрече",
+            "delaying" => "'Задреживается'",
+        ];
+    }
+
+    public function getManagerCard($manager_id)
+    {
+        $manager = User::where([['id', '=', $manager_id]])->first();
+
+        $manager_statuses = $this->getStatuses();
+
+        return [$manager, $manager_statuses];
+    }
 }
