@@ -26,4 +26,9 @@ class Lead extends Model
     {
         return $this->belongsTo(User::class, 'operator_id');
     }
+
+    public function getRepair()
+    {
+        return $this->hasOne(Repair::class, 'lead_id');
+    }
 }

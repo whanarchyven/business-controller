@@ -32,6 +32,12 @@
                         </script>
                         @endrole
 
+                        @role('director')
+                        <script>
+                            window.location.href = "{{route('director.managers')}}"
+                        </script>
+                        @endrole
+
                     </div>
                 </div>
             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\LeadsController;
 use App\Models\City;
 use App\Models\Lead;
+use App\Models\Plan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -157,7 +158,13 @@ class CoordinatorController extends Controller
         $cities = $this->getCities();
         $managers = $this->getManagers($city_id);
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined'));
+        $date = Carbon::now()->toDateString();
+        $yearTemp = preg_split("/[^1234567890]/", $date)[0];
+        $monthTemp = preg_split("/[^1234567890]/", $date)[1];
+
+        $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
+
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -171,6 +178,17 @@ class CoordinatorController extends Controller
 
         return redirect(route('coordinator.managers'));
 
+    }
+
+    public function changeManager(Lead $lead, Request $request)
+    {
+        $data = $request->all();
+        $manager = User::where([['id', '=', $data['manager']]])->first();
+        $lead->update(["manager_id" => null]);
+        $manager->status = 'free';
+        $manager->save();
+        $lead->save();
+        return redirect()->back();
     }
 
     public function getStatuses()

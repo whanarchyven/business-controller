@@ -86,10 +86,10 @@ class LeadsController extends Controller
             $date = Carbon::now()->toDateString();
         }
         $user = Auth::user();
-        if ($user->hasRole('coordinator')) {
-            $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined']])->get();
-        } else {
+        if ($user->hasRole('operator')) {
             $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined'], ['operator_id', '=', $user->id]])->get();
+        } else {
+            $leads = Lead::where([['meeting_date', '=', $date], ['status', '!=', 'declined']])->get();
         }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
@@ -183,7 +183,14 @@ class LeadsController extends Controller
         } else {
             $date = Carbon::now()->toDateString();
         }
-        $leads = Lead::where([['meeting_date', '=', $date], ['status', '=', 'declined']])->get();
+        $user = Auth::user();
+        if ($user->hasRole('operator')) {
+            $leads = Lead::where([['meeting_date', '=', $date], ['status', '=', 'declined'], ['operator_id', '=', $user->id]])->get();
+        } else {
+            $leads = Lead::where([['meeting_date', '=', $date], ['status', '=', 'declined']])->get();
+        }
+
+
         $dateTemp = preg_split("/[^1234567890]/", $date);
 //            dd($dateTemp);
         $dateTitle = '';
@@ -668,6 +675,7 @@ class LeadsController extends Controller
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
             $days[$day - 1]['meetings'] += 1;
             $days[$day - 1]['products_selled'] += $lead['check'];
+            $days[$day - 1]['products_issued'] += $lead['issued'];
             $totalMeetings++;
         }
 
@@ -708,19 +716,21 @@ class LeadsController extends Controller
 
         $totalWorkDays = 0;
         $totalSelled = 0;
+        $totalIssued = 0;
 
         foreach ($days as $day) {
             if ($day['meetings'] != 0) {
                 $totalWorkDays++;
             }
             $totalSelled += $day['products_selled'];
+            $totalIssued += $day['products_issued'];
         }
 
         $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
 
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued'));
         }
 
 

@@ -104,11 +104,11 @@
                                                 {{--                                                <label for="note">Примечание</label>--}}
                                                 {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
                                                 {{--                                                          type="text"></textarea>--}}
-                                                {{--                                                <label for="documents">Документы</label>--}}
-                                                {{--                                                <input enctype="multipart/form-data" type="file"--}}
-                                                {{--                                                       class="my-2 form-control"--}}
-                                                {{--                                                       name="documents[]"--}}
-                                                {{--                                                       placeholder="Документы" multiple>--}}
+                                                {{--                                                                                                <label for="documents">Документы</label>--}}
+                                                {{--                                                                                                <input enctype="multipart/form-data" type="file"--}}
+                                                {{--                                                                                                       class="my-2 form-control"--}}
+                                                {{--                                                                                                       name="documents[]"--}}
+                                                {{--                                                                                                       placeholder="Документы" multiple>--}}
                                                 <input type="submit" class="btn btn-success w-auto"
                                                        value="Закрыть встречу">
                                             </div>

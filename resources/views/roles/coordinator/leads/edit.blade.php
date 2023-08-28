@@ -14,7 +14,7 @@
                             </div>
                         @endif
 
-                        <form action="{{route('coordinator.leads.update`````````',$lead->id)}}" method="post">
+                        <form action="{{route('coordinator.leads.update',$lead->id)}}" method="post">
                             @csrf
                             @method('patch')
                             <div class="form-row row-gap-10">

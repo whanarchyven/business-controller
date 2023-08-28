@@ -143,6 +143,142 @@
                 </ul>
                 @endrole
 
+
+                @role('director')
+                <ul class="navbar-nav d-flex flex-row container align-items-center justify-content-around ">
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Сотрудники
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('director.employers.new') }}">
+                                Новый сотрудник
+                            </a>
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Руководитель--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Координатор--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Менеджер--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Оператор--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Мастер--}}
+                            {{--                            </a>--}}
+                        </div>
+                    </li>
+
+                    {{--                    <li class="nav-item dropdown">--}}
+                    {{--                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"--}}
+                    {{--                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>--}}
+                    {{--                            Статистика--}}
+                    {{--                        </a>--}}
+
+                    {{--                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">--}}
+                    {{--                            <a class="dropdown-item" href="{{ route('leads.create') }}">--}}
+                    {{--                                Продажи--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Встречи--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Заявки--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Бонусы--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Закуп--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Маржинальность--}}
+                    {{--                            </a>--}}
+                    {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                    {{--                                Позиграмма--}}
+                    {{--                            </a>--}}
+                    {{--                        </div>--}}
+                    {{--                    </li>--}}
+                    {{--                    <li class="nav-item dropdown">--}}
+                    {{--                        <a class="dropdown-item" href="#" role="button"--}}
+                    {{--                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>--}}
+                    {{--                            Транзакции--}}
+                    {{--                        </a>--}}
+                    {{--                    </li>--}}
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Ремонты
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('leads.create') }}">
+                                Таблица ремонтов
+                            </a>
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Таблица маржинальности--}}
+                            {{--                            </a>--}}
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Заявки
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('leads.create') }}">
+                                Создать заявку
+                            </a>
+                            <a class="dropdown-item" href="{{route('leads.index')}}">
+                                Оформленные заявки
+                            </a>
+                            <a class="dropdown-item"
+                               href="{{route('leads.declined')}}">
+                                Отклонённые заявки
+                            </a>
+                            <a class="dropdown-item"
+                               href="{{route('director.daily')}}">
+                                Дневная сводка
+                            </a>
+                            <a class="dropdown-item" href="{{ route('director.managers') }}">
+                                Таблица контроля
+                            </a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Склад
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('director.receipt') }}">
+                                Приход
+                            </a>
+                            <a class="dropdown-item" href="{{route('director.expense')}}">
+                                Выдача
+                            </a>
+                            <a class="dropdown-item" href="{{route('director.nomenclature')}}">
+                                Номенклатура
+                            </a>
+                        </div>
+                    </li>
+
+
+                </ul>
+                @endrole
+
+
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ms-auto">
                     <!-- Authentication Links -->
