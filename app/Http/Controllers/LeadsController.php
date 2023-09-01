@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\Salary;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Lead;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\CoordinatorController;
+
 
 class LeadsController extends Controller
 {
@@ -418,7 +420,6 @@ class LeadsController extends Controller
             'city' => '',
             'subcity' => '',
             'address' => '',
-            'meeting_date' => '',
             'time_period' => '',
             'client_fullname' => '',
             'phone' => '',
@@ -431,6 +432,7 @@ class LeadsController extends Controller
         $user = Auth::user()->id;
         $data['operator_id'] = $user;
         $data['status'] = 'not-managed';
+        $data['meeting_date'] = Carbon::now()->toDateString();
 
 
         if (isset($data['measuring'])) {
@@ -444,10 +446,21 @@ class LeadsController extends Controller
         if (!Lead::where([['created_at', '=', Carbon::now()->toDateTimeString()]])->first()) {
             $user = Auth::user();
 //            dd($user);
-            $user->update(['salary' => $user->salary += 200]);
+//            $user->update(['salary' => $user->salary += 200]);
         }
 
 //        dd($data);
+
+        if (Auth::user()->hasRole('operator')) {
+
+            $tempDate = Carbon::now()->toDateString();
+            $tempDate = preg_split("/[^1234567890]/", $tempDate);
+
+            if (!Lead::whereDate('created_at', Carbon::today())->where([['operator_id', '=', Auth::user()->id]])->get()) {
+                app('App\Http\Controllers\SalaryController')->addSalary(Auth::user(), 200);
+            }
+        }
+
         $lead = Lead::create($data);
         return redirect()->route('leads.index');
     }
@@ -505,7 +518,7 @@ class LeadsController extends Controller
             $lead->update(['status' => 'in-work']);
             $manager->status = 'on-meeting';
             $manager->save();
-            $operator->salary += 150;
+            app('\App\Http\Controllers\SalaryController')->addSalary($operator, 120);
             $operator->save();
         } else if ($data['status'] == 'exited') {
             $manager->status = 'free';
@@ -518,19 +531,7 @@ class LeadsController extends Controller
     public function closeLeadMeeting(Lead $lead, Request $request)
     {
         $data = \request()->all();
-//        $documents = array();
-//        if ($files = $request->file('documents')) {
-//            $i = 1;
-//            foreach ($files as $file) {
-//                $name = Carbon::now()->toDateString() . '-' . $lead->client_fullname . '-' . Auth::user()->name . '-' . $i . '.' . $file->extension();
-////                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
-//                $file->move('documents', $name);
-//                $documents[] = $name;
-//                $i++;
-//            }
-//        }
 
-//        $lead->update(['documents' => implode("|", $documents), 'check' => $data['check'], 'status' => 'in-work', 'note' => $data['note']]);
         $lead->update(['check' => $data['check'], 'status' => 'in-work',]);
         return redirect()->back();
     }
@@ -579,13 +580,13 @@ class LeadsController extends Controller
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         switch ($type) {
             case 'all':
-                return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['manager_id', '=', $manager_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['manager_id', '=', $manager_id]])->get();
             case 'successful':
-                return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', '=', 'completed'], ['manager_id', '=', $manager_id]])->orWhere([['status', '=', 'in-work'], ['manager_id', '=', $manager_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'completed'], ['manager_id', '=', $manager_id]])->orWhere([['status', '=', 'in-work'], ['manager_id', '=', $manager_id]])->get();
             case 'declined':
-                return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', '=', 'declined'], ['manager_id', '=', $manager_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['manager_id', '=', $manager_id]])->get();
             default:
-                return Lead::whereBetween('meeting_date', [$startDate, $endDate])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->get();
         }
     }
 
@@ -676,6 +677,7 @@ class LeadsController extends Controller
             $days[$day - 1]['meetings'] += 1;
             $days[$day - 1]['products_selled'] += $lead['check'];
             $days[$day - 1]['products_issued'] += $lead['issued'];
+            $days[$day - 1]['products_confirmed'] += $lead->repair ? $lead->repair->check : 0;
             $totalMeetings++;
         }
 
@@ -717,6 +719,7 @@ class LeadsController extends Controller
         $totalWorkDays = 0;
         $totalSelled = 0;
         $totalIssued = 0;
+        $totalConfirmed = 0;
 
         foreach ($days as $day) {
             if ($day['meetings'] != 0) {
@@ -724,13 +727,14 @@ class LeadsController extends Controller
             }
             $totalSelled += $day['products_selled'];
             $totalIssued += $day['products_issued'];
+            $totalConfirmed += $day['products_confirmed'];
         }
 
         $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
 
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed'));
         }
 
 

@@ -28,4 +28,24 @@ class Repair extends Model
         return $this->belongsTo(User::class, 'master_id');
     }
 
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class, 'repair_id');
+    }
+
+    public function materials()
+    {
+        return $this->hasManyThrough(NomenclatureExpense::class, Expense::class, 'repair_id', 'expense_id');
+    }
+
+    public function materialPrice()
+    {
+        $materials = $this->materials;
+        $summ = 0;
+        foreach ($materials as $material) {
+            $summ += $material->quantity * $material->nomenclature->price;
+        }
+        return $summ;
+    }
+
 }

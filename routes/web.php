@@ -80,11 +80,19 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('director.manager.leads.close');
     Route::patch('/director/plan/change', [App\Http\Controllers\DirectorController::class, 'changePlan'])->name('director.changeplan');
     Route::get('/director/daily', [App\Http\Controllers\DirectorController::class, 'daily'])->name('director.daily');
+
     Route::get('/director/leads/{lead}/accept', [App\Http\Controllers\DirectorController::class, 'acceptLeadView'])->name('director.leads.accept');
-    Route::patch('/director/leads/{lead}/close', [App\Http\Controllers\DirectorController::class, 'closeLead'])->name('director.leads.close');
+    Route::patch('/director/leads/{lead}/close', [App\Http\Controllers\DirectorController::class, 'closeLead'])->name('director.close.lead');
+    Route::patch('/director/leads/{lead}/close/null', [App\Http\Controllers\DirectorController::class, 'closeLeadNull'])->name('director.leads.close.null');
+
+
     Route::get('/director/nomenclature', [App\Http\Controllers\DirectorController::class, 'nomenclature'])->name('director.nomenclature');
     Route::get('/director/nomenclature/add', [App\Http\Controllers\DirectorController::class, 'addNomenclature'])->name('director.add.nomenclature');
+    Route::get('/director/nomenclature/{nomenclature}/edit', [App\Http\Controllers\DirectorController::class, 'editNomenclature'])->name('director.edit.nomenclature');
+    Route::patch('/director/nomenclature/{nomenclature}/update', [App\Http\Controllers\DirectorController::class, 'updateNomenclature'])->name('director.update.nomenclature');
     Route::post('/director/nomenclature/store', [App\Http\Controllers\DirectorController::class, 'storeNomenclature'])->name('director.store.nomenclature');
+
+
     Route::get('/director/receipt/new', [App\Http\Controllers\DirectorController::class, 'receipt'])->name('director.receipt');
     Route::post('/director/receipt/store', [App\Http\Controllers\DirectorController::class, 'newReceipt'])->name('director.receipt.store');
 

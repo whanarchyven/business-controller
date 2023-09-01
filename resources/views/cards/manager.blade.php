@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('title')
+    {{'- Карточка'}}
+@endsection
 @section('content')
     <div class="container">
         <div class="d-flex align-items-center gap-3 my-3">
@@ -68,6 +70,7 @@
             @endrole
         </div>
 
+        @role('manager')
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
@@ -83,6 +86,25 @@
                     месяц</a>
             </div>
         </div>
+        @endrole
+        @role('director')
+        <div class="d-flex justify-content-between">
+            <div>
+                <a class="bg-secondary px-4 rounded-2 py-2 text-white"
+                   href="/director/manager/{{$manager->id}}?date={{$prevMonthLink}}">Предыдущий
+                    месяц</a>
+            </div>
+            <div id="date-head">
+                <p class="fs-3">{{$dateTitle}}</p>
+            </div>
+            <div>
+                <a class="bg-secondary px-4 rounded-2 py-2 text-white"
+                   href="/director/manager/{{$manager->id}}?date={{$nextMonthLink}}">Следующий
+                    месяц</a>
+            </div>
+        </div>
+        @endrole
+
 
         <div class="">
             <table class="table table-bordered table-sm table-secondary ">
@@ -175,8 +197,49 @@
                     @endforeach
                     <th class="fw-normal  text-center" scope="row">{{$totalIssued}}</th>
                 </tr>
+                <tr>
+                    <th scope="col" class="fw-normal text-center">ТО Зачёт</th>
+                    @foreach($days as $day)
+                        @if($day['meetings']!=0)
+                            <th class="fw-normal text-center" scope="col">{{$day['products_confirmed']}}</th>
+                        @else
+                            <th class="fw-normal text-center" scope="col"></th>
+                        @endif
+                    @endforeach
+                    <th class="fw-normal  text-center" scope="row">{{$totalConfirmed}}</th>
+                </tr>
 
 
+                </tbody>
+
+            </table>
+
+
+            <table class="table table-bordered table-sm table-secondary ">
+                <thead>
+                <tr>
+                    <th class="fw-bold text-center" scope="col">% ТО</th>
+                    <th class="fw-bold text-center" scope="col">% отказ</th>
+                    <th class="fw-bold text-center" scope="col">Оклад</th>
+                    <th class="fw-bold text-center" scope="col">Рабочих дней</th>
+                    <th class="fw-bold text-center" scope="col">Факт. оклад</th>
+                    <th class="fw-bold text-center" scope="col">Общ.сумма удержаний</th>
+                    <th class="fw-bold text-center" scope="col">Сумма к выдаче</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.2}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.05}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{$manager->bet?$manager->bet*count($days):'Не назначено'}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{$manager->bet?$manager->bet*$totalWorkDays:'-'}}</th>
+                    <th class="fw-normal text-center" scope="col">0</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{($totalConfirmed*0.2)+($totalConfirmed*0.05)+($manager->bet?$manager->bet*$totalWorkDays:0)}}</th>
+                </tr>
                 </tbody>
 
             </table>

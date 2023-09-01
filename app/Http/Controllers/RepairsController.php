@@ -161,6 +161,21 @@ class RepairsController extends Controller
             "status" => "",
         ]);
 
+
+        if ($data['status'] == 'completed') {
+            $repair->check = $repair->lead->issued;
+            $repair->save();
+            $repair->lead->getManagerId->salary($repair->check * 0.2);
+            $repair->master->salary($repair->check * 0.1);
+        }
+
+        if (($data['status'] == 'declined' || $data['status'] == 'in-work') && $repair->status == 'completed') {
+            $repair->check = $repair->lead->issued;
+            $repair->save();
+            $repair->lead->getManagerId->salary($repair->check * -0.2);
+            $repair->master->salary($repair->check * -0.1);
+        }
+
         $repair->update($data);
 
         return redirect()->back();
@@ -199,7 +214,7 @@ class RepairsController extends Controller
         if ($files = $request->file('documents')) {
             $i = 1;
             foreach ($files as $file) {
-                $name = Carbon::now()->toDateString() . '-' . $repair->lead->client_fullname . '-' . $repair->lead->city . '-' . $i . '.' . $file->extension();
+                $name = Carbon::now()->toDateString() . '-' . $repair->lead->client_fullname . '-' . $repair->lead->city . '-' . $i . '_' . rand(0, 16000) . '.' . $file->extension();
 //                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $repair->lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
                 $file->move('documents', $name);
                 $documents[] = $name;
@@ -212,7 +227,7 @@ class RepairsController extends Controller
 
         $lead->update(["meeting_date" => $data['meeting_date'],
             "city" => $city->name,
-            "subcity" => $data['subcity'],
+            "subcity" => array_key_exists('subcity', $data) ? $data['subcity'] : $lead->subcity,
             "address" => $data['address'],
             "phone" => $data['phone'],
             "job_type" => $data['job_type'],
@@ -223,12 +238,12 @@ class RepairsController extends Controller
         ]);
         $lead->save();
 
+
         $repair->update([
             "contract_number" => $data['contract_number'],
             "works" => $data['works'],
             "master_id" => $data['master_id'],
-            "documents" => implode('|', $documents),
-            "status" => $data["status"],
+            "documents" => $repair->documents . '|' . implode('|', $documents),
             "repair_date" => $data['repair_date'],
             "check" => $data['issued']
 
@@ -236,6 +251,7 @@ class RepairsController extends Controller
         $repair->save();
 
         return (redirect(route('repairs.index')));
-
     }
+
+
 }

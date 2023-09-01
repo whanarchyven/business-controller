@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Новый сотрудник'}}
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
@@ -57,6 +61,11 @@
                                                 <option value="{{$coordinator->id}}">{{$coordinator->name}}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+
+                                    <div class="form-group my-2">
+                                        <label for="bet">Оклад (дневная ставка)</label>
+                                        <input type="tel" class="form-control" id='bet' name="bet" list="bet">
                                     </div>
 
                                     <label for="documents">Документы</label>

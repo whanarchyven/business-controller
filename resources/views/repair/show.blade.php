@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Таблица ремонтов'}}
+@endsection
+
 @section('content')
     <div class="container">
 
@@ -127,11 +131,14 @@
                             </th>
                             <th class="fw-bold bg-completed text-left" scope="col">
                                 <p class="m-0 fw-normal">Сумма ремонта: {{$repair->lead->issued}}</p>
-                                <p class="m-0 fw-normal">Стоимость материала: {{$repair->lead->issued*0.1}}</p>
+                                <p class="m-0 fw-normal">Стоимость материала: {{$repair->materialPrice()}}</p>
                                 <p class="m-0 fw-normal">ЗП мастера: {{$repair->lead->issued*0.1}}</p>
                                 <p class="m-0 fw-normal">ЗП менеджера: {{$repair->lead->issued*0.2}}</p>
-                                <p class="m-0 fw-normal">Прочие затраты: {{$repair->lead->issued*0.05}}</p>
-                                <p class="m-0 fw-normal">Прибыль: {{$repair->lead->issued*0.55}} - 55%</p>
+                                <p class="m-0 fw-normal">Прочие затраты: 0</p>
+                                <p class="m-0 fw-normal">Прибыль: {{$repair->lead->issued*0.7-$repair->materialPrice()}}
+                                    -
+                                    {{round(($repair->lead->issued*0.7-$repair->materialPrice())/($repair->lead->issued)*100)}}
+                                    %</p>
 
                             </th>
                         </tr>

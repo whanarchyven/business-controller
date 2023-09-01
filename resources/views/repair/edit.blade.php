@@ -1,12 +1,57 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Карточка ремонта'}}
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header fs-1 d-flex justify-content-center">Ремонт от {{$repair->repair_date}}
-                        на {{$repair->lead->issued}}/{{$repair->lead->avance}}</div>
+                    <div
+                        class="card-header fs-1 d-flex flex-column {{$repair->status=='completed'?'bg-completed':''}} {{$repair->status=='declined'?'bg-declined':''}} align-items-center justify-content-center">
+                        <p>Ремонт от {{$repair->repair_date}}
+                            на {{$repair->lead->issued}}/{{$repair->lead->avance}}</p>
+                        <div class="d-flex gap-2 w-100 col-2">
+                            <div id="status" class="btn w-25 btn-secondary">
+                                Статус
+                            </div>
+                            <div id="docs" class="btn w-25 btn-primary">
+                                Документы
+                            </div>
+                        </div>
+                        <div id="status-panel" class="d-none">
+                            <form action="{{route('repairs.update',$repair)}}" method="post">
+                                @csrf
+                                @method('patch')
+                                <input type="hidden" name="status" value="completed"/>
+                                <input type="submit" class="btn w-100 btn-success" value="Закрыть"/>
+                            </form>
+                            <form action="{{route('repairs.update',$repair)}}" method="post">
+                                @csrf
+                                @method('patch')
+                                <input type="hidden" name="status" value="declined"/>
+                                <input type="submit" class="btn w-100 btn-danger" value="Отказ"/>
+                            </form>
+                            <form action="{{route('repairs.update',$repair)}}" method="post">
+                                @csrf
+                                @method('patch')
+                                <input type="hidden" name="status" value="in-work"/>
+                                <input type="submit" class="btn w-100 btn-warning" value="Вернуть в работу"/>
+                            </form>
+                        </div>
+                        <div id="documents-panel" class="d-none">
+                            @foreach($documents as $document)
+                                @if(!$loop->first)
+                                    <a href="{{ URL::to('/documents') }}/{{$document}}"
+                                       class="w-100 border border-2 border-black d-flex"><img
+                                            class="w-100 object-fit-cover"
+                                            src="{{ URL::to('/documents') }}/{{$document}}"/></a>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
 
                     <div class="card-body">
                         @if (session('status'))
@@ -29,7 +74,7 @@
                                                list="meeting_date">
                                     </div>
                                     <label for="status">Статус</label>
-                                    <select id="status" class="form-control" name="status"
+                                    <select disabled id="status" class="form-control" name="status"
                                     >
                                         <option {{$repair->status=='in-work'?'selected':''}} value="in-work">В работе
                                         </option>
@@ -159,14 +204,14 @@
                                            class="my-2 form-control"
                                            name="documents[]"
                                            placeholder="Документы" multiple>
-                                    <div class="d-flex  p-2  gap-3">
-                                        @foreach($documents as $document)
-                                            <a href="{{ URL::to('/documents') }}/{{$document}}"
-                                               class="w-25 border border-2 border-black d-flex"><img
-                                                    class="w-100 object-fit-cover"
-                                                    src="{{ URL::to('/documents') }}/{{$document}}"/></a>
+                                    <div class="border  border-1 border-black p-1">
+                                        <p class="fw-bold">Выданные материалы</p>
+                                        @foreach($repair->materials as $material)
+                                            <p>{{$material->nomenclature->name}}
+                                                - {{$material->quantity}} {{$material->nomenclature->unit}}</p>
                                         @endforeach
                                     </div>
+
                                 </div>
 
                             </div>
@@ -180,44 +225,18 @@
 
 
                         <script>
-                            const subcityData = {
-                                "Москва": ["", "Люберцы", "Реутов", "Домодедово"],
-                                "Санкт-Петербург": ["", "Пушкин", "Колпино", "Петергоф"],
-                                "Новосибирск": ["", "Бердск", "Искитим", "Обь"],
-                                "Екатеринбург": ["", "Лесной", "Верхняя Пышма", "Ревда"],
-                                "Нижний Новгород": ["", "Бор", "Дзержинск", "Саров"],
-                                "Казань": ["", "Набережные Челны", "Зеленодольск", "Елабуга"],
-                                "Челябинск": ["", "Магнитогорск", "Златоуст", "Копейск"],
-                                "Омск": ["", "Тара", "Исилькуль", "Калачинск"],
-                                "Самара": ["", "Тольятти", "Новокуйбышевск", "Жигулевск"],
-                                "Ростов-на-Дону": ["", "Шахты", "Батайск", "Новочеркасск"],
-                                // Добавьте здесь другие города и адреса
-                            };
-
-                            function updateSubcityOptions() {
-                                const citySelect = document.getElementById("city-input");
-                                console.log(citySelect);
-                                const subcitySelect = document.getElementById("subcity");
-                                const selectedCity = citySelect.value;
-
-                                // Очищаем список адресов
-                                subcitySelect.innerHTML = "";
-
-                                if (selectedCity) {
-                                    const subcityes = subcityData[selectedCity];
-                                    if (subcityes) {
-                                        // Заполняем список адресов для выбранного города
-                                        subcityes.forEach((subcity) => {
-                                            const option = document.createElement("option");
-                                            option.value = subcity;
-                                            option.text = subcity;
-                                            subcitySelect.appendChild(option);
-                                        });
-                                    }
+                            document.getElementById('status').addEventListener('click', () => {
+                                document.getElementById('status-panel').className = 'd-flex gap-2 mt-4 w-100'
+                                if (document.getElementById('documents-panel')) {
+                                    document.getElementById('documents-panel').className = 'd-none'
                                 }
-                            }
-
-                            document.addEventListener('DOMContentLoaded', updateSubcityOptions)
+                            })
+                            document.getElementById('docs').addEventListener('click', () => {
+                                document.getElementById('documents-panel').className = 'd-flex flex-column gap-3 mt-4'
+                                if (document.getElementById('status-panel')) {
+                                    document.getElementById('status-panel').className = 'd-none'
+                                }
+                            })
                         </script>
                     </div>
                 </div>

@@ -250,9 +250,8 @@ class DirectorController extends Controller
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
-        $user = Auth::user();
 
-        return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', '=', 'in-work']])->get();
+        return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'in-work']])->get();
     }
 
     public function daily(Request $request)
@@ -363,7 +362,17 @@ class DirectorController extends Controller
                 $i++;
             }
         }
-        $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents)]);
+
+        $suka = Lead::whereDate("created_at", Carbon::today())->where(["manager_id" => $lead->getManagerId->id, "status" => 'completed'])->first();
+
+        if ($suka == null) {
+            $lead->getManagerId->salary($lead->getManagerId->bet);
+        }
+
+        //здесь будем бонусы выписывать
+
+        $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents), "status" => 'completed']);
+
 
         $repair = new Repair();
         $repair->lead_id = $lead->id;
@@ -375,23 +384,51 @@ class DirectorController extends Controller
         return redirect(route('director.daily'));
     }
 
+
+    public function closeLeadNull(Lead $lead)
+    {
+
+        $lead->status = 'declined';
+        $lead->save();
+
+        return redirect(route('director.daily'));
+    }
+
     public function nomenclature()
     {
         $nomenclature = Nomenclature::all();
 
-        return (view('roles.director.nomenclature', compact('nomenclature')));
+        return (view('nomenclature.show', compact('nomenclature')));
     }
 
     public function addNomenclature()
     {
-        return (view('roles.director.add_nomenclature'));
+        return (view('nomenclature.new'));
+    }
+
+    public function editNomenclature(Nomenclature $nomenclature)
+    {
+        return (view('nomenclature.edit', compact('nomenclature')));
+    }
+
+    public function updateNomenclature(Nomenclature $nomenclature, Request $request)
+    {
+        $data = $request->validate([
+            'name' => '',
+            'unit' => '',
+            'price' => '',
+        ]);
+        $nomenclature->update($data);
+
+        return (redirect(route('director.nomenclature')));
     }
 
     public function storeNomenclature(Request $request)
     {
         $data = $request->validate([
             'name' => '',
-            'unit' => ''
+            'unit' => '',
+            'price' => ''
         ]);
         $nomenclature = new Nomenclature($data);
         $nomenclature->remain = 0;
@@ -414,7 +451,9 @@ class DirectorController extends Controller
         $receipt->author = Auth::user()->id;
         $receipt->save();
 
-        for ($i = 1; $i < count($date) - 4; $i++) {
+        $date = array_slice($date, 2, count($date));
+
+        for ($i = 1; $i <= count($date) / 2; $i++) {
             $nomenclature_receipt = new NomenclatureReceipt();
             $nomenclature_receipt->quantity = $date['quantity' . $i];
             $nomenclature_receipt->nomenclature_id = $date['nomenclature' . $i];
@@ -446,11 +485,13 @@ class DirectorController extends Controller
         $date = $request->all();
 
         $expense = new Expense();
-        $expense->author = $repair->master ? $repair->master->name : Auth::user()->id;
+        $expense->author = $repair->master ? $repair->master->id : Auth::user()->id;
         $expense->repair_id = $repair->id;
         $expense->save();
 
-        for ($i = 1; $i < count($date) - 4; $i++) {
+        $date = array_slice($date, 2, count($date));
+
+        for ($i = 1; $i <= count($date) / 2; $i++) {
             $nomenclature_expense = new NomenclatureExpense();
             $nomenclature_expense->quantity = $date['quantity' . $i];
             $nomenclature_expense->nomenclature_id = $date['nomenclature' . $i];
@@ -516,6 +557,7 @@ class DirectorController extends Controller
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
+        $newUser->bet = $data['bet'];
         $newUser->save();
         switch ($data['role']) {
             case 'operator':

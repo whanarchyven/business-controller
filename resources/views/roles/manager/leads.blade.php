@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Активные заявки'}}
+@endsection
+
 @section('content')
     <div class="container">
 

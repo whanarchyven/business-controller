@@ -1,11 +1,16 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Выдача материала'}}
+@endsection
+
 @section('content')
     <div class="container">
 
         <div class="">
             <div class="bd-cyan-500">
                 <p class="fw-bold m-0 fs-2">Выдача материала</p>
+                <p class="fw-normal m-0 fs-4">Активные ремонты</p>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>

@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Таблица контроля'}}
+@endsection
+
 @section('content')
     <div class="container">
 

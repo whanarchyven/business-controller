@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('title')
+    {{'- Дневная сводка'}}
+@endsection
 @section('content')
     <div class="container">
 
@@ -68,7 +70,7 @@
                                 @if($lead->check)
                                     <p class="fw-bold">{{$lead->check}}</p>
                                 @else
-                                    <p class="fw-normal"></p>
+                                    <p class="fw-bold">0</p>
                                 @endif
                             </th>
                             <th class="p-3 fw-bold text-left" scope="col">

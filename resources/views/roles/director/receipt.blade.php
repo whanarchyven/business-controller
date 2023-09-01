@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Приход материала'}}
+@endsection
+
 @section('content')
     <div class="container">
 

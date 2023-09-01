@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return ManagerCoordinator::where([['coordinator_id', '=', Auth::user()->id]])->get();
     }
+
+    public function salary($salary)
+    {
+        app(\App\Http\Controllers\SalaryController::class)->addSalary($this, $salary);
+    }
 }

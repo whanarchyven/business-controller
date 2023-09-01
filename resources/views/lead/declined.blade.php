@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Отказанные заявки'}}
+@endsection
+
 @section('content')
     <div class="container">
 
@@ -61,7 +65,7 @@
             </table>
 
             <div class="bd-cyan-500">
-                <p class="fs-3 text-indigo">{{$city}} {{$formattedDate}}</p>
+                <p class="fs-3 text-indigo">Отклонённые {{$formattedDate}}</p>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>

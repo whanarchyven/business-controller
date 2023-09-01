@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Карточка'}}
+@endsection
+
 @section('content')
     <div class="container">
         <p class="fs-2 fw-bold">{{$user->name}}</p>

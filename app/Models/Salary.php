@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Nomenclature extends Model
+class Salary extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'unit', 'remain', 'price'];
+    protected $fillable = ['user_id', 'month', 'year'];
 }

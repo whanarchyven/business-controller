@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Создание заявки'}}
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
@@ -46,11 +50,11 @@
                                     <label for="address">Адрес</label>
                                     <input type="text" class="form-control" id='address' name="address" list="address">
                                 </div>
-                                <div class="form-group my-2">
-                                    <label for="meeting_date">Дата встречи</label>
-                                    <input type="date" class="form-control" id='meeting_date' name="meeting_date"
-                                           list="meeting_date">
-                                </div>
+                                {{--                                <div class="form-group my-2">--}}
+                                {{--                                    <label for="meeting_date">Дата встречи</label>--}}
+                                {{--                                    <input type="date" class="form-control" id='meeting_date' name="meeting_date"--}}
+                                {{--                                           list="meeting_date">--}}
+                                {{--                                </div>--}}
                                 <div class="form-group my-2">
                                     <label for="time_period">Ожидает в </label>
                                     <select id="time_period" class="form-control" name="time_period">

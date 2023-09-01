@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Выдача материала'}}
+@endsection
+
 @section('content')
     <div class="container">
 
@@ -30,7 +34,7 @@
                     </div>
                 </div>
                 <p id="new-btn" class="text-primary mt-2 link-primary link-underline">Добавить позицию</p>
-                <input class="btn btn-success" type="submit" value="Провести приход"/>
+                <input class="btn btn-success" type="submit" value="Провести расход"/>
             </form>
         </div>
 

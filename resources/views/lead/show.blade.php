@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+    {{'- Оформленные заявки'}}
+@endsection
+
 @section('content')
     <div class="container">
 
