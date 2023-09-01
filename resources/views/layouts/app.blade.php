@@ -146,34 +146,33 @@
 
                 @role('director')
                 <ul class="navbar-nav d-flex flex-row container align-items-center justify-content-around ">
-
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            Сотрудники
+                            Заявки
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('director.employers.new') }}">
-                                Новый сотрудник
+                            <a class="dropdown-item" href="{{ route('leads.create') }}">
+                                Создать заявку
                             </a>
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Руководитель--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Координатор--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Менеджер--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Оператор--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Мастер--}}
-                            {{--                            </a>--}}
+                            <a class="dropdown-item" href="{{route('leads.index')}}">
+                                Оформленные заявки
+                            </a>
+                            <a class="dropdown-item"
+                               href="{{route('leads.declined')}}">
+                                Отклонённые заявки
+                            </a>
+                            <a class="dropdown-item"
+                               href="{{route('director.daily')}}">
+                                Дневная сводка
+                            </a>
+                            <a class="dropdown-item" href="{{ route('director.managers') }}">
+                                Таблица контроля
+                            </a>
                         </div>
                     </li>
+
 
                     {{--                    <li class="nav-item dropdown">--}}
                     {{--                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"--}}
@@ -231,29 +230,31 @@
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            Заявки
+                            Сотрудники
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('leads.create') }}">
-                                Создать заявку
+                            <a class="dropdown-item" href="{{ route('director.employers.new') }}">
+                                Новый сотрудник
                             </a>
-                            <a class="dropdown-item" href="{{route('leads.index')}}">
-                                Оформленные заявки
-                            </a>
-                            <a class="dropdown-item"
-                               href="{{route('leads.declined')}}">
-                                Отклонённые заявки
-                            </a>
-                            <a class="dropdown-item"
-                               href="{{route('director.daily')}}">
-                                Дневная сводка
-                            </a>
-                            <a class="dropdown-item" href="{{ route('director.managers') }}">
-                                Таблица контроля
-                            </a>
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Руководитель--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Координатор--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Менеджер--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Оператор--}}
+                            {{--                            </a>--}}
+                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
+                            {{--                                Мастер--}}
+                            {{--                            </a>--}}
                         </div>
                     </li>
+
 
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
