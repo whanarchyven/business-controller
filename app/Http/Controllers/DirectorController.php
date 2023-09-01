@@ -133,8 +133,7 @@ class DirectorController extends Controller
     {
 
         $data = $request->all();
-
-
+        $user = Auth::user();
         if ($data && $data['city']) {
             $city_id = $data['city'];
         } else {
@@ -172,7 +171,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -251,7 +250,13 @@ class DirectorController extends Controller
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
 
-        return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'in-work']])->get();
+        $city = City::where(["id" => Auth::user()->city])->first();
+
+        if (Auth::user()->isAdmin) {
+            return Lead::where([['status', '=', 'in-work']])->orWhere([['status', '=', 'completed']])->whereBetween('created_at', [$startDate, $endDate])->get()->reverse();
+        } else {
+            return Lead::where([['status', '=', 'in-work'], ['city', '=', $city->name]])->orWhere([['status', '=', 'completed'], ['city', '=', $city->name]])->whereBetween('created_at', [$startDate, $endDate])->get()->reverse();
+        }
     }
 
     public function daily(Request $request)
@@ -364,7 +369,6 @@ class DirectorController extends Controller
         }
 
         $suka = Lead::whereDate("created_at", Carbon::today())->where(["manager_id" => $lead->getManagerId->id, "status" => 'completed'])->first();
-
         if ($suka == null) {
             $lead->getManagerId->salary($lead->getManagerId->bet);
         }
@@ -376,7 +380,7 @@ class DirectorController extends Controller
 
         $repair = new Repair();
         $repair->lead_id = $lead->id;
-        $repair->check = $data['issued'];
+        $repair->check = 0;
         $repair->repair_date = $data['repair_date'];
         $repair->save();
 
@@ -510,6 +514,8 @@ class DirectorController extends Controller
     {
         $cities = City::all();
 
+        $director = Auth::user();
+
         $users = User::where(["city" => Auth::user()->city])->get();
 
         $coordinators = array();
@@ -521,7 +527,7 @@ class DirectorController extends Controller
         }
 
 
-        return view('roles.director.employer.new', compact('cities', 'coordinators'));
+        return view('roles.director.employer.new', compact('cities', 'coordinators', 'director'));
     }
 
     public function storeNewUser(Request $request)
@@ -553,11 +559,12 @@ class DirectorController extends Controller
         $newUser->name = $data['name'];
         $newUser->email = $data['email'];
         $newUser->password = bcrypt($data['password']);
-        $newUser->city = Auth::user()->city;
+        $newUser->city = array_key_exists('city', $data) ? $data['city'] : Auth::user()->city;
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
         $newUser->bet = $data['bet'];
+        $newUser->isAdmin = 0;
         $newUser->save();
         switch ($data['role']) {
             case 'operator':
@@ -572,6 +579,9 @@ class DirectorController extends Controller
                 break;
             case 'coordinator':
                 $newUser->roles()->attach($coordinator);
+                break;
+            case 'director':
+                $newUser->roles()->attach($director);
                 break;
         }
         return redirect()->back();

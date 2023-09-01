@@ -25,21 +25,18 @@
                                     <label for="city">Город:</label>
                                     <input type="text" class="form-control" id='city-input' name="city" list="city"
                                            onchange="updateSubcityOptions()">
-                                    <datalist id="city">
-                                        <option value="" disabled selected>Выберите город</option>
-                                        {{--                            <option value="Москва">Москва</option>--}}
-                                        {{--                            <option value="Санкт-Петербург">Санкт-Петербург</option>--}}
-                                        {{--                            <option value="Новосибирск">Новосибирск</option>--}}
-                                        {{--                            <option value="Екатеринбург">Екатеринбург</option>--}}
-                                        {{--                            <option value="Нижний Новгород">Нижний Новгород</option>--}}
-                                        {{--                            <option value="Казань">Казань</option>--}}
-                                        {{--                            <option value="Челябинск">Челябинск</option>--}}
-                                        {{--                            <option value="Омск">Омск</option>--}}
-                                        {{--                            <option value="Самара">Самара</option>--}}
-                                        {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
-                                        @foreach($cities as $city)
-                                            <option class="" value="{{$city->name}}"></option>
-                                        @endforeach
+                                    <datalist {{!$user->isAdmin?`disabled`:''}} id="city">
+                                        @if($user->isAdmin)
+                                            @foreach($cities as $city)
+                                                <option class="" value="{{$city->name}}"></option>
+                                            @endforeach
+                                        @else
+                                            @foreach($cities as $city)
+                                                @if($city->id==$user->city)
+                                                    <option class="" selected value="{{$city->name}}"></option>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     </datalist>
                                 </div>
                                 <div class="form-group my-2">

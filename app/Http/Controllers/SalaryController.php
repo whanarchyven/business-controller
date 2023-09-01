@@ -21,6 +21,7 @@ class SalaryController extends Controller
             $salary->save();
         } else {
             $salary = new Salary(["month" => $monthTemp, "year" => $yearTemp, "user_id" => $user->id, "salary" => $money]);
+            $salary->salary += $money;
             $salary->save();
         }
     }

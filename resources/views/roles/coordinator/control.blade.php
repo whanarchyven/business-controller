@@ -11,12 +11,23 @@
         @role('coordinator')
         <div class="">
             <div class="">
-                @foreach($cities as $city)
-                    <button
-                        class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
-                        onclick="window.location.href='/coordinator/?city={{$city->id}}'">{{$city->name}}
-                    </button>
-                @endforeach
+                @if($user->isAdmin)
+                    @foreach($cities as $city)
+                        <button
+                            class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
+                            onclick="window.location.href='/coordinator/?city={{$city->id}}'">{{$city->name}}
+                        </button>
+                    @endforeach
+                @else
+                    @foreach($cities as $city)
+                        @if($city->id==$user->city)
+                            <button
+                                class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
+                                onclick="window.location.href='/coordinator/?city={{$city->id}}'">{{$city->name}}
+                            </button>
+                        @endif
+                    @endforeach
+                @endif
                 <div class="container mt-3 row">
                     <div class="col-sm d-flex flex-column">
                         <p class="fs-3">{{$month}}</p>
@@ -216,12 +227,23 @@
         @role('director')
         <div class="">
             <div class="">
-                @foreach($cities as $city)
-                    <button
-                        class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
-                        onclick="window.location.href='/director/?city={{$city->id}}'">{{$city->name}}
-                    </button>
-                @endforeach
+                @if($user->isAdmin)
+                    @foreach($cities as $city)
+                        <button
+                            class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
+                            onclick="window.location.href='/director/?city={{$city->id}}'">{{$city->name}}
+                        </button>
+                    @endforeach
+                @else
+                    @foreach($cities as $city)
+                        @if($city->id==$user->city)
+                            <button
+                                class="btn {{$city->id==$city_id?'btn-secondary':'btn-outline-secondary'}} "
+                                onclick="window.location.href='/director/?city={{$city->id}}'">{{$city->name}}
+                            </button>
+                        @endif
+                    @endforeach
+                @endif
                 <div class="container mt-3 row">
                     <div class="col-sm d-flex flex-column">
                         <p class="fs-3">{{$month}}</p>

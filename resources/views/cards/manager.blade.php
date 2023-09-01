@@ -166,7 +166,7 @@
                 <tr>
                     <th scope="col" class="fw-normal text-center">Раб. день</th>
                     @foreach($days as $day)
-                        @if($day['meetings']!=0)
+                        @if($day['products_issued']!=0)
                             <th class="fw-bold text-center" scope="col">✓</th>
                         @else
                             <th class="fw-normal text-center" scope="col">✕</th>

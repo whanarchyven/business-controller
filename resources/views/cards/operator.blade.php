@@ -127,7 +127,7 @@
                             0
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->salary}}
+                            {{$user->getSalary()->salary}}
                         </th>
 
                     </tr>

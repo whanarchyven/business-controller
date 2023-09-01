@@ -49,8 +49,21 @@ class RepairsController extends Controller
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        $user = Auth::user();
+        $city = City::where(["id" => $user->city])->first();
 
-        return Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+        if ($user->isAdmin) {
+            return Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+        } else {
+            $temp = array();
+            $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == $city->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            return $temp;
+        }
     }
 
 
@@ -62,7 +75,19 @@ class RepairsController extends Controller
             $date = Carbon::now()->toDateString();
         }
         $user = Auth::user();
-        $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+        $city = City::where(["id" => $user->city])->first();
+        if ($user->isAdmin) {
+            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+        } else {
+            $temp = array();
+            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == $city->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
+        }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -162,18 +187,22 @@ class RepairsController extends Controller
         ]);
 
 
-        if ($data['status'] == 'completed') {
+        if ($data['status'] == 'completed' && ($repair->status == 'declined' || $repair->status == 'in-work')) {
             $repair->check = $repair->lead->issued;
             $repair->save();
             $repair->lead->getManagerId->salary($repair->check * 0.2);
-            $repair->master->salary($repair->check * 0.1);
+            if ($repair->master) {
+                $repair->master->salary($repair->check * 0.1);
+            };
         }
 
         if (($data['status'] == 'declined' || $data['status'] == 'in-work') && $repair->status == 'completed') {
-            $repair->check = $repair->lead->issued;
+            $repair->check = 0;
             $repair->save();
-            $repair->lead->getManagerId->salary($repair->check * -0.2);
-            $repair->master->salary($repair->check * -0.1);
+            $repair->lead->getManagerId->salary($repair->lead->issued * -0.2);
+            if ($repair->master) {
+                $repair->master->salary($repair->lead->issued * -0.1);
+            };
         }
 
         $repair->update($data);

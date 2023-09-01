@@ -45,9 +45,9 @@
 <div id="app">
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
-            <div class="clockpage">
+            <a href="/" class="clockpage text-black text-decoration-none">
                 <span class="fw-bold fs-4" id="clock"></span>
-            </div>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">

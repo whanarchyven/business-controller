@@ -51,6 +51,9 @@
                                             <option value="operator">Оператор</option>
                                             <option value="manager">Менеджер</option>
                                             <option value="coordinator">Координатор</option>
+                                            @if($director->isAdmin)
+                                                <option value="director">Руководитель</option>
+                                            @endif
                                         </select>
                                     </div>
 
@@ -63,7 +66,18 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group my-2">
+                                    @if($director->isAdmin)
+                                        <div id="city-form" class="my-2">
+                                            <label for="city">Город</label>
+                                            <select id="city" class="form-control" name="city">
+                                                @foreach($cities as $city)
+                                                    <option value="{{$city->id}}">{{$city->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endif
+
+                                    <div id="oklad" class="form-group my-2">
                                         <label for="bet">Оклад (дневная ставка)</label>
                                         <input type="tel" class="form-control" id='bet' name="bet" list="bet">
                                     </div>
