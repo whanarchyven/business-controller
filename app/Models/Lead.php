@@ -19,7 +19,7 @@ class Lead extends Model
 
     public function getManagerId()
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(User::class, 'manager_id')->withTrashed();
     }
 
     public function getOperatorId()

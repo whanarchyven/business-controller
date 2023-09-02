@@ -253,9 +253,9 @@ class DirectorController extends Controller
         $city = City::where(["id" => Auth::user()->city])->first();
 
         if (Auth::user()->isAdmin) {
-            return Lead::where([['status', '=', 'in-work']])->orWhere([['status', '=', 'completed']])->whereBetween('created_at', [$startDate, $endDate])->get()->reverse();
+            return Lead::whereDate('created_at', Carbon::today())->where([['status', '=', 'in-work']])->orWhere([['status', '=', 'completed']])->get()->reverse();
         } else {
-            return Lead::where([['status', '=', 'in-work'], ['city', '=', $city->name]])->orWhere([['status', '=', 'completed'], ['city', '=', $city->name]])->whereBetween('created_at', [$startDate, $endDate])->get()->reverse();
+            return Lead::whereDate('created_at', Carbon::today())->where([['status', '=', 'in-work'], ['city', '=', $city->name]])->orWhere([['status', '=', 'completed'], ['city', '=', $city->name]])->get()->reverse();
         }
     }
 
