@@ -125,6 +125,8 @@
                                         @method('patch')
                                         <input type="date" class="form-control"
                                                id='repair_date' name="repair_date" list="repair_date">
+                                        <input type="hidden" class="form-control"
+                                               id='status' value="{{$repair->status}}}" name="status" list="status">
                                         <input type="submit" class="btn btn-primary w-100" value="Перенос">
                                     </form>
                                 </div>
