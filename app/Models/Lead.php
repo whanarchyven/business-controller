@@ -24,11 +24,11 @@ class Lead extends Model
 
     public function getOperatorId()
     {
-        return $this->belongsTo(User::class, 'operator_id');
+        return $this->belongsTo(User::class, 'operator_id')->withTrashed();
     }
 
     public function repair()
     {
-        return $this->hasOne(Repair::class, 'lead_id');
+        return $this->hasOne(Repair::class, 'lead_id')->withTrashed();
     }
 }
