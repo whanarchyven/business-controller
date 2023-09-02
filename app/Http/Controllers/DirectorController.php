@@ -401,8 +401,8 @@ class DirectorController extends Controller
     public function nomenclature()
     {
         $nomenclature = Nomenclature::all();
-
-        return (view('nomenclature.show', compact('nomenclature')));
+        $user = Auth::user();
+        return (view('nomenclature.show', compact('nomenclature', 'user')));
     }
 
     public function addNomenclature()
@@ -510,6 +510,193 @@ class DirectorController extends Controller
         return (redirect(route('director.nomenclature')));
     }
 
+    public function managersView(Request $request)
+    {
+        $director = Auth::user();
+        $title = 'Менеджеры';
+        $role = 'Менеджер';
+        $link = 'managers';
+        $route_card = 'director.managercard';
+        if ($request->query('city') && $director->isAdmin) {
+            $city = $request->query('city');
+        } else {
+            $city = $director->city;
+        }
+        $city = City::where(["id" => $city])->first();
+
+        $cities = City::all();
+        $users = User::where(["city" => $city->id])->get();
+        $temp = array();
+        foreach ($users as $user) {
+            if ($user->hasRole('manager')) {
+                array_push($temp, $user);
+            }
+        }
+        $users = $temp;
+
+        $dismissed = User::onlyTrashed()->where(["city" => $city->id])->get();
+        $dismissed_temp = array();
+
+        foreach ($dismissed as $dis) {
+            if ($dis->hasRole('manager')) {
+                array_push($dismissed_temp, $dis);
+            }
+        }
+        $dismissed = $dismissed_temp;
+
+
+        return view('roles.director.employer.show', compact('users', 'city', 'title', 'director', 'cities', 'link', 'role', 'route_card', 'dismissed'));
+    }
+
+    public function operatorsView(Request $request)
+    {
+        $director = Auth::user();
+        $title = 'Операторы';
+        $role = 'Оператор';
+        $link = 'operator';
+        $route_card = 'director.operatorcard';
+
+        if ($request->query('city') && $director->isAdmin) {
+            $city = $request->query('city');
+        } else {
+            $city = $director->city;
+        }
+        $city = City::where(["id" => $city])->first();
+
+        $cities = City::all();
+        $users = User::where(["city" => $city->id])->get();
+        $temp = array();
+        foreach ($users as $user) {
+            if ($user->hasRole('operator')) {
+                array_push($temp, $user);
+            }
+        }
+        $users = $temp;
+
+
+        $dismissed = User::onlyTrashed()->where(["city" => $city->id])->get();
+        $dismissed_temp = array();
+
+        foreach ($dismissed as $dis) {
+            if ($dis->hasRole('operator')) {
+                array_push($dismissed_temp, $dis);
+            }
+        }
+        $dismissed = $dismissed_temp;
+        return view('roles.director.employer.show', compact('users', 'city', 'title', 'director', 'cities', 'link', 'role', 'route_card', 'dismissed'));
+    }
+
+    public function coordinatorsView(Request $request)
+    {
+        $director = Auth::user();
+        $title = 'Координаторы';
+        $role = 'Координатор';
+        $link = 'coordinator';
+        $route_card = 'director.coordinatorcard';
+
+        if ($request->query('city') && $director->isAdmin) {
+            $city = $request->query('city');
+        } else {
+            $city = $director->city;
+        }
+        $city = City::where(["id" => $city])->first();
+
+        $cities = City::all();
+        $users = User::where(["city" => $city->id])->get();
+        $temp = array();
+        foreach ($users as $user) {
+            if ($user->hasRole('coordinator')) {
+                array_push($temp, $user);
+            }
+        }
+        $users = $temp;
+
+        $dismissed = User::onlyTrashed()->where(["city" => $city->id])->get();
+        $dismissed_temp = array();
+
+        foreach ($dismissed as $dis) {
+            if ($dis->hasRole('coordinator')) {
+                array_push($dismissed_temp, $dis);
+            }
+        }
+        $dismissed = $dismissed_temp;
+        return view('roles.director.employer.show', compact('users', 'city', 'title', 'director', 'cities', 'link', 'role', 'route_card', 'dismissed'));
+    }
+
+
+    public function mastersView(Request $request)
+    {
+        $director = Auth::user();
+        $title = 'Мастера';
+        $role = 'Мастер';
+        $link = 'masters';
+        $route_card = 'director.mastercard';
+
+        if ($request->query('city') && $director->isAdmin) {
+            $city = $request->query('city');
+        } else {
+            $city = $director->city;
+        }
+        $city = City::where(["id" => $city])->first();
+
+        $cities = City::all();
+        $users = User::where(["city" => $city->id])->get();
+        $temp = array();
+        foreach ($users as $user) {
+            if ($user->hasRole('master')) {
+                array_push($temp, $user);
+            }
+        }
+        $users = $temp;
+        $dismissed = User::onlyTrashed()->where(["city" => $city->id])->get();
+        $dismissed_temp = array();
+
+        foreach ($dismissed as $dis) {
+            if ($dis->hasRole('master')) {
+                array_push($dismissed_temp, $dis);
+            }
+        }
+        $dismissed = $dismissed_temp;
+        return view('roles.director.employer.show', compact('users', 'city', 'title', 'director', 'cities', 'link', 'role', 'route_card', 'dismissed'));
+    }
+
+    public function directorsView(Request $request)
+    {
+        $director = Auth::user();
+        $title = 'Руководители';
+        $role = 'Руководитель';
+        $link = 'directors';
+        $route_card = 'director.directorcard';
+
+        if ($request->query('city') && $director->isAdmin) {
+            $city = $request->query('city');
+        } else {
+            $city = $director->city;
+        }
+        $city = City::where(["id" => $city])->first();
+
+        $cities = City::all();
+        $users = User::where(["city" => $city->id])->get();
+        $temp = array();
+        foreach ($users as $user) {
+            if ($user->hasRole('director') && !$user->isAdmin) {
+                array_push($temp, $user);
+            }
+        }
+        $users = $temp;
+        $dismissed = User::onlyTrashed()->where(["city" => $city->id])->get();
+        $dismissed_temp = array();
+
+        foreach ($dismissed as $dis) {
+            if ($dis->hasRole('director')) {
+                array_push($dismissed_temp, $dis);
+            }
+        }
+        $dismissed = $dismissed_temp;
+        return view('roles.director.employer.show', compact('users', 'city', 'title', 'director', 'cities', 'link', 'role', 'route_card', 'dismissed'));
+    }
+
+
     public function newUserView()
     {
         $cities = City::all();
@@ -558,12 +745,14 @@ class DirectorController extends Controller
         $newUser = new User();
         $newUser->name = $data['name'];
         $newUser->email = $data['email'];
+        $newUser->birth_date = $data['birth_date'];
         $newUser->password = bcrypt($data['password']);
         $newUser->city = array_key_exists('city', $data) ? $data['city'] : Auth::user()->city;
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
-        $newUser->bet = $data['bet'];
+        $newUser->bet = $data['bet'] ? $data['bet'] : 0;
+        $newUser->phone = $data['phone'];
         $newUser->isAdmin = 0;
         $newUser->save();
         switch ($data['role']) {
@@ -583,7 +772,60 @@ class DirectorController extends Controller
             case 'director':
                 $newUser->roles()->attach($director);
                 break;
+            case 'master':
+                $newUser->roles()->attach($master);
+                break;
         }
+        return redirect()->back();
+    }
+
+    public function updateUserView(User $user)
+    {
+        $director = Auth::user();
+        if (Auth::user()->isAdmin) {
+            $cities = City::all();
+        } else {
+            $cities = City::where(["id" => Auth::user()->city])->first();
+        }
+        return view('roles.director.employer.edit', compact('user', 'cities', 'director'));
+    }
+
+    public function updateUser(User $user, Request $request)
+    {
+        $data = $request->validate([
+            "name" => '',
+            "email" => '',
+            "birth_date" => '',
+            "password" => '',
+            "phone" => "",
+            "city" => '',
+            "bet" => '',
+        ]);
+
+        $user->name = $data['name'] ? $data['name'] : $user->name;
+        $user->email = $data['email'] ? $data['email'] : $user->email;
+        $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
+        $user->city = $data['city'] ? $data['city'] : $user->city;
+        $user->phone = $data['phone'] ? $data['phone'] : $user->phone;;
+        $user->bet = $data['bet'] ? $data['bet'] : $user->bet;
+        $user->password = $data['password'] ? bcrypt($data['password']) : $user->password;
+        $user->save();
+
+
+        return redirect()->back();
+    }
+
+    public function deleteUser(User $user)
+    {
+        $user->delete();
+        return redirect()->back();
+    }
+
+    public function restoreUser(Request $request)
+    {
+        $data = $request->all();
+//        dd($data);
+        User::where(["id" => $data['user']])->withTrashed()->restore();
         return redirect()->back();
     }
 }

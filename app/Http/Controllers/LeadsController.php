@@ -305,15 +305,14 @@ class LeadsController extends Controller
         return view('lead.create', compact('cities', 'user'));
     }
 
-    public function getLeadsByOperatorId(Request $request)
+    public function getLeadsByOperatorId(User $user, Request $request)
     {
         if ($request->query('date')) {
             $date = $request->query('date');
         } else {
             $date = Carbon::now()->toDateString();
         }
-
-        $user = Auth::user();
+        
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -360,7 +359,7 @@ class LeadsController extends Controller
 
         $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
 
-        $city = Auth::user()->city;
+        $city = $user->city;
 
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 

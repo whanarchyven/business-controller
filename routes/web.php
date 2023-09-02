@@ -35,7 +35,7 @@ Route::group(['middleware' => 'role:operator'], function () {
 //    Route::patch('/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'update'])->name('leads.update');
 //    Route::get('/leads/declined', [App\Http\Controllers\LeadsController::class, 'getDeclined'])->name('leads.declined');
 //    Route::post('/leads', [App\Http\Controllers\LeadsController::class, 'store'])->name('leads.store');
-    Route::get('/card/', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('card.operator');
+    Route::get('/card/{user}/', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('card.operator');
 });
 
 Route::group(['middleware' => 'role:manager'], function () {
@@ -75,6 +75,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('director.leads.manage');
     Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
     Route::get('/director/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('director.managercard');
+    Route::get('/director/operator/{user}', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('director.operatorcard');
     Route::patch('/director/managers/{manager}/status', [\App\Http\Controllers\ManagerController::class, 'changeManagerStatus'])->name('director.manager.status');
     Route::patch('/director/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('director.manager.leads.status');
     Route::patch('/director/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('director.manager.leads.close');
@@ -100,8 +101,21 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/expenses/{repair}/new', [App\Http\Controllers\DirectorController::class, 'newExpense'])->name('director.expense.new');
     Route::post('/director/expense/{repair}/store', [App\Http\Controllers\DirectorController::class, 'expenseStore'])->name('director.expense.store');
 
-    Route::get('/director/employers/', [App\Http\Controllers\DirectorController::class, 'newUserView'])->name('director.employers.new');
-    Route::post('/director/employers/', [App\Http\Controllers\DirectorController::class, 'storeNewUser'])->name('director.employers.store');
+
+    Route::get('/director/employers/managers', [App\Http\Controllers\DirectorController::class, 'managersView'])->name('director.employers.managers');
+    Route::get('/director/employers/operator', [App\Http\Controllers\DirectorController::class, 'operatorsView'])->name('director.employers.operators');
+    Route::get('/director/employers/coordinator', [App\Http\Controllers\DirectorController::class, 'coordinatorsView'])->name('director.employers.coordinators');
+    Route::get('/director/employers/masters', [App\Http\Controllers\DirectorController::class, 'mastersView'])->name('director.employers.masters');
+    Route::get('/director/employers/directors', [App\Http\Controllers\DirectorController::class, 'directorsView'])->name('director.employers.directors');
+
+    Route::get('/director/employers/new', [App\Http\Controllers\DirectorController::class, 'newUserView'])->name('director.employers.new');
+    Route::get('/director/employers/{user}/edit', [App\Http\Controllers\DirectorController::class, 'updateUserView'])->name('director.employers.edit');
+    Route::patch('/director/employers/{user}', [App\Http\Controllers\DirectorController::class, 'updateUser'])->name('director.employers.update');
+    Route::delete('/director/employers/{user}', [App\Http\Controllers\DirectorController::class, 'deleteUser'])->name('director.employers.delete');
+
+    Route::post('/director/employers/{user}/restore', [App\Http\Controllers\DirectorController::class, 'restoreUser'])->name('director.employers.restore');
+
+    Route::post('/director/employers/store', [App\Http\Controllers\DirectorController::class, 'storeNewUser'])->name('director.employers.store');
 
 
 });

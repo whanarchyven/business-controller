@@ -39,6 +39,11 @@
                                                name="name"
                                                list="name">
                                     </div>
+                                    <div class="form-group my-2">
+                                        <label for="birth_date">Дата рождения</label>
+                                        <input type="date" class="form-control" id='birth_date' name="birth_date"
+                                               list="birth_date">
+                                    </div>
 
 
                                     <div class="form-group my-2">
@@ -48,10 +53,11 @@
                                     <div class="form-group my-2">
                                         <label for="role">Должность</label>
                                         <select onchange="updateSubForm()" id="role" class="form-control" name="role">
-                                            <option value="operator">Оператор</option>
-                                            <option value="manager">Менеджер</option>
                                             <option value="coordinator">Координатор</option>
+                                            <option value="manager">Менеджер</option>
+                                            <option value="master">Мастер</option>
                                             @if($director->isAdmin)
+                                                <option value="operator">Оператор</option>
                                                 <option value="director">Руководитель</option>
                                             @endif
                                         </select>
@@ -77,7 +83,7 @@
                                         </div>
                                     @endif
 
-                                    <div id="oklad" class="form-group my-2">
+                                    <div id="oklad" class="d-none">
                                         <label for="bet">Оклад (дневная ставка)</label>
                                         <input type="tel" class="form-control" id='bet' name="bet" list="bet">
                                     </div>
@@ -102,9 +108,14 @@
                                 let select = document.querySelector("#role");
                                 console.log(select.value);
                                 if (select.value == 'manager') {
-                                    document.querySelector('#coordinator-form').className = 'form-group my-2'
+                                    document.querySelector('#coordinator-form').className = 'form-group my-2';
+                                    document.getElementById('oklad').className = 'form-group my-2';
+                                } else if (select.value == 'coordinator') {
+                                    document.querySelector('#coordinator-form').className = 'd-none'
+                                    document.getElementById('oklad').className = 'form-group my-2';
                                 } else {
                                     document.querySelector('#coordinator-form').className = 'd-none'
+                                    document.getElementById('oklad').className = 'd-none';
                                 }
                             }
 

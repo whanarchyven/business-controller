@@ -13729,8 +13729,11 @@ textarea.form-control-lg {
     background-color: #FF7701 !important;
 }
 
-@media screen and (max-width: 500px) {
-    .container {
-        width: 960px !important;
-    }
-}
+/*@media screen and (max-width: 500px) {*/
+/*    */
+/*}*/
+/*.container {*/
+/*    width: 1440px !important;*/
+/*}*/
+
+

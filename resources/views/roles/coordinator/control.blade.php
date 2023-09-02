@@ -311,15 +311,18 @@
                     <p class="fs-1 {{$plan?'text-black':'text-danger'}} m-0">
                         План: {{$plan?$plan->value:'Не назначено'}}
                         ({{$products_selled}}) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
-                    <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
-                        план {{$city_id}}</button>
-                    <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form" class="d-none">
-                        @csrf
-                        @method('patch')
-                        <input placeholder="Введите новый план" name="value" type="number" class="form-control"/>
-                        <input name="city" type="hidden" value="{{$city_id}}">
-                        <input type="submit" value="Изменить" class="btn h-50 fw-bold btn-warning"/>
-                    </form>
+                    @if($user->isAdmin)
+                        <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
+                            план {{$city_id}}</button>
+                        <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form"
+                              class="d-none">
+                            @csrf
+                            @method('patch')
+                            <input placeholder="Введите новый план" name="value" type="number" class="form-control"/>
+                            <input name="city" type="hidden" value="{{$city_id}}">
+                            <input type="submit" value="Изменить" class="btn h-50 fw-bold btn-warning"/>
+                        </form>
+                    @endif
                 </div>
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)

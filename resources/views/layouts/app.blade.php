@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{--    <meta name="viewport" content="width=device-width, initial-scale=1">--}}
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -64,7 +64,8 @@
                         </a>
                     </li>
                     <li class="nav-item mx-3 border border-dark p-2">
-                        <a class="dropdown-item fw-bold" href="{{ route('card.operator') }}">
+                        <a class="dropdown-item fw-bold"
+                           href="{{ route('card.operator',\Illuminate\Support\Facades\Auth::user()) }}">
                             Карточка
                         </a>
                     </li>
@@ -237,21 +238,26 @@
                             <a class="dropdown-item" href="{{ route('director.employers.new') }}">
                                 Новый сотрудник
                             </a>
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Руководитель--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Координатор--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Менеджер--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Оператор--}}
-                            {{--                            </a>--}}
-                            {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
-                            {{--                                Мастер--}}
-                            {{--                            </a>--}}
+                            @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                <a class="dropdown-item" href="{{route('director.employers.directors')}}">
+                                    Руководитель
+                                </a>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                <a class="dropdown-item" href="{{route('director.employers.operators')}}">
+                                    Оператор
+                                </a>
+                            @endif
+                            <a class="dropdown-item" href="{{route('director.employers.coordinators')}}">
+                                Координатор
+                            </a>
+                            <a class="dropdown-item" href="{{route('director.employers.managers')}}">
+                                Менеджер
+                            </a>
+
+                            <a class="dropdown-item" href="{{route('director.employers.masters')}}">
+                                Мастер
+                            </a>
                         </div>
                     </li>
 

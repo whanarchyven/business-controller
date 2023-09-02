@@ -126,7 +126,7 @@ class CoordinatorController extends Controller
     {
 
         $data = $request->all();
-
+        $user = Auth::user();
 
         if ($data && $data['city']) {
             $city_id = $data['city'];
@@ -164,7 +164,7 @@ class CoordinatorController extends Controller
 
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan'));
+        return view('roles.coordinator.control', compact('cities', 'user', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan'));
     }
 
     public function manageLead(Lead $lead, Request $request)
