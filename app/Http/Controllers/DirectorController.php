@@ -781,11 +781,19 @@ class DirectorController extends Controller
         $admin = Role::where('slug', 'admin')->first();
 
 
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $count = mb_strlen($chars);
+
+        for ($i = 0, $result = ''; $i < 8; $i++) {
+            $index = rand(0, $count - 1);
+            $result .= mb_substr($chars, $index, 1);
+        }
+
         $newUser = new User();
         $newUser->name = $data['name'];
         $newUser->email = $data['email'];
         $newUser->birth_date = $data['birth_date'];
-        $newUser->password = bcrypt($data['password']);
+        $newUser->password = bcrypt($result);
         $newUser->city = array_key_exists('city', $data) ? $data['city'] : Auth::user()->city;
         $newUser->status = 'free';
         $newUser->salary = 0;
@@ -815,7 +823,7 @@ class DirectorController extends Controller
                 $newUser->roles()->attach($master);
                 break;
         }
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Пользователь успешно зарегистрирован, пароль: ' . $result,);
     }
 
     public function updateUserView(User $user)

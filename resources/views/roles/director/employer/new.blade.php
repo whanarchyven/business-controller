@@ -8,9 +8,14 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
+
                 <div class="card">
                     <div class="card-header">Новый пользователь</div>
-
+                    @if(session()->has('success'))
+                        <div class="alert alert-success">
+                            {{ session()->get('success') }}
+                        </div>
+                    @endif
                     <div class="card-body">
                         @if (session('status'))
                             <div class="alert alert-success" role="alert">
@@ -28,11 +33,11 @@
                                         <input type="text" class="form-control" id='email'
                                                name="email">
                                     </div>
-                                    <div class="form-group my-2">
-                                        <label for="password">Пароль</label>
-                                        <input type="password" class="form-control" id='password'
-                                               name="password">
-                                    </div>
+                                    {{--                                    <div class="form-group my-2">--}}
+                                    {{--                                        <label for="password">Пароль</label>--}}
+                                    {{--                                        <input type="password" class="form-control" id='password'--}}
+                                    {{--                                               name="password">--}}
+                                    {{--                                    </div>--}}
                                     <div class="form-group my-2">
                                         <label for="name">ФИО</label>
                                         <input type="text" class="form-control" id='name'

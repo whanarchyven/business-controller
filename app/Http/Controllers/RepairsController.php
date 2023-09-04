@@ -191,16 +191,7 @@ class RepairsController extends Controller
 
     public function update(Repair $repair, Request $request)
     {
-        $data = $request->validate([
-            "lead_id" => "",
-            "master_id" => "",
-            "check" => "",
-            "repair_date" => "",
-            "contract_number" => "",
-            "works" => "",
-            "documents" => "",
-            "status" => "",
-        ]);
+        $data = $request->all();
 
 
         if ($data['status'] == 'completed' && ($repair->status == 'declined' || $repair->status == 'in-work')) {
@@ -221,7 +212,22 @@ class RepairsController extends Controller
             };
         }
 
-        $repair->update($data);
+
+        $documents = array();
+        if ($files = $request->file('documents')) {
+            $i = 1;
+            foreach ($files as $file) {
+                $name = Carbon::now()->toDateString() . '-' . $repair->lead->client_fullname . '-' . $repair->lead->city . '-' . $i . '_' . rand(0, 16000) . '.' . $file->extension();
+//                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $repair->lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
+                $file->move('documents', $name);
+                $documents[] = $name;
+                $i++;
+            }
+        }
+
+        $repair->documents = $repair->documents . '|' . implode('|', $documents);
+        $repair->status = $data['status'];
+        $repair->save();
 
         return redirect()->back();
     }

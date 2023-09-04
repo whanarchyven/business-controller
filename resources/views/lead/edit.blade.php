@@ -54,12 +54,12 @@
                                     <input type="text" value="{{$lead->address}}" class="form-control" id='address'
                                            name="address" list="address">
                                 </div>
-                                <div class="form-group my-2">
-                                    <label for="meeting_date">Дата встречи</label>
-                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"
-                                           id='meeting_date' name="meeting_date"
-                                           list="meeting_date">
-                                </div>
+                                {{--                                <div class="form-group my-2">--}}
+                                {{--                                    <label for="meeting_date">Дата встречи</label>--}}
+                                {{--                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"--}}
+                                {{--                                           id='meeting_date' name="meeting_date"--}}
+                                {{--                                           list="meeting_date">--}}
+                                {{--                                </div>--}}
                                 <div class="form-group my-2">
                                     <label for="time_period">Ожидает в </label>
                                     <select value="{{$lead->time_period}}" id="time_period" class="form-control"
@@ -182,12 +182,12 @@
                                     <input type="text" value="{{$lead->address}}" class="form-control" id='address'
                                            name="address" list="address">
                                 </div>
-                                <div class="form-group my-2">
-                                    <label for="meeting_date">Дата встречи</label>
-                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"
-                                           id='meeting_date' name="meeting_date"
-                                           list="meeting_date">
-                                </div>
+                                {{--                                <div class="form-group my-2">--}}
+                                {{--                                    <label for="meeting_date">Дата встречи</label>--}}
+                                {{--                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"--}}
+                                {{--                                           id='meeting_date' name="meeting_date"--}}
+                                {{--                                           list="meeting_date">--}}
+                                {{--                                </div>--}}
                                 <div class="form-group my-2">
                                     <label for="time_period">Ожидает в </label>
                                     <select value="{{$lead->time_period}}" id="time_period" class="form-control"
@@ -311,12 +311,12 @@
                                     <input type="text" value="{{$lead->address}}" class="form-control" id='address'
                                            name="address" list="address">
                                 </div>
-                                <div class="form-group my-2">
-                                    <label for="meeting_date">Дата встречи</label>
-                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"
-                                           id='meeting_date' name="meeting_date"
-                                           list="meeting_date">
-                                </div>
+                                {{--                                <div class="form-group my-2">--}}
+                                {{--                                    <label for="meeting_date">Дата встречи</label>--}}
+                                {{--                                    <input value="{{$lead->meeting_date}}" type="date" class="form-control"--}}
+                                {{--                                           id='meeting_date' name="meeting_date"--}}
+                                {{--                                           list="meeting_date">--}}
+                                {{--                                </div>--}}
                                 <div class="form-group my-2">
                                     <label for="time_period">Ожидает в </label>
                                     <select value="{{$lead->time_period}}" id="time_period" class="form-control"

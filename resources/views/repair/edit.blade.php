@@ -14,33 +14,69 @@
                         <p>Ремонт от {{$repair->repair_date}}
                             на {{$repair->lead->issued}}/{{$repair->lead->avance}}</p>
                         <div class="d-flex gap-2 w-100 col-2">
-                            <div id="status" class="btn w-25 btn-secondary">
-                                Статус
-                            </div>
+                            @if($repair->status!='completed')
+                                <div id="status" class="btn w-25 btn-secondary">
+                                    Статус
+                                </div>
+                            @endif
                             <div id="docs" class="btn w-25 btn-primary">
                                 Документы
                             </div>
                         </div>
-                        <div id="status-panel" class="d-none">
-                            <form action="{{route('repairs.update',$repair)}}" method="post">
-                                @csrf
-                                @method('patch')
-                                <input type="hidden" name="status" value="completed"/>
-                                <input type="submit" class="btn w-100 btn-success" value="Закрыть"/>
-                            </form>
-                            <form action="{{route('repairs.update',$repair)}}" method="post">
-                                @csrf
-                                @method('patch')
-                                <input type="hidden" name="status" value="declined"/>
-                                <input type="submit" class="btn w-100 btn-danger" value="Отказ"/>
-                            </form>
-                            <form action="{{route('repairs.update',$repair)}}" method="post">
-                                @csrf
-                                @method('patch')
-                                <input type="hidden" name="status" value="in-work"/>
-                                <input type="submit" class="btn w-100 btn-warning" value="Вернуть в работу"/>
-                            </form>
-                        </div>
+                        @if($repair->status!='declined')
+                            <div id="status-panel" class="d-none">
+                                <div id="close-button" onclick="openForm()" class="btn h-100 btn-success">
+                                    Закрыть
+                                </div>
+                                <form id="close-form" enctype="multipart/form-data"
+                                      action="{{route('repairs.update',$repair)}}" class="d-none"
+                                      method="post">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="hidden" name="status" value="completed"/>
+                                    <div>
+                                        <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>
+                                        <input enctype="multipart/form-data"
+                                               id="docs"
+                                               type="file"
+                                               class="m-0 h-100 form-control"
+                                               name="documents[]"
+                                               placeholder="Документы" multiple>
+                                    </div>
+                                    <input type="submit" class="btn w-100 btn-success" value="Закрыть"/>
+                                </form>
+                                <form id="decline-form" action="{{route('repairs.update',$repair)}}" method="post"
+                                      class="m-0 h-100">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="hidden" name="status" value="declined"/>
+                                    <input type="submit" class="btn w-100 btn-danger" value="Отказ"/>
+                                </form>
+                            </div>
+                        @else
+                            <div id="status-panel" class="d-none">
+                                <div id="return-button" onclick="openReturn()" class="btn mt-2 h-100 btn-warning">
+                                    Возврат
+                                </div>
+                                <form id="return-form" enctype="multipart/form-data"
+                                      action="{{route('repairs.update',$repair)}}" class="d-none"
+                                      method="post">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="hidden" name="status" value="declined"/>
+                                    <div>
+                                        <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>
+                                        <input enctype="multipart/form-data"
+                                               id="docs"
+                                               type="file"
+                                               class="m-0 h-100 form-control"
+                                               name="documents[]"
+                                               placeholder="Документы" multiple>
+                                    </div>
+                                    <input type="submit" class="btn w-100 btn-warning" value="Возврат"/>
+                                </form>
+                            </div>
+                        @endif
                         <div id="documents-panel" class="d-none">
                             @foreach($documents as $document)
                                 @if(!$loop->first)
@@ -226,7 +262,7 @@
 
                         <script>
                             document.getElementById('status').addEventListener('click', () => {
-                                document.getElementById('status-panel').className = 'd-flex gap-2 mt-4 w-100'
+                                document.getElementById('status-panel').className = 'd-flex gap-2 w-100 justify-content-start flex-row align-items-center'
                                 if (document.getElementById('documents-panel')) {
                                     document.getElementById('documents-panel').className = 'd-none'
                                 }
@@ -237,6 +273,18 @@
                                     document.getElementById('status-panel').className = 'd-none'
                                 }
                             })
+
+                            function openForm() {
+                                document.getElementById('close-button').className = 'd-none'
+                                document.getElementById('decline-form').className = 'd-none'
+                                document.getElementById('close-form').className = 'w-100 d-flex gap-2 align-items-end'
+                            }
+
+                            function openReturn() {
+                                document.getElementById('return-button').className = 'd-none'
+                                document.getElementById('return-form').className = 'w-100 d-flex gap-2 align-items-end'
+                            }
+
                         </script>
                     </div>
                 </div>
