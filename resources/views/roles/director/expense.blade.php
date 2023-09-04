@@ -26,7 +26,8 @@
                     @foreach($repairs as $repair)
                         <tr>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                {{$repair->repair_date}}
+                                {{$repair->repair_date}} <br/>
+                                {{$repair->lead->city}}
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$repair->lead->client_fullname}}</p>

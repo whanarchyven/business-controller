@@ -9,7 +9,7 @@
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
                    href="/director/daily?date={{$prevMonthLink}}">Предыдущий
-                    месяц</a>
+                    день</a>
             </div>
             <div id="date-head">
                 <p class="fs-3">{{$dateTitle}}</p>
@@ -17,7 +17,7 @@
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
                    href="/director/daily?date={{$nextMonthLink}}">Следующий
-                    месяц</a>
+                    день</a>
             </div>
         </div>
 

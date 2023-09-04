@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Session;
 
 class DirectorController extends Controller
 {
@@ -245,17 +246,15 @@ class DirectorController extends Controller
         return redirect()->back();
     }
 
-    public function getMonthWorkLeads($year, $month)
+    public function getMonthWorkLeads($date)
     {
-        $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
 
         $city = City::where(["id" => Auth::user()->city])->first();
 
         if (Auth::user()->isAdmin) {
-            return Lead::whereDate('created_at', Carbon::today())->where([['status', '=', 'in-work']])->orWhere([['status', '=', 'completed']])->get()->reverse();
+            return Lead::whereDate('created_at', $date)->where([['status', '=', 'in-work'], ['city', '=', Session::get('city')->name]])->get()->reverse();
         } else {
-            return Lead::whereDate('created_at', Carbon::today())->where([['status', '=', 'in-work'], ['city', '=', $city->name]])->orWhere([['status', '=', 'completed'], ['city', '=', $city->name]])->get()->reverse();
+            return Lead::whereDate('created_at', $date)->where([['status', '=', 'in-work'], ['city', '=', $city->name]])->get()->reverse();
         }
     }
 
@@ -271,65 +270,67 @@ class DirectorController extends Controller
         $dateTitle = '';
         switch ($dateTemp[1]) {
             case '01':
-                $dateTitle = 'Январь ';
+                $dateTitle = ' Января';
                 break;
             case '02':
-                $dateTitle = 'Февраль ';
+                $dateTitle = ' Февраля ';
                 break;
             case '03':
-                $dateTitle = 'Март ';
+                $dateTitle = ' Марта ';
                 break;
             case '04':
-                $dateTitle = 'Апрель ';
+                $dateTitle = ' Апреля ';
                 break;
             case '05':
-                $dateTitle = 'Май ';
+                $dateTitle = ' Мая ';
                 break;
             case '06':
-                $dateTitle = 'Июнь ';
+                $dateTitle = ' Июня ';
                 break;
             case '07':
-                $dateTitle = 'Июль ';
+                $dateTitle = ' Июля ';
                 break;
             case '08':
-                $dateTitle = 'Август ';
+                $dateTitle = ' Августа ';
                 break;
             case '09':
-                $dateTitle = 'Сентябрь ';
+                $dateTitle = ' Сентября ';
                 break;
             case '10':
-                $dateTitle = 'Октябрь ';
+                $dateTitle = ' Октября ';
                 break;
             case '11':
-                $dateTitle = 'Ноябрь ';
+                $dateTitle = ' Ноября ';
                 break;
             case '12':
-                $dateTitle = 'Декабрь ';
+                $dateTitle = ' Декабря ';
                 break;
         }
-        $dateTitle = $dateTitle . $dateTemp[0];
+        $dateTitle = intval($dateTemp[2]) . $dateTitle . $dateTemp[0];
 
-        if (intval($dateTemp[1]) + 1 < 10) {
-            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
-        } else {
-            if (intval($dateTemp[1]) + 1 > 12) {
-                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
-            } else {
-                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
-            }
-        }
-
-        if (intval($dateTemp[1]) - 1 >= 10) {
-            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
-        } else {
-            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
-                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
-            } else {
-                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
-            }
-        }
-
-        $leads = $this->getMonthWorkLeads($dateTemp[0], $dateTemp[1]);
+//        if (intval($dateTemp[1]) + 1 < 10) {
+//            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
+//        } else {
+//            if (intval($dateTemp[1]) + 1 > 12) {
+//                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
+//            } else {
+//                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
+//            }
+//        }
+//
+//        if (intval($dateTemp[1]) - 1 >= 10) {
+//            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
+//        } else {
+//            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
+//                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
+//            } else {
+//                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
+//            }
+//        }
+//        dd(Carbon::today()->toDateString());
+        $prevMonthLink = Carbon::createFromDate($date)->subDays(1)->toDateString();
+        $nextMonthLink = Carbon::createFromDate($date)->addDays(1)->toDateString();
+        $leads = $this->getMonthWorkLeads($date);
 
 
         return (view('roles.director.daily', compact('dateTitle', 'prevMonthLink', 'nextMonthLink', 'leads')));
@@ -400,14 +401,19 @@ class DirectorController extends Controller
 
     public function nomenclature()
     {
-        $nomenclature = Nomenclature::all();
         $user = Auth::user();
+        if ($user->isAdmin) {
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+        } else {
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+        }
         return (view('nomenclature.show', compact('nomenclature', 'user')));
     }
 
     public function addNomenclature()
     {
-        return (view('nomenclature.new'));
+        $user = Auth::user();
+        return (view('nomenclature.new', compact('user')));
     }
 
     public function editNomenclature(Nomenclature $nomenclature)
@@ -432,10 +438,13 @@ class DirectorController extends Controller
         $data = $request->validate([
             'name' => '',
             'unit' => '',
-            'price' => ''
+            'price' => '',
+            'city_id' => ''
         ]);
+//        dd($data);
         $nomenclature = new Nomenclature($data);
         $nomenclature->remain = 0;
+        $nomenclature->city_id = $data['city_id'];
         $nomenclature->save();
 
         return (redirect(route('director.nomenclature')));
@@ -443,19 +452,24 @@ class DirectorController extends Controller
 
     public function receipt()
     {
-        $nomenclature = Nomenclature::all();
-        return view('roles.director.receipt', compact('nomenclature'));
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+        } else {
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+        }
+        return view('roles.director.receipt', compact('nomenclature', 'user'));
     }
 
     public function newReceipt(Request $request)
     {
         $date = $request->all();
-
         $receipt = new Receipt();
         $receipt->author = Auth::user()->id;
         $receipt->save();
 
         $date = array_slice($date, 2, count($date));
+
 
         for ($i = 1; $i <= count($date) / 2; $i++) {
             $nomenclature_receipt = new NomenclatureReceipt();
@@ -474,13 +488,38 @@ class DirectorController extends Controller
 
     public function expense()
     {
-        $repairs = Repair::all();
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $repairs = Repair::all();
+            $temp = array();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == Session::get('city')->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
+        } else {
+            $city = City::where(["id" => $user->city])->first();
+            $repairs = Repair::all();
+            $temp = array();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == $city->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
+        }
         return view('roles.director.expense', compact('repairs'));
     }
 
     public function newExpense(Repair $repair)
     {
-        $nomenclature = Nomenclature::all();
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+        } else {
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+        }
         return view('roles.director.expense_new', compact('nomenclature', 'repair'));
     }
 
@@ -517,8 +556,8 @@ class DirectorController extends Controller
         $role = 'Менеджер';
         $link = 'managers';
         $route_card = 'director.managercard';
-        if ($request->query('city') && $director->isAdmin) {
-            $city = $request->query('city');
+        if ($director->isAdmin) {
+            $city = $request->session()->get('city')->id;
         } else {
             $city = $director->city;
         }
@@ -556,8 +595,8 @@ class DirectorController extends Controller
         $link = 'operator';
         $route_card = 'director.operatorcard';
 
-        if ($request->query('city') && $director->isAdmin) {
-            $city = $request->query('city');
+        if ($director->isAdmin) {
+            $city = $request->session()->get('city')->id;
         } else {
             $city = $director->city;
         }
@@ -594,8 +633,8 @@ class DirectorController extends Controller
         $link = 'coordinator';
         $route_card = 'director.coordinatorcard';
 
-        if ($request->query('city') && $director->isAdmin) {
-            $city = $request->query('city');
+        if ($director->isAdmin) {
+            $city = $request->session()->get('city')->id;
         } else {
             $city = $director->city;
         }
@@ -632,8 +671,8 @@ class DirectorController extends Controller
         $link = 'masters';
         $route_card = 'director.mastercard';
 
-        if ($request->query('city') && $director->isAdmin) {
-            $city = $request->query('city');
+        if ($director->isAdmin) {
+            $city = $request->session()->get('city')->id;
         } else {
             $city = $director->city;
         }
@@ -668,8 +707,8 @@ class DirectorController extends Controller
         $link = 'directors';
         $route_card = 'director.directorcard';
 
-        if ($request->query('city') && $director->isAdmin) {
-            $city = $request->query('city');
+        if ($director->isAdmin) {
+            $city = $request->session()->get('city')->id;
         } else {
             $city = $director->city;
         }
@@ -828,4 +867,17 @@ class DirectorController extends Controller
         User::where(["id" => $data['user']])->withTrashed()->restore();
         return redirect()->back();
     }
+
+
+    public function changeCity(City $city, Request $request)
+    {
+        $request->session()->put('city', $city);
+        return redirect()->back();
+    }
+
+    public function getCity(Request $request)
+    {
+        dd($request->session()->get('city'));
+    }
+
 }

@@ -30,6 +30,9 @@
                                         <label for="price">Цена за ед. измерения</label>
                                         <input class="form-control" type="text" name="price"/>
                                     </div>
+                                    <input type="hidden"
+                                           value="{{$user->isAdmin?\Illuminate\Support\Facades\Session::get('city')->id:$user->city}}"
+                                           name="city_id"/>
                                 </div>
                                 <div class="d-flex gap-3 align-items-center">
                                     <input class="form-control btn btn-success w-50" value="Создать" type="submit"/>

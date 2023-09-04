@@ -29,6 +29,6 @@ class Lead extends Model
 
     public function repair()
     {
-        return $this->hasOne(Repair::class, 'lead_id')->withTrashed();
+        return $this->hasOne(Repair::class, 'lead_id');
     }
 }

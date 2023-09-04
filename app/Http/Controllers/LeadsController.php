@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\CoordinatorController;
+use MongoDB\Driver\Session;
 
 
 class LeadsController extends Controller
@@ -62,7 +63,7 @@ class LeadsController extends Controller
             return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['operator_id', '=', $user->id]])->get();
         } else {
             if ($user->isAdmin) {
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', "=", \Illuminate\Support\Facades\Session::get('city')->name]])->get();
             } else {
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city->name]])->get();
             }
@@ -104,7 +105,7 @@ class LeadsController extends Controller
         if ($user->hasRole('operator')) {
             $leads = Lead::where([['status', '!=', 'declined'], ['operator_id', '=', $user->id]])->whereDate('created_at', $date)->get();
         } else if ($user->isAdmin) {
-            $leads = Lead::where([['status', '!=', 'declined']])->whereDate('created_at', $date)->get();
+            $leads = Lead::where([['status', '!=', 'declined'], ['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereDate('created_at', $date)->get();
         } else {
             $leads = Lead::where([['status', '!=', 'declined'], ['city', '=', $city->name]])->whereDate('created_at', $date)->get();
         }
@@ -208,7 +209,7 @@ class LeadsController extends Controller
         if ($user->hasRole('operator')) {
             $leads = Lead::where([['status', '=', 'declined'], ['operator_id', '=', $user->id]])->whereDate('created_at', $date)->get();
         } else if ($user->isAdmin) {
-            $leads = Lead::where([['status', '=', 'declined']])->whereDate('created_at', $date)->get();
+            $leads = Lead::where([['status', '=', 'declined'], ['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereDate('created_at', $date)->get();
         } else {
             $leads = Lead::where([['status', '=', 'declined'], ['city', '=', $city->name]])->whereDate('created_at', $date)->get();
         }
@@ -312,7 +313,7 @@ class LeadsController extends Controller
         } else {
             $date = Carbon::now()->toDateString();
         }
-        
+
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -754,7 +755,6 @@ class LeadsController extends Controller
         }
 
         $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
-
 
         if ($manager->hasRole('manager')) {
             return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed'));

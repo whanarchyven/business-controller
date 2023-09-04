@@ -228,6 +228,7 @@
                         </div>
                     </li>
 
+
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -302,6 +303,23 @@
                             </li>
                         @endif
                     @else
+                        @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    {{\Illuminate\Support\Facades\Session::has('city')?\Illuminate\Support\Facades\Session::get('city')->name:'Выбрать город'}}
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @foreach($cities=\App\Models\City::all() as $city)
+                                        <a class="dropdown-item" href="{{route('admin.city.change',$city)}}">
+                                            {{$city->name}}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </li>
+
+                        @endif
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -320,6 +338,7 @@
                                 </form>
                             </div>
                         </li>
+
                     @endguest
                 </ul>
             </div>

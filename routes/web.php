@@ -117,5 +117,9 @@ Route::group(['middleware' => 'role:director'], function () {
 
     Route::post('/director/employers/store', [App\Http\Controllers\DirectorController::class, 'storeNewUser'])->name('director.employers.store');
 
+    Route::get('/director/changecity/{city}', [App\Http\Controllers\DirectorController::class, 'changeCity'])->name('admin.city.change');
+
+    Route::get('/director/getcity/', [App\Http\Controllers\DirectorController::class, 'getCity'])->name('admin.city.get');
+
 
 });

@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class RepairsController extends Controller
 {
@@ -53,7 +54,14 @@ class RepairsController extends Controller
         $city = City::where(["id" => $user->city])->first();
 
         if ($user->isAdmin) {
-            return Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+            $temp = array();
+            $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == Session::get('city')->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            return $temp;
         } else {
             $temp = array();
             $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
@@ -78,6 +86,14 @@ class RepairsController extends Controller
         $city = City::where(["id" => $user->city])->first();
         if ($user->isAdmin) {
             $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            $temp = array();
+            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == Session::get('city')->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
         } else {
             $temp = array();
             $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
