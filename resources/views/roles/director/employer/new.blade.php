@@ -16,6 +16,11 @@
                             {{ session()->get('success') }}
                         </div>
                     @endif
+                    @if(session()->has('error'))
+                        <div class="alert alert-danger">
+                            {{ session()->get('error') }}
+                        </div>
+                    @endif
                     <div class="card-body">
                         @if (session('status'))
                             <div class="alert alert-success" role="alert">
@@ -68,14 +73,14 @@
                                         </select>
                                     </div>
 
-                                    <div id="coordinator-form" class="d-none">
-                                        <label for="coordinator_id">Закреплённый координатор</label>
-                                        <select id="coordinator_id" class="form-control" name="coordinator_id">
-                                            @foreach($coordinators as $coordinator)
-                                                <option value="{{$coordinator->id}}">{{$coordinator->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    {{--                                    <div id="coordinator-form" class="d-none">--}}
+                                    {{--                                        <label for="coordinator_id">Закреплённый координатор</label>--}}
+                                    {{--                                        <select id="coordinator_id" class="form-control" name="coordinator_id">--}}
+                                    {{--                                            @foreach($coordinators as $coordinator)--}}
+                                    {{--                                                <option value="{{$coordinator->id}}">{{$coordinator->name}}</option>--}}
+                                    {{--                                            @endforeach--}}
+                                    {{--                                        </select>--}}
+                                    {{--                                    </div>--}}
 
                                     @if($director->isAdmin)
                                         <div id="city-form" class="my-2">
@@ -88,10 +93,10 @@
                                         </div>
                                     @endif
 
-                                    <div id="oklad" class="d-none">
-                                        <label for="bet">Оклад (дневная ставка)</label>
-                                        <input type="tel" class="form-control" id='bet' name="bet" list="bet">
-                                    </div>
+                                    {{--                                    <div id="oklad" class="d-none">--}}
+                                    {{--                                        <label for="bet">Оклад (дневная ставка)</label>--}}
+                                    {{--                                        <input type="tel" class="form-control" id='bet' name="bet" list="bet">--}}
+                                    {{--                                    </div>--}}
 
                                     <label for="documents">Документы</label>
                                     <input enctype="multipart/form-data"

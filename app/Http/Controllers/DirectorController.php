@@ -778,6 +778,11 @@ class DirectorController extends Controller
     {
 
         $data = $request->all();
+
+        if (User::where(["email" => $data['email']])->exists()) {
+            return redirect()->back()->with('error', 'Пользователь с таким логином уже существует! Придумайте другой');
+        }
+
         $documents = array();
         if ($files = $request->file('documents')) {
             $i = 1;
@@ -816,7 +821,7 @@ class DirectorController extends Controller
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
-        $newUser->bet = $data['bet'] ? $data['bet'] : 0;
+//        $newUser->bet = $data['bet'] ? $data['bet'] : 0;
         $newUser->phone = $data['phone'];
         $newUser->isAdmin = 0;
         $newUser->save();
@@ -826,10 +831,6 @@ class DirectorController extends Controller
                 break;
             case 'manager':
                 $newUser->roles()->attach($manager);
-                $manager_coordinator = new ManagerCoordinator();
-                $manager_coordinator->manager_id = $newUser->id;
-                $manager_coordinator->coordinator_id = $data['coordinator_id'];
-                $manager_coordinator->save();
                 break;
             case 'coordinator':
                 $newUser->roles()->attach($coordinator);
@@ -918,7 +919,7 @@ class DirectorController extends Controller
         if ($user->isAdmin) {
             $city = Session::get('city');
         } else {
-            $city = City::where(['id' => Auth::user()->city]);
+            $city = City::where(['id' => Auth::user()->city])->first();
         }
 
 

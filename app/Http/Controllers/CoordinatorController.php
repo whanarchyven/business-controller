@@ -16,14 +16,13 @@ class CoordinatorController extends Controller
     public function getManagers($city_id)
     {
         $coordinator = Auth::user();
-        $temp = $coordinator->getManagersByCoordinator();
+        $temp = User::where(['city' => $coordinator->city])->get();
 
         $managers = array();
 
-        foreach ($temp as $record) {
-            $temp_user = User::where([['id', '=', $record->manager_id], ['city', '=', $city_id]])->get();
-            if (count($temp_user) != 0) {
-                array_push($managers, ...$temp_user);
+        foreach ($temp as $temp_user) {
+            if ($temp_user->hasRole('manager')) {
+                array_push($managers, $temp_user);
             }
         }
 
