@@ -288,7 +288,7 @@
                                 <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($todayDeclined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsSelled}}</th>
-                                <th class="fw-bold text-left" scope="col">0</th>
+                                <th class="fw-bold text-left" scope="col">{{$todayProductsIssued}}</th>
 
                             </tr>
                             </tbody>

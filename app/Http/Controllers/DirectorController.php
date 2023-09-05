@@ -167,9 +167,13 @@ class DirectorController extends Controller
         $todayDeclined = $this->getTodayLeads(true, $city);
 
         $todayProductsSelled = 0;
+        $todayProductsIssued = 0;
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
+            if ($lead->repair) {
+                $todayProductsIssued += $lead->repair->check;
+            }
         }
 
         $cities = $this->getCities();
@@ -182,7 +186,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued'));
     }
 
     public function manageLead(Lead $lead, Request $request)
