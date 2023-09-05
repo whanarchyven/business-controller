@@ -171,7 +171,7 @@ class DirectorController extends Controller
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
-            if ($lead->repair) {
+            if ($lead->repair && $lead->repair->status == 'completed') {
                 $todayProductsIssued += $lead->repair->check;
             }
         }
