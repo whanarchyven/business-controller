@@ -9,7 +9,7 @@ class TransactionState extends Model
 {
     use HasFactory;
 
-    public function getByCode($code)
+    static function getByCode($code)
     {
         return TransactionState::where(["code" => $code])->first();
     }
