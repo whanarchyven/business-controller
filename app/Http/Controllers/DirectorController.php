@@ -158,7 +158,9 @@ class DirectorController extends Controller
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
-            $products_issued += $lead->issued;
+            if ($lead->repair) {
+                $products_issued += $lead->repair->check;
+            }
         }
 
         $todayLeads = $this->getTodayLeads(false, $city);
