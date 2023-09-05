@@ -6,23 +6,23 @@
 
 @section('content')
     <div class="container">
-        @if($director->isAdmin)
-            @foreach($cities as $town)
-                <button
-                    class="btn {{$town->id==$city->id?'btn-secondary':'btn-outline-secondary'}} "
-                    onclick="window.location.href='/director/employers/{{$link}}/?city={{$town->id}}'">{{$town->name}}
-                </button>
-            @endforeach
-        @else
-            @foreach($cities as $town)
-                @if($town->id==$director->city)
-                    <button
-                        class="btn {{$town->id==$city->id?'btn-secondary':'btn-outline-secondary'}} "
-                        onclick="window.location.href='/director/employers/{{$link}}/?city={{$town->id}}'">{{$town->name}}
-                    </button>
-                @endif
-            @endforeach
-        @endif
+        {{--        @if($director->isAdmin)--}}
+        {{--            @foreach($cities as $town)--}}
+        {{--                <button--}}
+        {{--                    class="btn {{$town->id==$city->id?'btn-secondary':'btn-outline-secondary'}} "--}}
+        {{--                    onclick="window.location.href='/director/employers/{{$link}}/?city={{$town->id}}'">{{$town->name}}--}}
+        {{--                </button>--}}
+        {{--            @endforeach--}}
+        {{--        @else--}}
+        {{--            @foreach($cities as $town)--}}
+        {{--                @if($town->id==$director->city)--}}
+        {{--                    <button--}}
+        {{--                        class="btn {{$town->id==$city->id?'btn-secondary':'btn-outline-secondary'}} "--}}
+        {{--                        onclick="window.location.href='/director/employers/{{$link}}/?city={{$town->id}}'">{{$town->name}}--}}
+        {{--                    </button>--}}
+        {{--                @endif--}}
+        {{--            @endforeach--}}
+        {{--        @endif--}}
         <p class="fw-bold my-3 fs-3">{{$title}} - {{$city->name}}</p>
         <table class="table  table-bordered table-sm table-secondary">
             <thead class="table-light">
