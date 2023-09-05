@@ -262,6 +262,12 @@
                         </div>
                     </li>
 
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-item" href="{{ route('director.transactions') }}">
+                            Транзакции
+                        </a>
+                    </li>
+
 
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"

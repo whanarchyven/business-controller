@@ -60,6 +60,11 @@
             <button id="change-status"
                     class="btn btn-primary text-white rounded-2  p-2">Изменить статус
             </button>
+
+            <button id="checkdocs"
+                    class="btn btn-warning text-white rounded-2  p-2">Документы
+            </button>
+
             <script>
                 document.getElementById('change-status').addEventListener('click', () => {
                     document.getElementById('change-status').className = 'd-none';
@@ -88,6 +93,14 @@
         </div>
         @endrole
         @role('director')
+        <div id="docs-pop" class="d-none">
+            @foreach($documents as $document)
+                <a href="{{ URL::to('/documents') }}/{{$document}}"
+                   class="w-100 border border-2 border-black d-flex"><img
+                        class="w-100 object-fit-cover"
+                        src="{{ URL::to('/documents') }}/{{$document}}"/></a>
+            @endforeach
+        </div>
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
@@ -103,6 +116,19 @@
                     месяц</a>
             </div>
         </div>
+        <script>
+            let isOpen = false;
+            document.getElementById('checkdocs').addEventListener('click', () => {
+                if (!isOpen) {
+                    document.getElementById('docs-pop').className = 'w-100 d-flex justify-content-center my-4'
+                    isOpen = true;
+                } else {
+                    document.getElementById('docs-pop').className = 'd-none'
+                    isOpen = false;
+                }
+            })
+
+        </script>
         @endrole
 
 

@@ -10,7 +10,11 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Редактирование сотрудника</div>
-
+                    @if(session()->has('success'))
+                        <div class="alert alert-success">
+                            {{ session()->get('success') }}
+                        </div>
+                    @endif
                     <div class="card-body">
                         @if (session('status'))
                             <div class="alert alert-success" role="alert">
@@ -28,11 +32,6 @@
                                         <label for="email">Логин</label>
                                         <input value="{{$user->email}}" type="text" class="form-control" id='email'
                                                name="email">
-                                    </div>
-                                    <div class="form-group my-2">
-                                        <label for="password">Пароль</label>
-                                        <input value="" type="password" class="form-control" id='password'
-                                               name="password">
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="name">ФИО</label>
@@ -87,13 +86,13 @@
                                         </div>
                                     @endif
 
-                                    @if($user->hasRole('manager'))
-                                        <div id="oklad" class="form-group my-2">
-                                            <label for="bet">Оклад (дневная ставка)</label>
-                                            <input type="tel" value="{{$user->bet}}" class="form-control" id='bet'
-                                                   name="bet" list="bet">
-                                        </div>
-                                    @endif
+                                    {{--                                    @if($user->hasRole('manager'))--}}
+                                    {{--                                        <div id="oklad" class="form-group my-2">--}}
+                                    {{--                                            <label for="bet">Оклад (дневная ставка)</label>--}}
+                                    {{--                                            <input type="tel" value="{{$user->bet}}" class="form-control" id='bet'--}}
+                                    {{--                                                   name="bet" list="bet">--}}
+                                    {{--                                        </div>--}}
+                                    {{--                                    @endif--}}
 
                                     {{--                                    <label for="documents">Документы</label>--}}
                                     {{--                                    <input enctype="multipart/form-data"--}}
@@ -104,7 +103,7 @@
 
                                     <div class="form-group my-2">
                                         <input type="submit" class="form-control bg-primary text-white fw-bold"
-                                               value="Отправить">
+                                               value="Сохранить">
                                     </div>
                                 </div>
                             </div>

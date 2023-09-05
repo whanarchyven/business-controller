@@ -141,9 +141,11 @@ class CoordinatorController extends Controller
         $month = $this->getMonth();
 
         $products_selled = 0;
+        $products_issued = 0;
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
+            $products_issued += $lead->issued;
         }
 
         $todayLeads = $this->getTodayLeads(false, $city);
@@ -164,7 +166,7 @@ class CoordinatorController extends Controller
 
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
-        return view('roles.coordinator.control', compact('cities', 'user', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan'));
+        return view('roles.coordinator.control', compact('cities', 'user', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'products_issued'));
     }
 
     public function manageLead(Lead $lead, Request $request)

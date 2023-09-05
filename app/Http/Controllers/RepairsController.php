@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\Lead;
 use App\Models\Repair;
+use App\Models\TransactionState;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -85,9 +86,9 @@ class RepairsController extends Controller
         $user = Auth::user();
         $city = City::where(["id" => $user->city])->first();
         if ($user->isAdmin) {
-            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            $repairs = Repair::where([['repair_date', '=', $date]])->get();
             $temp = array();
-            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            $repairs = Repair::where([['repair_date', '=', $date]])->get();
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == Session::get('city')->name) {
                     array_push($temp, $repair);
@@ -96,7 +97,7 @@ class RepairsController extends Controller
             $repairs = $temp;
         } else {
             $temp = array();
-            $repairs = Repair::where([['repair_date', '=', $date], ['status', '!=', 'declined']])->get();
+            $repairs = Repair::where([['repair_date', '=', $date]])->get();
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == $city->name) {
                     array_push($temp, $repair);
@@ -155,13 +156,21 @@ class RepairsController extends Controller
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
         $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], false);
+        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], true);
 
         $totalRepairs = 0;
+        $totalDeclined = 0;
 
         foreach ($monthRepairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
             $days[$day - 1]['repairs'] += 1;
             $totalRepairs++;
+        }
+
+        foreach ($declinedRepairs as $declined) {
+            $day = intval(preg_split("/[^1234567890]/", $declined['repair_date'])[2]);
+            $days[$day - 1]['declined'] += 1;
+            $totalDeclined++;
         }
 
         $lexems = preg_split("/[^1234567890]/", $date);
@@ -186,7 +195,7 @@ class RepairsController extends Controller
             }
         }
 
-        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink'));
+        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined'));
     }
 
     public function update(Repair $repair, Request $request)
@@ -229,13 +238,34 @@ class RepairsController extends Controller
         $repair->status = $data['status'];
         $repair->save();
 
+        if ($data['status'] == 'completed') {
+            $state = TransactionState::getByCode('1.5.');
+            $desc = 'Ремонт от ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
+            $value = $repair->check - $repair->lead->avance;
+            $responsible = $repair->lead->getManagerId->id;
+            $documents = implode("|", $documents);
+            $city_id = City::where(['name' => $repair->lead->city])->first()->id;
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $documents, $city_id);
+            $transaction->save();
+        }
+        if ($data['status'] == 'declined' && array_key_exists('refund', $data)) {
+            $state = TransactionState::getByCode('1.2.');
+            $desc = 'Возврат по договору ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
+            $value = $repair->lead->avance;
+            $responsible = $repair->lead->getManagerId->id;
+            $documents = implode("|", $documents);
+            $city_id = City::where(['name' => $repair->lead->city])->first()->id;
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $documents, $city_id);
+            $transaction->save();
+        }
         return redirect()->back();
     }
 
     public function edit(Repair $repair)
     {
         $cities = City::all();
-        $users = User::where(["city" => Auth::user()->city])->get();
+        $city = City::where(["name" => $repair->lead->city])->first();
+        $users = User::where(["city" => $city->id])->get();
 
         $managers = array();
         $masters = array();

@@ -13,6 +13,8 @@ use App\Models\Plan;
 use App\Models\Receipt;
 use App\Models\Repair;
 use App\Models\Role;
+use App\Models\Transaction;
+use App\Models\TransactionState;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -138,7 +140,11 @@ class DirectorController extends Controller
         if ($data && $data['city']) {
             $city_id = $data['city'];
         } else {
-            $city_id = Auth::user()->city;
+            if ($user->isAdmin) {
+                $city_id = Session::get('city')->id;
+            } else {
+                $city_id = Auth::user()->city;
+            }
         }
 
         $city = City::where([['id', '=', $city_id]])->first()->name;
@@ -148,9 +154,11 @@ class DirectorController extends Controller
         $month = $this->getMonth();
 
         $products_selled = 0;
+        $products_issued = 0;
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
+            $products_issued += $lead->issued;
         }
 
         $todayLeads = $this->getTodayLeads(false, $city);
@@ -172,7 +180,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -378,6 +386,16 @@ class DirectorController extends Controller
 
         $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents), "status" => 'completed']);
 
+
+        if ($data['avance'] && $data['avance'] > 0) {
+            $state = TransactionState::getByCode('1.1.');
+            $desc = 'Предоплата от ' . $lead->city . ' ' . $lead->address . ' ';
+            $value = $data['avance'];
+            $responsible = $lead->getManagerId->id;
+            $documents = implode("|", $documents);
+            $city_id = City::where(['name' => $lead->city])->first()->id;
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $documents, $city_id);
+        }
 
         $repair = new Repair();
         $repair->lead_id = $lead->id;
@@ -843,23 +861,28 @@ class DirectorController extends Controller
             "name" => '',
             "email" => '',
             "birth_date" => '',
-            "password" => '',
             "phone" => "",
             "city" => '',
-            "bet" => '',
         ]);
+
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $count = mb_strlen($chars);
+
+        for ($i = 0, $result = ''; $i < 8; $i++) {
+            $index = rand(0, $count - 1);
+            $result .= mb_substr($chars, $index, 1);
+        }
 
         $user->name = $data['name'] ? $data['name'] : $user->name;
         $user->email = $data['email'] ? $data['email'] : $user->email;
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;;
-        $user->bet = $data['bet'] ? $data['bet'] : $user->bet;
-        $user->password = $data['password'] ? bcrypt($data['password']) : $user->password;
+        $user->password = $result;
         $user->save();
 
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Пользователь успешно обновлён, пароль: ' . $result);
     }
 
     public function deleteUser(User $user)
@@ -886,6 +909,100 @@ class DirectorController extends Controller
     public function getCity(Request $request)
     {
         dd($request->session()->get('city'));
+    }
+
+
+    public function getTransactionsView(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = City::where(['id' => Auth::user()->city]);
+        }
+
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = ' Январь';
+                break;
+            case '02':
+                $dateTitle = ' Февраль';
+                break;
+            case '03':
+                $dateTitle = ' Март';
+                break;
+            case '04':
+                $dateTitle = ' Апрель';
+                break;
+            case '05':
+                $dateTitle = ' Май ';
+                break;
+            case '06':
+                $dateTitle = ' Июнь ';
+                break;
+            case '07':
+                $dateTitle = ' Июль ';
+                break;
+            case '08':
+                $dateTitle = ' Август ';
+                break;
+            case '09':
+                $dateTitle = ' Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = ' Октябрь ';
+                break;
+            case '11':
+                $dateTitle = ' Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = ' Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        if (intval($dateTemp[1]) + 1 < 10) {
+            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
+        } else {
+            if (intval($dateTemp[1]) + 1 > 12) {
+                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($dateTemp[1]) - 1 >= 10) {
+            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
+            }
+        }
+
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+        $transactions = $city->transactions()->whereBetween('created_at', [$startDate, $endDate]);
+
+
+        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city'));
+    }
+
+    public function showTransactionDocs(Transaction $transaction)
+    {
+        $documents = explode('|', $transaction->documents);
+
+        return view('roles.director.transaction', compact('transaction', 'documents'));
     }
 
 }

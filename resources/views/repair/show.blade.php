@@ -59,6 +59,17 @@
                     @endforeach
                     <th class="fw-normal  text-center" scope="row">{{$totalRepairs}}</th>
                 </tr>
+                <tr>
+                    <th scope="row text-center">Отказы</th>
+                    @foreach($days as $day)
+                        @if($day['declined']!=0)
+                            <th class="fw-normal text-center" scope="col">{{$day['declined']}}</th>
+                        @else
+                            <th class="fw-normal text-center" scope="col"></th>
+                        @endif
+                    @endforeach
+                    <th class="fw-normal  text-center" scope="row">{{$totalDeclined}}</th>
+                </tr>
 
                 </tbody>
 
@@ -136,10 +147,11 @@
                                 <p class="m-0 fw-normal">Стоимость материала: {{$repair->materialPrice()}}</p>
                                 <p class="m-0 fw-normal">ЗП мастера: {{$repair->master?$repair->lead->issued*0.1:0}}</p>
                                 <p class="m-0 fw-normal">ЗП менеджера: {{$repair->lead->issued*0.2}}</p>
-                                <p class="m-0 fw-normal">Прочие затраты: 0</p>
-                                <p class="m-0 fw-normal">Прибыль: {{$repair->lead->issued*0.7-$repair->materialPrice()}}
+                                <p class="m-0 fw-normal">Прочие затраты: {{$repair->lead->issued*0.2}}</p>
+                                <p class="m-0 fw-normal">
+                                    Прибыль: {{$repair->lead->issued*0.6-($repair->master?$repair->lead->issued*0.1:0)-$repair->materialPrice()}}
                                     -
-                                    {{round(($repair->lead->issued*($repair->master?0.7:0.8)-$repair->materialPrice())/($repair->lead->issued)*100)}}
+                                    {{round(($repair->lead->issued*($repair->master?0.5:0.6)-$repair->materialPrice())/($repair->lead->issued)*100)}}
                                     %</p>
 
                             </th>

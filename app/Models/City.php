@@ -13,4 +13,14 @@ class City extends Model
      * @var mixed|string
      */
     protected $guarded = [];
+
+    public function budget()
+    {
+        return $this->hasOne(Budget::class, 'city_id')->first();
+    }
+
+    public function transactions()
+    {
+        return $this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->get();
+    }
 }

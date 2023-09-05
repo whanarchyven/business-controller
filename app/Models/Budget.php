@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TransactionState extends Model
+class Budget extends Model
 {
     use HasFactory;
 
-    public function getByCode($code)
+    public function transactions()
     {
-        return TransactionState::where(["code" => $code])->first();
+        return $this->hasMany(Transaction::class, 'budget_id');
     }
 }

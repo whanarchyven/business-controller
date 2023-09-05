@@ -64,6 +64,7 @@
                                     @csrf
                                     @method('patch')
                                     <input type="hidden" name="status" value="declined"/>
+                                    <input type="hidden" name="refund" value="{{$repair->lead->avance}}"/>
                                     <div>
                                         <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>
                                         <input enctype="multipart/form-data"
