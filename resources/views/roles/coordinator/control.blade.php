@@ -310,7 +310,7 @@
                 <div class="d-flex flex-row gap-2 align-items-center justify-content-center">
                     <p class="fs-1 {{$plan?'text-black':'text-danger'}} m-0">
                         План: {{$plan?$plan->value:'Не назначено'}}
-                        ({{$products_selled}}) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
+                        ({{$plan?($plan-$products_selled):'0'}}) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
                     @if($user->isAdmin)
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
                             план {{$city_id}}</button>

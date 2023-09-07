@@ -234,8 +234,8 @@ class RepairsController extends Controller
         $repair->status = $data['status'];
         $repair->save();
 
-        if ($data['status'] == 'completed') {
-            $state = TransactionState::getByCode('1.5.');
+        if ($data['status'] == 'completed' && $repair->lead->issued > $repair->lead->avance) {
+            $state = TransactionState::getByCode('1.2.');
             $desc = 'Ремонт от ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
             $value = $repair->check - $repair->lead->avance;
             $responsible = $repair->lead->getManagerId->id;
@@ -245,7 +245,7 @@ class RepairsController extends Controller
             $transaction->save();
         }
         if ($data['status'] == 'declined' && array_key_exists('refund', $data)) {
-            $state = TransactionState::getByCode('1.2.');
+            $state = TransactionState::getByCode('1.5.');
             $desc = 'Возврат по договору ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
             $value = $repair->lead->avance;
             $responsible = $repair->lead->getManagerId->id;

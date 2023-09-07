@@ -104,7 +104,7 @@ class DirectorController extends Controller
 
     public function getTodayLeads($isDeclined, $city)
     {
-        return Lead::where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city], ['meeting_date', '=', Carbon::now()->toDateString()]])->get();
+        return Lead::where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city], ['meeting_date', '=', Carbon::now()->toDateString()], ['issued', '=', null]])->get();
     }
 
     public function declineLead(Lead $lead, Request $request)
