@@ -268,6 +268,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-item"
+                           href="{{ route('director.directorcard',\Illuminate\Support\Facades\Auth::user()) }}">
+                            Карточка
+                        </a>
+                    </li>
+
 
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"

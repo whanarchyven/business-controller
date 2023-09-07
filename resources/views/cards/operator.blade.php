@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/card?date={{$prevMonthLink}}">Предыдущий
+                   href="{{route('director.operatorcard',$user->id).'?date='.$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -18,7 +18,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/card?date={{$nextMonthLink}}">Следующий
+                   href="{{route('director.operatorcard',$user->id).'?date='.$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>
@@ -127,7 +127,7 @@
                             0
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->getSalary()?$user->getSalary()->salary:0}}
+                            {{$totalSuccessful*150+$totalWorkDays*200}}
                         </th>
 
                     </tr>

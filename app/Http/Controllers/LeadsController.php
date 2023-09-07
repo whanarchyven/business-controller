@@ -480,9 +480,6 @@ class LeadsController extends Controller
 //            dd(count(Lead::whereDate('created_at', Carbon::today())->where([['operator_id', '=', Auth::user()->id]])->get()));
 
 
-            if (count(Lead::whereDate('created_at', Carbon::today())->where([['operator_id', '=', Auth::user()->id]])->get()) == 0) {
-                app('App\Http\Controllers\SalaryController')->addSalary(Auth::user(), 200);
-            }
         }
 
         $lead = Lead::create($data);
@@ -542,7 +539,6 @@ class LeadsController extends Controller
             $lead->update(['status' => 'in-work']);
             $manager->status = 'on-meeting';
             $manager->save();
-            app('\App\Http\Controllers\SalaryController')->addSalary($operator, 150);
             $operator->save();
         } else if ($data['status'] == 'exited') {
             $manager->status = 'free';
@@ -758,9 +754,53 @@ class LeadsController extends Controller
 
         $documents = explode('|', $manager->documents);
 
+        $oklad = 0;
+        $okladSallary = 0;
+
+        if ($totalIssued < 200000) {
+            $oklad = 5000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 200000 && $totalIssued < 300000) {
+            $oklad = 15000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 300000 && $totalIssued < 400000) {
+            $oklad = 25000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 400000 && $totalIssued < 500000) {
+            $oklad = 40000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 500000 && $totalIssued < 700000) {
+            $oklad = 50000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 700000 && $totalIssued < 900000) {
+            $oklad = 70000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 900000 && $totalIssued < 1000000) {
+            $oklad = 80000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 1000000 && $totalIssued < 1500000) {
+            $oklad = 100000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 1500000 && $totalIssued < 2000000) {
+            $oklad = 120000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        } elseif ($totalIssued >= 2000000) {
+            $oklad = 150000;
+            $okladSallary = $oklad * $totalWorkDays / count($days);
+
+        }
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary'));
         }
 
 

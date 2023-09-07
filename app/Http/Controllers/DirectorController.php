@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\DirectorWorkday;
 use App\Models\Expense;
 use App\Models\Lead;
 use App\Models\ManagerCoordinator;
@@ -20,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class DirectorController extends Controller
@@ -265,6 +267,8 @@ class DirectorController extends Controller
 
         $city = City::where(["id" => Auth::user()->city])->first();
 
+//        dd(Session::get('city')->name);
+
         if (Auth::user()->isAdmin) {
             return Lead::whereDate('created_at', $date)->where([['status', '=', 'in-work'], ['city', '=', Session::get('city')->name]])->get()->reverse();
         } else {
@@ -279,6 +283,7 @@ class DirectorController extends Controller
         } else {
             $date = Carbon::now()->toDateString();
         }
+
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
         $dateTitle = '';
@@ -345,7 +350,7 @@ class DirectorController extends Controller
         $prevMonthLink = Carbon::createFromDate($date)->subDays(1)->toDateString();
         $nextMonthLink = Carbon::createFromDate($date)->addDays(1)->toDateString();
         $leads = $this->getMonthWorkLeads($date);
-
+//        dd($leads);
 
         return (view('roles.director.daily', compact('dateTitle', 'prevMonthLink', 'nextMonthLink', 'leads')));
     }
@@ -383,15 +388,17 @@ class DirectorController extends Controller
             }
         }
 
-        $suka = Lead::whereDate("created_at", Carbon::today())->where(["manager_id" => $lead->getManagerId->id, "status" => 'completed'])->first();
-        if ($suka == null) {
-            $lead->getManagerId->salary($lead->getManagerId->bet);
-        }
 
         //здесь будем бонусы выписывать
 
         $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents), "status" => 'completed']);
 
+
+        $repair = new Repair();
+        $repair->lead_id = $lead->id;
+        $repair->check = 0;
+        $repair->repair_date = $data['repair_date'];
+        $repair->save();
 
         if ($data['avance'] && $data['avance'] > 0) {
             $state = TransactionState::getByCode('1.1.');
@@ -403,11 +410,11 @@ class DirectorController extends Controller
             $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $documents, $city_id);
         }
 
-        $repair = new Repair();
-        $repair->lead_id = $lead->id;
-        $repair->check = 0;
-        $repair->repair_date = $data['repair_date'];
-        $repair->save();
+
+        if ($data['issued'] != 0 && DirectorWorkday::whereDate('created_at', Carbon::today()->toDateString())->where(["director_id" => Auth::user()->id])->first() == null) {
+            $director_workday = new DirectorWorkday(["director_id" => Auth::user()->id]);
+            $director_workday->save();
+        }
 
 
         return redirect(route('director.daily'));
@@ -1010,6 +1017,202 @@ class DirectorController extends Controller
         $documents = explode('|', $transaction->documents);
 
         return view('roles.director.transaction', compact('transaction', 'documents'));
+    }
+
+
+    public function getDirectorDaysInMonthWithWeekdays($month, $year)
+    {
+        $firstDay = strtotime("$year-$month-01");
+        $daysInMonth = date('t', $firstDay);
+
+        $result = array();
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $currentDate = strtotime("$year-$month-$day");
+            $weekDay = date('N', $currentDate); // 1 (понедельник) до 7 (воскресенье)
+
+            $weekDays = array(
+                1 => 'пн',
+                2 => 'вт',
+                3 => 'ср',
+                4 => 'чт',
+                5 => 'пт',
+                6 => 'сб',
+                7 => 'вс'
+            );
+
+            $result[] = array(
+                'day' => $day,
+                'date' => $year . '-' . $month . '-' . ($day < 10 ? '0' . $day : $day),
+                'weekDay' => $weekDays[$weekDay],
+                'repairs_confirmed' => 0,
+                'managers' => [],
+                'workDay' => 0,
+                'link' => $year . '-' . $month . '-' . ($day < 10 ? ('0' . $day) : ($day)),
+            );
+        }
+
+        return $result;
+    }
+
+    public function getDirectorMonthLeads($year, $month, $city)
+    {
+        $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        return $leads = Lead::where([['status', '=', 'completed'], ["city", "=", $city]])->whereBetween('created_at', [$startDate, $endDate])->get();
+
+    }
+
+
+    public function getDirectorWorkDays($year, $month, $director_id)
+    {
+        $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        return DirectorWorkday::where([['director_id', '=', $director_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+    }
+
+
+    public function directorCard(User $director, Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+
+        if (!$director->id) {
+            $director = Auth::user();
+        }
+
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+
+
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $city = City::where(["id" => $director->city])->first();
+
+        $days = $this->getDirectorDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+
+        $monthLeads = $this->getDirectorMonthLeads($dateTemp[0], $dateTemp[1], $city->name);
+
+
+        foreach ($monthLeads as $lead) {
+            $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
+            $days[$day - 1]['repairs_confirmed'] += $lead->issued;
+//            echo array_search($lead->getManagerId->id, $days[$day - 1]['managers']);
+            if (in_array($lead->getManagerId->id, $days[$day - 1]['managers']) == false) {
+                array_push($days[$day - 1]['managers'], $lead->getManagerId->id);
+//                echo $lead->getManagerId->id;
+//                echo '------------';
+            }
+        }
+
+        $monthWorkDays = $this->getDirectorWorkDays($dateTemp[0], $dateTemp[1], $director->id);
+
+        foreach ($monthWorkDays as $workDay) {
+            $day = intval(preg_split("/[^1234567890]/", $workDay['created_at'])[2]);
+            $days[$day - 1]['workDay'] = $workDay->id;
+        }
+
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+
+        $totalWorkDays = 0;
+        $totalConfirmed = 0;
+
+        foreach ($days as $day) {
+            if ($day['workDay'] != 0) {
+                $totalWorkDays++;
+            }
+            $totalConfirmed += $day['repairs_confirmed'];
+        }
+
+//        dd($days);
+
+        $documents = explode('|', $director->documents);
+
+        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents'));
+    }
+
+    public function addWorkDay(User $director, Request $request)
+    {
+        $date = $request['date'];
+        $workDay = new DirectorWorkday(["director_id" => $director->id]);
+        $workDay->created_at = $date . ' 08:00:00';
+        $workDay->updated_at = $date . ' 08:00:00';
+        $workDay->save();
+        return redirect()->back();
+    }
+
+    public function removeWorkDay(User $director, Request $request)
+    {
+        $date = $request['date'];
+        $workDay = DirectorWorkday::whereDate('created_at', $date)->where(["director_id" => $director->id]);
+        $workDay->delete();
+
+        return redirect()->back();
     }
 
 }

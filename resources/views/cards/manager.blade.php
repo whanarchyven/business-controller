@@ -79,7 +79,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/card?date={{$prevMonthLink}}">Предыдущий
+                   href="{{route('director.managercard',$manager->id).'?date='.$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -87,7 +87,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/card?date={{$nextMonthLink}}">Следующий
+                   href="{{route('director.managercard',$manager->id).'?date='.$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>
@@ -104,7 +104,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/director/manager/{{$manager->id}}?date={{$prevMonthLink}}">Предыдущий
+                   href="{{route('director.managercard',$manager->id).'?date='.$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -112,7 +112,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/director/manager/{{$manager->id}}?date={{$nextMonthLink}}">Следующий
+                   href="{{route('director.managercard',$manager->id).'?date='.$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>
@@ -256,15 +256,15 @@
                 <tbody>
                 <tr>
                     <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.2}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.05}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalDeclined<3?$totalConfirmed*0.01:0}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{$manager->bet?$manager->bet*count($days):'Не назначено'}}</th>
+                        scope="col">{{$oklad}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{$manager->bet?$manager->bet*$totalWorkDays:'-'}}</th>
+                        scope="col">{{round($okladSallary)}}</th>
                     <th class="fw-normal text-center" scope="col">0</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{($totalConfirmed*0.2)+($totalConfirmed*0.05)+($manager->bet?$manager->bet*$totalWorkDays:0)}}</th>
+                        scope="col">{{round(($totalConfirmed*0.2)+($totalDeclined<3?$totalConfirmed*0.01:0)+($okladSallary))}}</th>
                 </tr>
                 </tbody>
 

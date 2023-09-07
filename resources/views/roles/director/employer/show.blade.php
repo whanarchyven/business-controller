@@ -65,7 +65,19 @@
                                         class="btn btn-warning">
                                     Карточка
                                 </button>
+                            @elseif($user->hasRole('master'))
+                                <button onclick="window.location.href='{{route($route_card,$user)}}'"
+                                        class="btn btn-warning">
+                                    Карточка
+                                </button>
+                            @elseif($user->hasRole('director'))
+                                <button onclick="window.location.href='{{route($route_card,$user)}}'"
+                                        class="btn btn-warning">
+                                    Карточка
+                                </button>
                             @endif
+
+
                         </div>
                     </th>
                 </tr>

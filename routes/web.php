@@ -67,6 +67,12 @@ Route::patch('/repairs/{repair}', [App\Http\Controllers\RepairsController::class
 Route::patch('/repairs/{repair}/update', [App\Http\Controllers\RepairsController::class, 'editRepairViaLead'])->name('repairs.leads.update');
 
 
+Route::get('/card/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('director.managercard');
+Route::get('/card/operator/{user}', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('director.operatorcard');
+Route::get('/card/master/{master}', [App\Http\Controllers\RepairsController::class, 'masterCard'])->name('director.mastercard');
+Route::get('/card/director/{director}', [App\Http\Controllers\DirectorController::class, 'directorCard'])->name('director.directorcard');
+
+
 Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/', [App\Http\Controllers\DirectorController::class, 'controlTable'])->name('director.managers');
     Route::get('/director/leads/{lead}/edit', [App\Http\Controllers\LeadsController::class, 'edit'])->name('director.leads.edit');
@@ -74,8 +80,10 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('director.leads.decline');
     Route::patch('/director/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('director.leads.manage');
     Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
-    Route::get('/director/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('director.managercard');
-    Route::get('/director/operator/{user}', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('director.operatorcard');
+
+    Route::post('/director/director/{director}/addworkday', [App\Http\Controllers\DirectorController::class, 'addWorkDay'])->name('director.add.workday');
+    Route::delete('/director/director/{director}/removeworkday', [App\Http\Controllers\DirectorController::class, 'removeWorkDay'])->name('director.delete.workday');
+
     Route::patch('/director/managers/{manager}/status', [\App\Http\Controllers\ManagerController::class, 'changeManagerStatus'])->name('director.manager.status');
     Route::patch('/director/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('director.manager.leads.status');
     Route::patch('/director/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('director.manager.leads.close');
