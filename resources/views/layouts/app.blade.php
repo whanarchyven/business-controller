@@ -268,12 +268,14 @@
                         </a>
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a class="dropdown-item"
-                           href="{{ route('director.directorcard',\Illuminate\Support\Facades\Auth::user()) }}">
-                            Карточка
-                        </a>
-                    </li>
+                    @if(!\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-item"
+                               href="{{ route('director.directorcard',\Illuminate\Support\Facades\Auth::user()) }}">
+                                Карточка
+                            </a>
+                        </li>
+                    @endif
 
 
                     <li class="nav-item dropdown">
