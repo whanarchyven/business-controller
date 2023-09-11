@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\DirectorWorkday;
+use App\Models\EmployeerWorkDay;
 use App\Models\Expense;
 use App\Models\Lead;
 use App\Models\ManagerCoordinator;
@@ -414,6 +415,11 @@ class DirectorController extends Controller
         if ($data['issued'] != 0 && DirectorWorkday::whereDate('created_at', Carbon::today()->toDateString())->where(["director_id" => Auth::user()->id])->first() == null) {
             $director_workday = new DirectorWorkday(["director_id" => Auth::user()->id]);
             $director_workday->save();
+        }
+
+        if (EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $lead->getManagerId->id])->first() == null) {
+            $workDay = new EmployeerWorkDay(["user_id" => $lead->getManagerId->id]);
+            $workDay->save();
         }
 
 
@@ -891,8 +897,8 @@ class DirectorController extends Controller
         $user->email = $data['email'] ? $data['email'] : $user->email;
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
-        $user->phone = $data['phone'] ? $data['phone'] : $user->phone;;
-        $user->password = $result;
+        $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
+        $user->password = bcrypt($result);
         $user->save();
 
 
@@ -1068,7 +1074,12 @@ class DirectorController extends Controller
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
-        return DirectorWorkday::where([['director_id', '=', $director_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+        $user = User::where(['id' => $director_id])->first();
+        if ($user->hasRole('director')) {
+            return DirectorWorkday::where([['director_id', '=', $director_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+        } else {
+            return EmployeerWorkDay::where([['user_id', '=', $director_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+        }
     }
 
 
@@ -1181,10 +1192,14 @@ class DirectorController extends Controller
 
         $totalWorkDays = 0;
         $totalConfirmed = 0;
+        $weekends = 0;
 
         foreach ($days as $day) {
             if ($day['workDay'] != 0) {
                 $totalWorkDays++;
+            }
+            if ($day['weekDay'] == 'вс') {
+                $weekends++;
             }
             $totalConfirmed += $day['repairs_confirmed'];
         }
@@ -1193,13 +1208,18 @@ class DirectorController extends Controller
 
         $documents = explode('|', $director->documents);
 
-        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents'));
+        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends'));
     }
 
     public function addWorkDay(User $director, Request $request)
     {
         $date = $request['date'];
-        $workDay = new DirectorWorkday(["director_id" => $director->id]);
+        if ($director->hasRole('director')) {
+            $workDay = new DirectorWorkday(["director_id" => $director->id]);
+        } else {
+            $workDay = new EmployeerWorkDay(["user_id" => $director->id]);
+        }
+
         $workDay->created_at = $date . ' 08:00:00';
         $workDay->updated_at = $date . ' 08:00:00';
         $workDay->save();
@@ -1209,9 +1229,12 @@ class DirectorController extends Controller
     public function removeWorkDay(User $director, Request $request)
     {
         $date = $request['date'];
-        $workDay = DirectorWorkday::whereDate('created_at', $date)->where(["director_id" => $director->id]);
+        if ($director->hasRole('director')) {
+            $workDay = DirectorWorkday::whereDate('created_at', $date)->where(["director_id" => $director->id]);
+        } else {
+            $workDay = EmployeerWorkDay::whereDate('created_at', $date)->where(["user_id" => $director->id]);
+        }
         $workDay->delete();
-
         return redirect()->back();
     }
 

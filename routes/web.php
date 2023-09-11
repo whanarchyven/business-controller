@@ -65,6 +65,7 @@ Route::get('/repairs/', [App\Http\Controllers\RepairsController::class, 'index']
 Route::get('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 'edit'])->name('repairs.edit');
 Route::patch('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 'update'])->name('repairs.update');
 Route::patch('/repairs/{repair}/update', [App\Http\Controllers\RepairsController::class, 'editRepairViaLead'])->name('repairs.leads.update');
+Route::post('/repairs/{repair}/duplicate', [App\Http\Controllers\RepairsController::class, 'duplicate'])->name('repairs.duplicate');
 
 
 Route::get('/card/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('director.managercard');
@@ -87,6 +88,9 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/managers/{manager}/status', [\App\Http\Controllers\ManagerController::class, 'changeManagerStatus'])->name('director.manager.status');
     Route::patch('/director/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('director.manager.leads.status');
     Route::patch('/director/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('director.manager.leads.close');
+    Route::get('/director/manager/{manager}/operative', [App\Http\Controllers\LeadsController::class, 'managerOperative'])->name('director.manager.operative');
+
+
     Route::patch('/director/plan/change', [App\Http\Controllers\DirectorController::class, 'changePlan'])->name('director.changeplan');
     Route::get('/director/daily', [App\Http\Controllers\DirectorController::class, 'daily'])->name('director.daily');
 

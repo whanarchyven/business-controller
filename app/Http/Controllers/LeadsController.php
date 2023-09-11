@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\EmployeerWorkDay;
 use App\Models\Salary;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -40,7 +41,9 @@ class LeadsController extends Controller
 
             $result[] = array(
                 'day' => $day,
+                'date' => $year . '-' . $month . '-' . ($day < 10 ? '0' . $day : $day),
                 'weekDay' => $weekDays[$weekDay],
+                'workDay' => 0,
                 'leads' => 0,
                 'declined' => 0,
                 'successful' => 0,
@@ -415,18 +418,28 @@ class LeadsController extends Controller
             }
         }
 
-        $totalWorkDays = 0;
+        $monthWorkDays = app(\App\Http\Controllers\DirectorController::class)->getDirectorWorkDays($dateTemp[0], $dateTemp[1], $user->id);
 
+        foreach ($monthWorkDays as $workDay) {
+            $day = intval(preg_split("/[^1234567890]/", $workDay['created_at'])[2]);
+            $days[$day - 1]['workDay'] = $workDay->id;
+        }
+        $weekends = 0;
+        $totalWorkDays = 0;
         foreach ($days as $day) {
-            if ($day['leads'] != 0) {
+            if ($day['workDay'] != 0) {
                 $totalWorkDays++;
             }
+            if ($day['weekDay'] == 'вс') {
+                $weekends++;
+            }
         }
+//        dd($days);
 
 //        dd($successful_leads);
 
 
-        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays'));
+        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'weekends'));
     }
 
 
@@ -472,14 +485,11 @@ class LeadsController extends Controller
 
 //        dd($data);
 
-        if (Auth::user()->hasRole('operator')) {
-//            dd('aaaa');
-            $tempDate = Carbon::now()->toDateString();
-            $tempDate = preg_split("/[^1234567890]/", $tempDate);
+        $tempUser = Auth::user();
 
-//            dd(count(Lead::whereDate('created_at', Carbon::today())->where([['operator_id', '=', Auth::user()->id]])->get()));
-
-
+        if ($tempUser->hasRole('operator') && EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $tempUser->id])->first() == null) {
+            $workDay = new EmployeerWorkDay(["user_id" => $tempUser->id]);
+            $workDay->save();
         }
 
         $lead = Lead::create($data);
@@ -579,17 +589,19 @@ class LeadsController extends Controller
 
             $result[] = array(
                 'day' => $day,
+                'date' => $year . '-' . $month . '-' . ($day < 10 ? '0' . $day : $day),
                 'weekDay' => $weekDays[$weekDay],
                 'meetings' => 0,
                 'successful' => 0,
                 'declined' => 0,
-                'workDay' => false,
+                'workDay' => 0,
                 'products_selled' => 0,
                 'products_issued' => 0,
                 'products_confirmed' => 0,
                 'link' => $year . '-' . $month . '-' . ($day < 10 ? ('0' . $day) : ($day)),
             );
         }
+
 
         return $result;
     }
@@ -741,69 +753,110 @@ class LeadsController extends Controller
         $totalIssued = 0;
         $totalConfirmed = 0;
 
-        foreach ($days as $day) {
-            if ($day['products_issued'] != 0) {
-                $totalWorkDays++;
-            }
-            $totalSelled += $day['products_selled'];
-            $totalIssued += $day['products_issued'];
-            $totalConfirmed += $day['products_confirmed'];
-        }
-
         $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
 
         $documents = explode('|', $manager->documents);
 
         $oklad = 0;
         $okladSallary = 0;
+        $weekends = 0;
+
+        $monthWorkDays = app(\App\Http\Controllers\DirectorController::class)->getDirectorWorkDays($dateTemp[0], $dateTemp[1], $manager->id);
+
+        foreach ($monthWorkDays as $workDay) {
+            $day = intval(preg_split("/[^1234567890]/", $workDay['created_at'])[2]);
+            $days[$day - 1]['workDay'] = $workDay->id;
+        }
+
+        foreach ($days as $day) {
+            if ($day['workDay'] != 0) {
+                $totalWorkDays++;
+            }
+            if ($day['weekDay'] == 'вс') {
+                $weekends++;
+            }
+
+            $totalSelled += $day['products_selled'];
+            $totalIssued += $day['products_issued'];
+            $totalConfirmed += $day['products_confirmed'];
+        }
 
         if ($totalIssued < 200000) {
             $oklad = 5000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 200000 && $totalIssued < 300000) {
             $oklad = 15000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 300000 && $totalIssued < 400000) {
             $oklad = 25000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 400000 && $totalIssued < 500000) {
             $oklad = 40000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 500000 && $totalIssued < 700000) {
             $oklad = 50000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 700000 && $totalIssued < 900000) {
             $oklad = 70000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 900000 && $totalIssued < 1000000) {
             $oklad = 80000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 1000000 && $totalIssued < 1500000) {
             $oklad = 100000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 1500000 && $totalIssued < 2000000) {
             $oklad = 120000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         } elseif ($totalIssued >= 2000000) {
             $oklad = 150000;
-            $okladSallary = $oklad * $totalWorkDays / count($days);
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
         }
 
+
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends'));
         }
 
 
     }
+
+    public function managerOperative(User $manager, Request $request)
+    {
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+
+        if (!$manager->id) {
+            $manager = Auth::user();
+        }
+
+
+        [$manager, $manager_statuses] = app('App\Http\Controllers\CoordinatorController')->getManagerCard($manager->id);
+
+
+        $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
+
+
+        if ($manager->hasRole('manager')) {
+            return view('roles.manager.operative', compact('date', 'manager', 'manager_statuses', 'leads'));
+        }
+
+
+    }
+
 
 }

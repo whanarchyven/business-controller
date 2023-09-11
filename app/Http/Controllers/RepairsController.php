@@ -40,6 +40,7 @@ class RepairsController extends Controller
                 'weekDay' => $weekDays[$weekDay],
                 'repairs' => 0,
                 'declined' => 0,
+                'completed' => 0,
                 'link' => $year . '-' . $month . '-' . ($day < 10 ? ('0' . $day) : ($day)),
             );
         }
@@ -47,7 +48,7 @@ class RepairsController extends Controller
         return $result;
     }
 
-    public function getMonthRepairs($year, $month, $isDeclined)
+    public function getMonthRepairs($year, $month, $status)
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
@@ -56,7 +57,20 @@ class RepairsController extends Controller
 
         if ($user->isAdmin) {
             $temp = array();
-            $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+            switch ($status) {
+                case 'all':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
+                    break;
+                case 'declined':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
+                    break;
+                case 'completed':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
+                    break;
+                default:
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
+                    break;
+            }
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == Session::get('city')->name) {
                     array_push($temp, $repair);
@@ -65,7 +79,20 @@ class RepairsController extends Controller
             return $temp;
         } else {
             $temp = array();
-            $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined']])->get();
+            switch ($status) {
+                case 'all':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
+                    break;
+                case 'declined':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'declined']])->get();
+                    break;
+                case 'completed':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'completed']])->get();
+                    break;
+                default:
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
+                    break;
+            }
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == $city->name) {
                     array_push($temp, $repair);
@@ -158,11 +185,14 @@ class RepairsController extends Controller
 
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
-        $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], false);
-        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], true);
+        $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'all');
+        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
+        $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
+
 
         $totalRepairs = 0;
         $totalDeclined = 0;
+        $totalCompleted = 0;
 
         foreach ($monthRepairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
@@ -174,6 +204,12 @@ class RepairsController extends Controller
             $day = intval(preg_split("/[^1234567890]/", $declined['repair_date'])[2]);
             $days[$day - 1]['declined'] += 1;
             $totalDeclined++;
+        }
+
+        foreach ($completedRepairs as $completed) {
+            $day = intval(preg_split("/[^1234567890]/", $completed['repair_date'])[2]);
+            $days[$day - 1]['completed'] += 1;
+            $totalCompleted++;
         }
 
         $lexems = preg_split("/[^1234567890]/", $date);
@@ -198,7 +234,12 @@ class RepairsController extends Controller
             }
         }
 
-        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined'));
+        $totalCheck = 0;
+        foreach ($repairs as $repair) {
+            $totalCheck += $repair->check;
+        }
+
+        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck'));
     }
 
     public function update(Repair $repair, Request $request)
@@ -230,8 +271,13 @@ class RepairsController extends Controller
             }
         }
 
+//        dd($data);
+
         $repair->documents = $repair->documents . '|' . implode('|', $documents);
         $repair->status = $data['status'];
+        if (key_exists('repair_date', $data)) {
+            $repair->repair_date = $data['repair_date'];
+        }
         $repair->save();
 
         if ($data['status'] == 'completed' && $repair->lead->issued > $repair->lead->avance) {
@@ -314,7 +360,6 @@ class RepairsController extends Controller
             "note" => $data['note']
         ]);
         $lead->save();
-
 
         $repair->update([
             "contract_number" => $data['contract_number'],
@@ -512,5 +557,11 @@ class RepairsController extends Controller
         return view('cards.master', compact('date', 'dateTitle', 'formattedDate', 'city', 'master', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalRepairs', 'totalConfirmed', 'documents', 'documents'));
     }
 
+    public function duplicate(Repair $repair)
+    {
+        $newRepair = $repair->replicate();
+        $newRepair->save();
+        return redirect()->back();
+    }
 
 }

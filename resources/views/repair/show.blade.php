@@ -52,7 +52,8 @@
                     <th scope="row text-center">Ремонты</th>
                     @foreach($days as $day)
                         @if($day['repairs']!=0)
-                            <th class="fw-normal text-center" scope="col">{{$day['repairs']}}</th>
+                            <th class="fw-normal text-center {{$day['repairs']==$day['completed']?'bg-completed':''}}"
+                                scope="col">{{$day['repairs']}}</th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>
                         @endif
@@ -71,17 +72,33 @@
                     <th class="fw-normal  text-center" scope="row">{{$totalDeclined}}</th>
                 </tr>
 
+                <tr>
+                    <th scope="row text-center">Выполнено</th>
+                    @foreach($days as $day)
+                        @if($day['completed']!=0)
+                            <th class="fw-normal text-center" scope="col">{{$day['completed']}}</th>
+                        @else
+                            <th class="fw-normal text-center" scope="col"></th>
+                        @endif
+                    @endforeach
+                    <th class="fw-normal  text-center" scope="row">{{$totalCompleted}}</th>
+                </tr>
+
                 </tbody>
 
             </table>
 
             <div class="bd-cyan-500">
                 <p class="fs-3 text-indigo">Ремонты {{$formattedDate}}</p>
-                <div class="flex gap-3 mb-4">
-
-                    <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>
-                    <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно</button>
-                    <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено</button>
+                <div class="w-100 d-flex flex-row justify-content-between">
+                    <div class="d-flex gap-3 mb-4">
+                        <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>
+                        <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно
+                        </button>
+                        <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено
+                        </button>
+                    </div>
+                    <p class="fs-3 fw-bold">Суммарный чек за день: {{$totalCheck}}</p>
                 </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
@@ -104,6 +121,11 @@
                                 {{$repair->lead->city}}<br/>
                                 c {{preg_split("/[^1234567890]/", $repair->lead->time_period)[0]}}
                                 до {{preg_split("/[^1234567890]/", $repair->lead->time_period)[1]}}
+                                <form method="post" action="{{route('repairs.duplicate',$repair)}}">
+                                    @csrf
+                                    @method('post')
+                                    <input type="submit" class="btn btn-primary mt-3" value="Дублировать">
+                                </form>
                             </th>
                             <th class="fw-bold text-left" scope="col">
                                 <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$repair->lead->client_fullname}}</p>
@@ -137,7 +159,7 @@
                                         <input type="date" class="form-control"
                                                id='repair_date' name="repair_date" list="repair_date">
                                         <input type="hidden" class="form-control"
-                                               id='status' value="{{$repair->status}}}" name="status" list="status">
+                                               id='status' value="{{$repair->status}}" name="status" list="status">
                                         <input type="submit" class="btn btn-primary w-100" value="Перенос">
                                     </form>
                                 </div>

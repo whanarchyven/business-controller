@@ -83,13 +83,37 @@
                 <tr>
                     <th scope="col" class="fw-normal text-center">Раб. день</th>
                     @foreach($days as $day)
-                        @if($day['leads']!=0)
-                            <th class="fw-bold text-center" scope="col">✓</th>
+                        @if($day['workDay']!=0)
+                            <th class="fw-bold text-center" scope="col">
+                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                    <form action="{{route('director.delete.workday',$user)}}" method="post"
+                                          class="w-auto d-flex flex-column align-items-center">
+                                        @csrf
+                                        @method('delete')
+                                        <input name="date" value="{{$day['date']}}" type="hidden">
+                                        <input class="p-0 bg-transparent border-0" type="submit" value="✔️">
+                                    </form>
+                                @else
+                                    <p>✔️</p>
+                                @endif
+                            </th>
                         @else
-                            <th class="fw-normal text-center" scope="col">✕</th>
+                            <th class="fw-normal text-center" scope="col">
+                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                    <form method="post" action="{{route('director.add.workday',$user)}}"
+                                          class="w-auto d-flex flex-column align-items-center">
+                                        @csrf
+                                        @method('post')
+                                        <input name="date" value="{{$day['date']}}" type="hidden">
+                                        <input class="p-0 bg-transparent border-0" type="submit" value="❌">
+                                    </form>
+                                @else
+                                    <p>❌</p>
+                                @endif
+                            </th>
                         @endif
                     @endforeach
-                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}/{{count($days)}}</th>
+                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}/{{(count($days)-$weekends)}}</th>
                 </tr>
 
                 </tbody>

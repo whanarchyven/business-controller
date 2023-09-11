@@ -327,7 +327,7 @@
                 </div>
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
-                    <button onclick="window.location.href='{{route('director.managercard',$manager)}}'"
+                    <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"
                             class="btn manager-{{$manager->status}}">{{$manager->name}}</button>
                 @endforeach
 
@@ -399,45 +399,10 @@
                                         <p class="m-0">Менеджер: {{$lead->getManagerId->name}}</p>
                                         <p class="m-0">Сумма: {{$lead->check}}</p>
                                     </div>
-                                    <div class="d-flex">
-                                        <div id="control-panel" class="d-flex flex-row gap-2">
-                                            <div class="d-flex flex-row gap-2 w-100">
-                                                <button id="decline-btn"
-                                                        class="btn btn-danger text-white w-50 rounded-2  p-2">
-                                                    Отказ
-                                                </button>
-                                                <button
-                                                    onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
-                                                    class="btn btn-warning text-white w-75 rounded-2  p-2">
-                                                    Редатировать
-                                                </button>
-                                                <form method="post"
-                                                      action="{{route('director.leads.changemanager',$lead)}}">
-                                                    @csrf
-                                                    @method('patch')
-                                                    <input type="hidden" name="manager" value="{{$lead->manager_id}}">
-                                                    <input type="submit"
-                                                           class="btn btn-primary text-white w-100 rounded-2  p-2"
-                                                           value="Сменить менеджера"/>
-                                                </form>
-                                            </div>
 
-                                        </div>
-                                    </div>
                                 @endif
 
 
-                                <div id="decline-form-second" class="d-none">
-                                    <form class="d-flex gap-2 w-100"
-                                          action="{{route('director.leads.decline',$lead->id)}}"
-                                          method="post">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input placeholder="Укажите причину отказа" class="form-control" name="note"
-                                               type="text"/>
-                                        <input type="submit" class="my-2 btn btn-danger w-50" value="Отказ">
-                                    </form>
-                                </div>
                                 <p class="fw-normal">Оператор: {{$lead->getOperatorId->name}}</p>
                             </th>
                         </tr>
@@ -450,18 +415,6 @@
         </div>
         @endrole
 
-        <script>
-            document.getElementById('decline-btn')?.addEventListener('click', () => {
-                document.getElementById('control-panel').className = 'd-none';
-                document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
-            })
-
-            document.getElementById('change-plan-btn')?.addEventListener('click', () => {
-                document.getElementById('change-plan-btn').className = 'd-none';
-                document.getElementById('change-plan-form').className = 'd-flex gap-2';
-
-            })
-        </script>
 
     </div>
 @endsection

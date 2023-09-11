@@ -136,7 +136,7 @@
                             </th>
                         @endif
                     @endforeach
-                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}/{{count($days)}}</th>
+                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}/{{(count($days)-$weekends)}}</th>
                 </tr>
                 </tbody>
             </table>
@@ -159,10 +159,11 @@
                         scope="col">{{$totalConfirmed>=1000000?$totalConfirmed*0.01:0}}</th>
                     <th class="fw-normal text-center" scope="col">50000</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
-                    <th class="fw-normal text-center" scope="col">{{round($totalWorkDays*50000/count($days))}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{round($totalWorkDays*50000/(count($days)-$weekends))}}</th>
                     <th class="fw-normal text-center" scope="col">0</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round($totalWorkDays*50000/count($days))}}</th>
+                        scope="col">{{round($totalWorkDays*50000/(count($days)-$weekends))}}</th>
                 </tr>
                 </tbody>
 
