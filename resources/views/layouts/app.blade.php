@@ -297,6 +297,30 @@
                         </div>
                     </li>
 
+                    @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Ведомость
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('director.bonuses') }}">
+                                    Бонусы
+                                </a>
+                                <a class="dropdown-item" href="{{ route('director.deductions') }}">
+                                    Удержания
+                                </a>
+                                <a class="dropdown-item" href="{{route('director.expense')}}">
+                                    Аванс неделя
+                                </a>
+                                <a class="dropdown-item" href="{{route('director.nomenclature')}}">
+                                    Аванс месяц
+                                </a>
+                            </div>
+                        </li>
+                    @endif
+
 
                 </ul>
                 @endrole

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BonusManager;
 use App\Models\City;
 use App\Models\EmployeerWorkDay;
 use App\Models\Salary;
@@ -823,9 +824,29 @@ class LeadsController extends Controller
 
         }
 
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $bonuses = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $manager->id, "type" => "plus"])->get();
+        $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $manager->id, "type" => "minus"])->get();
+
+        $totalDeduction = 0;
+
+        foreach ($deductions as $deduction) {
+            $totalDeduction += $deduction->amount;
+        }
+
+        $totalBonus = 0;
+
+        foreach ($bonuses as $bonus) {
+            if ($bonus->isPayed) {
+                $totalBonus += $bonus->amount;
+            }
+        }
+
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus'));
         }
 
 

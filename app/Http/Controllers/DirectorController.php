@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BonusManager;
 use App\Models\City;
 use App\Models\DirectorWorkday;
 use App\Models\EmployeerWorkDay;
@@ -422,6 +423,25 @@ class DirectorController extends Controller
             $workDay->save();
         }
 
+        $managerTodayLeads = Lead::where(["manager_id" => $lead->getManagerId->id])->whereDate('created_at', Carbon::today()->toDateString())->get();
+        $totalCheckToday = 0;
+
+        foreach ($managerTodayLeads as $managerTodayLead) {
+            $totalCheckToday += $managerTodayLead->issued;
+        }
+
+        if ($totalCheckToday >= 15000 && $totalCheckToday < 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . Carbon::today()->toDateString()])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+            $newBonus->save();
+        }
+        if ($totalCheckToday >= 50000 && $totalCheckToday < 100000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . Carbon::today()->toDateString()])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 50000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+            $newBonus->save();
+        }
+        if ($totalCheckToday >= 100000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 100000 ' . Carbon::today()->toDateString()])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 100000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+            $newBonus->save();
+        }
 
         return redirect(route('director.daily'));
     }
@@ -1208,7 +1228,28 @@ class DirectorController extends Controller
 
         $documents = explode('|', $director->documents);
 
-        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends'));
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $bonuses = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $director->id, "type" => "plus"])->get();
+        $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $director->id, "type" => "minus"])->get();
+
+
+        $totalDeduction = 0;
+
+        foreach ($deductions as $deduction) {
+            $totalDeduction += $deduction->amount;
+        }
+
+        $totalBonus = 0;
+
+        foreach ($bonuses as $bonus) {
+            if ($bonus->isPayed) {
+                $totalBonus += $bonus->amount;
+            }
+        }
+
+        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus'));
     }
 
     public function addWorkDay(User $director, Request $request)

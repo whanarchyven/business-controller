@@ -85,7 +85,7 @@
                     @foreach($days as $day)
                         @if($day['workDay']!=0)
                             <th class="fw-bold text-center" scope="col">
-                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                @if(\Illuminate\Support\Facades\Auth::user()->hasRole('director'))
                                     <form action="{{route('director.delete.workday',$user)}}" method="post"
                                           class="w-auto d-flex flex-column align-items-center">
                                         @csrf
@@ -99,7 +99,7 @@
                             </th>
                         @else
                             <th class="fw-normal text-center" scope="col">
-                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                @if(\Illuminate\Support\Facades\Auth::user()->hasRole('director'))
                                     <form method="post" action="{{route('director.add.workday',$user)}}"
                                           class="w-auto d-flex flex-column align-items-center">
                                         @csrf
@@ -113,7 +113,8 @@
                             </th>
                         @endif
                     @endforeach
-                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}/{{(count($days)-$weekends)}}</th>
+                    <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}
+                        /{{(count($days)-hasRole('director'))}}</th>
                 </tr>
 
                 </tbody>

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function newReceipt($state_id, $description, $value, $responsible, $documents, $city_id)
+    public function newReceipt($state_id, $description, $value, $responsible, $city_id, $documents)
     {
         $city = City::where(['id' => $city_id])->first();
         $budget = $city->budget();
@@ -23,7 +23,7 @@ class TransactionController extends Controller
     }
 
 
-    public function newExpense($state_id, $description, $value, $responsible, $documents, $city_id)
+    public function newExpense($state_id, $description, $value, $responsible, $city_id, $documents)
     {
         $city = City::where(['id' => $city_id])->first();
         $budget = $city->budget();

@@ -137,4 +137,16 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/transactions/{transaction}', [App\Http\Controllers\DirectorController::class, 'showTransactionDocs'])->name('director.transactions.docs');
 
 
+    Route::get('/director/bonuses', [App\Http\Controllers\BonusController::class, 'index'])->name('director.bonuses');
+    Route::get('/director/deductions', [App\Http\Controllers\BonusController::class, 'deduction'])->name('director.deductions');
+
+
+    Route::post('/director/bonuses/{user}/store', [App\Http\Controllers\BonusController::class, 'createBonus'])->name('director.bonuses.create');
+
+
+    Route::patch('/director/bonuses/{bonus}/pay', [App\Http\Controllers\BonusController::class, 'payBonus'])->name('director.bonuses.pay');
+    Route::delete('/director/bonuses/{bonus}/delete', [App\Http\Controllers\BonusController::class, 'deleteBonus'])->name('director.bonus.delete');
+    Route::delete('/director/deductions/{bonus}/delete', [App\Http\Controllers\BonusController::class, 'deleteDeduction'])->name('director.deductions.delete');
+
+
 });
