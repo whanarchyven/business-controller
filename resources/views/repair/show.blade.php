@@ -97,7 +97,7 @@
                         </button>
                         <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено
                         </button>
-                        <button class="bg-refund btn-outline-info border-0 p-2 text-white rounded-3">Возврат
+                        <button class="bg-refund  p-2 text-white rounded-3">Возврат
                         </button>
                     </div>
                     <p class="fs-3 fw-bold">Суммарный чек за день: {{$totalCheck}}</p>
