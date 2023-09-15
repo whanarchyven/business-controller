@@ -325,6 +325,7 @@
                         </form>
                     @endif
                 </div>
+                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"

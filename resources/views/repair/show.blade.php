@@ -97,6 +97,8 @@
                         </button>
                         <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено
                         </button>
+                        <button class="bg-refund btn-outline-info border-0 p-2 text-white rounded-3">Возврат
+                        </button>
                     </div>
                     <p class="fs-3 fw-bold">Суммарный чек за день: {{$totalCheck}}</p>
                 </div>
@@ -168,12 +170,12 @@
                                 <p class="m-0 fw-normal">Сумма ремонта: {{$repair->lead->issued}}</p>
                                 <p class="m-0 fw-normal">Стоимость материала: {{$repair->materialPrice()}}</p>
                                 <p class="m-0 fw-normal">ЗП мастера: {{$repair->master?$repair->lead->issued*0.1:0}}</p>
-                                <p class="m-0 fw-normal">ЗП менеджера: {{$repair->lead->issued*0.2}}</p>
+                                <p class="m-0 fw-normal">ЗП менеджера: {{$repair->lead->issued*0.1}}</p>
                                 <p class="m-0 fw-normal">Прочие затраты: {{$repair->lead->issued*0.2}}</p>
                                 <p class="m-0 fw-normal">
-                                    Прибыль: {{$repair->lead->issued*0.6-($repair->master?$repair->lead->issued*0.1:0)-$repair->materialPrice()}}
+                                    Прибыль: {{$repair->lead->issued*0.7-($repair->master?$repair->lead->issued*0.1:0)-$repair->materialPrice()}}
                                     -
-                                    {{round(($repair->lead->issued*($repair->master?0.5:0.6)-$repair->materialPrice())/($repair->lead->issued)*100)}}
+                                    {{round(($repair->lead->issued*($repair->master?0.6:0.7)-$repair->materialPrice())/($repair->lead->issued)*100)}}
                                     %</p>
 
                             </th>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    {{'- Таблица ремонтов'}}
+    {{'- Транзакции'}}
 @endsection
 
 @section('content')
@@ -25,7 +25,13 @@
 
         <div class="">
             <div class="bd-cyan-500">
-                <p class="fs-3 text-indigo">Транзакции за {{$dateTitle}}, {{$city->name}}</p>
+                <div class="d-flex flex-row gap-3">
+                    <p class="fs-3 text-indigo">Транзакции за {{$dateTitle}}, {{$city->name}}</p>
+                    <button onclick="window.location.href='{{route('director.transactions.new')}}'"
+                            class="btn btn-primary h-50">
+                        Новая транзакция
+                    </button>
+                </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>

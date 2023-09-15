@@ -287,7 +287,7 @@ class RepairsController extends Controller
             $responsible = $repair->lead->getManagerId->id;
             $documents = implode("|", $documents);
             $city_id = City::where(['name' => $repair->lead->city])->first()->id;
-            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $documents, $city_id);
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $city_id, $documents);
             $transaction->save();
         }
         if ($data['status'] == 'declined' && array_key_exists('refund', $data)) {
@@ -297,7 +297,7 @@ class RepairsController extends Controller
             $responsible = $repair->lead->getManagerId->id;
             $documents = implode("|", $documents);
             $city_id = City::where(['name' => $repair->lead->city])->first()->id;
-            $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $documents, $city_id);
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, $documents);
             $transaction->save();
         }
         return redirect()->back();

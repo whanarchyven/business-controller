@@ -172,9 +172,11 @@ class DirectorController extends Controller
 
         $todayProductsSelled = 0;
         $todayProductsIssued = 0;
+        $todayTotalLeads = 0;
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
+            $todayTotalLeads++;
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $todayProductsIssued += $lead->repair->check;
             }
@@ -190,7 +192,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayTotalLeads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -409,7 +411,7 @@ class DirectorController extends Controller
             $responsible = $lead->getManagerId->id;
             $documents = implode("|", $documents);
             $city_id = City::where(['name' => $lead->city])->first()->id;
-            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $documents, $city_id);
+            $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $city_id, $documents);
         }
 
 
@@ -1032,7 +1034,7 @@ class DirectorController extends Controller
 
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
-        $transactions = $city->transactions()->whereBetween('created_at', [$startDate, $endDate]);
+        $transactions = $city->transactions()->whereBetween('created_at', [$startDate, $endDate])->reverse();
 
 
         return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city'));

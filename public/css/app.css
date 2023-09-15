@@ -13662,6 +13662,11 @@ textarea.form-control-lg {
     color: white !important;
 }
 
+.bg-refund {
+    background-color: #fd7e14 !important;
+    color: white !important;
+}
+
 
 .manager-free {
     background-color: #F41C34 !important;

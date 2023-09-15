@@ -38,9 +38,9 @@
             </script>
             @endrole
             @role('director')
-            <button id="status"
-                    class="btn h-25 manager-{{$manager->status}}">{{$manager_statuses[$manager->status]}}
-            </button>
+            {{--            <button id="status"--}}
+            {{--                    class="btn h-25 manager-{{$manager->status}}">{{$manager_statuses[$manager->status]}}--}}
+            {{--            </button>--}}
 
             <form id="status-form" method="post" action="{{route('director.manager.status',$manager)}}"
                   class="d-none">
@@ -57,9 +57,9 @@
                        value="Изменить статус"/>
             </form>
 
-            <button id="change-status"
-                    class="btn btn-primary text-white rounded-2  p-2">Изменить статус
-            </button>
+            {{--            <button id="change-status"--}}
+            {{--                    class="btn btn-primary text-white rounded-2  p-2">Изменить статус--}}
+            {{--            </button>--}}
 
             <button id="checkdocs"
                     class="btn btn-warning text-white rounded-2  p-2">Документы
@@ -414,7 +414,7 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.2}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.1}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeclined<3?$totalConfirmed*0.01:0}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{$oklad}}</th>
@@ -424,7 +424,7 @@
                     <th class="fw-normal text-center" scope="col">{{$totalBonus}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round(($totalConfirmed*0.2)+($totalDeclined<3?$totalConfirmed*0.01:0)+($okladSallary)-$totalDeduction+$totalBonus)}}</th>
+                        scope="col">{{round(($totalConfirmed*0.1)+($totalDeclined<3?$totalConfirmed*0.01:0)+($okladSallary)-$totalDeduction+$totalBonus)}}</th>
                 </tr>
                 </tbody>
 

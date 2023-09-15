@@ -10,7 +10,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div
-                        class="card-header fs-1 d-flex flex-column {{$repair->status=='completed'?'bg-completed':''}} {{$repair->status=='declined'?'bg-declined':''}} align-items-center justify-content-center">
+                        class="card-header fs-1 d-flex flex-column {{$repair->status=='completed'?'bg-completed':''}} {{$repair->status=='declined'?'bg-declined':''}} {{$repair->status=='refund'?'bg-refund':''}} align-items-center justify-content-center">
                         <p>Ремонт от {{$repair->repair_date}}
                             на {{$repair->lead->issued}}/{{$repair->lead->avance}}</p>
                         <div class="d-flex gap-2 w-100 col-2">
@@ -63,7 +63,7 @@
                                       method="post">
                                     @csrf
                                     @method('patch')
-                                    <input type="hidden" name="status" value="declined"/>
+                                    <input type="hidden" name="status" value="refund"/>
                                     <input type="hidden" name="refund" value="{{$repair->lead->avance}}"/>
                                     <div>
                                         <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>

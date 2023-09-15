@@ -28,9 +28,9 @@
                            value="Изменить статус"/>
                 </form>
 
-                <button id="change-status"
-                        class="btn btn-outline-primary text-black rounded-2  p-2">Изменить статус
-                </button>
+                {{--                <button id="change-status"--}}
+                {{--                        class="btn btn-outline-primary text-black rounded-2  p-2">Изменить статус--}}
+                {{--                </button>--}}
                 <script>
                     document.getElementById('change-status').addEventListener('click', () => {
                         document.getElementById('change-status').className = 'd-none';
@@ -59,9 +59,9 @@
                            value="Изменить статус"/>
                 </form>
 
-                <button id="change-status"
-                        class="btn btn-outline-primary text-black rounded-2  p-2">Изменить статус
-                </button>
+                {{--                <button id="change-status"--}}
+                {{--                        class="btn btn-outline-primary text-black rounded-2  p-2">Изменить статус--}}
+                {{--                </button>--}}
                 <script>
                     document.getElementById('change-status').addEventListener('click', () => {
                         document.getElementById('change-status').className = 'd-none';
