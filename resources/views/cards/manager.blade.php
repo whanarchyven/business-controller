@@ -57,9 +57,9 @@
                        value="Изменить статус"/>
             </form>
 
-            <button id="change-status"
-                    class="btn btn-primary text-white rounded-2  p-2">Изменить статус
-            </button>
+            {{--            <button id="change-status"--}}
+            {{--                    class="btn btn-primary text-white rounded-2  p-2">Изменить статус--}}
+            {{--            </button>--}}
 
             <button id="checkdocs"
                     class="btn btn-warning text-white rounded-2  p-2">Документы
