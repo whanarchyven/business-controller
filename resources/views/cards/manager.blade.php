@@ -414,7 +414,8 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.1}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{$totalConfirmed*$totalProductsPercent-($totalDeclined<3?$totalConfirmed*0.01:0)}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeclined<3?$totalConfirmed*0.01:0}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{$oklad}}</th>
@@ -424,7 +425,7 @@
                     <th class="fw-normal text-center" scope="col">{{$totalBonus}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round(($totalConfirmed*0.1)+($totalDeclined<3?$totalConfirmed*0.01:0)+($okladSallary)-$totalDeduction+$totalBonus)}}</th>
+                        scope="col">{{round($totalSalary)}}</th>
                 </tr>
                 </tbody>
 

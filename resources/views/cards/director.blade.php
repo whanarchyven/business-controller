@@ -293,15 +293,15 @@
                 <tbody>
                 <tr>
                     <th class="fw-normal text-center"
-                        scope="col">{{$totalConfirmed>=1000000?$totalConfirmed*0.01:0}}</th>
-                    <th class="fw-normal text-center" scope="col">50000</th>
+                        scope="col">{{$totalConfirmed>=1000000?$totalSalary:'-'}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed>=1000000?'-':50000}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round($totalWorkDays*50000/(count($days)-$weekends))}}</th>
+                        scope="col">{{$totalConfirmed>=1000000?'-':round($totalWorkDays*50000/(count($days)-$weekends))}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalBonus}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{(round($totalWorkDays*50000/(count($days)-$weekends)))-$totalDeduction+$totalBonus}}</th>
+                        scope="col">{{$totalSalary-$totalDeduction}}</th>
                 </tr>
                 </tbody>
 

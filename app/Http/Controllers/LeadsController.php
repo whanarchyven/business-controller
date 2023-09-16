@@ -435,12 +435,14 @@ class LeadsController extends Controller
                 $weekends++;
             }
         }
-//        dd($days);
 
-//        dd($successful_leads);
+        $startDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+        $bonuses = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => "plus"])->get();
+        $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => "minus"])->get();
+        $documents = explode('|', $user->documents);
 
-
-        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'weekends'));
+        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'weekends', 'bonuses', 'deductions', 'documents'));
     }
 
 
@@ -704,6 +706,8 @@ class LeadsController extends Controller
         $totalMeetings = 0;
         $totalDeclined = 0;
         $totalSuccessful = 0;
+        $totalNull = 0;
+        $totalEnter = 0;
 
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
@@ -712,12 +716,18 @@ class LeadsController extends Controller
             $days[$day - 1]['products_issued'] += $lead['issued'];
             $days[$day - 1]['products_confirmed'] += $lead->repair ? $lead->repair->check : 0;
             $totalMeetings++;
+            if ($lead->entered) {
+                $totalEnter++;
+            }
         }
 
         foreach ($declined_leads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
             $days[$day - 1]['declined'] += 1;
             $totalDeclined++;
+            if ($lead->issued == 0) {
+                $totalNull++;
+            }
         }
 
         foreach ($successful_leads as $lead) {
@@ -782,43 +792,43 @@ class LeadsController extends Controller
             $totalConfirmed += $day['products_confirmed'];
         }
 
-        if ($totalIssued < 200000) {
+        if ($totalConfirmed < 200000) {
             $oklad = 5000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 200000 && $totalIssued < 300000) {
+        } elseif ($totalConfirmed >= 200000 && $totalConfirmed < 300000) {
             $oklad = 15000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 300000 && $totalIssued < 400000) {
+        } elseif ($totalConfirmed >= 300000 && $totalConfirmed < 400000) {
             $oklad = 25000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 400000 && $totalIssued < 500000) {
+        } elseif ($totalConfirmed >= 400000 && $totalConfirmed < 500000) {
             $oklad = 40000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 500000 && $totalIssued < 700000) {
+        } elseif ($totalConfirmed >= 500000 && $totalConfirmed < 700000) {
             $oklad = 50000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 700000 && $totalIssued < 900000) {
+        } elseif ($totalConfirmed >= 700000 && $totalConfirmed < 900000) {
             $oklad = 70000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 900000 && $totalIssued < 1000000) {
+        } elseif ($totalConfirmed >= 900000 && $totalConfirmed < 1000000) {
             $oklad = 80000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 1000000 && $totalIssued < 1500000) {
+        } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 1500000) {
             $oklad = 100000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 1500000 && $totalIssued < 2000000) {
+        } elseif ($totalConfirmed >= 1500000 && $totalConfirmed < 2000000) {
             $oklad = 120000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
-        } elseif ($totalIssued >= 2000000) {
+        } elseif ($totalConfirmed >= 2000000) {
             $oklad = 150000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
@@ -844,9 +854,26 @@ class LeadsController extends Controller
             }
         }
 
+        $totalProductsPercent = 0.1;
+        $conversion = $totalEnter / ($totalNull + $totalEnter);
+
+        if ($conversion >= 0.5) {
+            $totalProductsPercent += 0.01;
+        }
+        if ($totalDeclined < 3) {
+            $totalProductsPercent += 0.01;
+        }
+        if ($totalConfirmed >= 400000) {
+            $totalProductsPercent += 0.01;
+        }
+
+        $totalProductsSalary = $totalConfirmed * $totalProductsPercent;
+
+        $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction;
+//        dd($okladSallary);
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary'));
         }
 
 

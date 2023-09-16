@@ -344,69 +344,72 @@
                     </thead>
                     <tbody>
                     @foreach($todayLeads as $lead)
-                        <tr>
-                            <th class="fw-bold {{$lead->check?"bg-completed":""}} text-left" scope="col">
-                                c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}
-                                до {{preg_split("/[^1234567890]/", $lead->time_period)[1]}}
-                            </th>
-                            <th class="fw-bold text-left" scope="col">
-                                <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$lead->client_fullname}}</p>
-                                <p class="mb-0 fw-normal"><strong>Адрес: </strong>{{$lead->address}}</p>
-                            </th>
-                            <th class="fw-bold text-left" scope="col">
-                                <p class="mb-0 fw-normal"><strong>Телефон: </strong> <br/>{{$lead->phone}}</p>
-                                <p class="mb-0 fw-normal"><strong>Доп: </strong>{{$lead->comment}}</p>
-                            </th>
-                            <th class="fw-normal text-left" scope="col">{{$lead->note}}</th>
+                        @if(!$lead->issued)
+                            <tr>
+                                <th class="fw-bold {{$lead->check?"bg-completed":""}} text-left" scope="col">
+                                    c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}
+                                    до {{preg_split("/[^1234567890]/", $lead->time_period)[1]}}
+                                </th>
+                                <th class="fw-bold text-left" scope="col">
+                                    <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$lead->client_fullname}}</p>
+                                    <p class="mb-0 fw-normal"><strong>Адрес: </strong>{{$lead->address}}</p>
+                                </th>
+                                <th class="fw-bold text-left" scope="col">
+                                    <p class="mb-0 fw-normal"><strong>Телефон: </strong> <br/>{{$lead->phone}}</p>
+                                    <p class="mb-0 fw-normal"><strong>Доп: </strong>{{$lead->comment}}</p>
+                                </th>
+                                <th class="fw-normal text-left" scope="col">{{$lead->note}}</th>
 
-                            <th class="fw-bold text-left" scope="col">
-                                @if(!$lead->manager_id)
-                                    <div id="control-panel" class="d-flex flex-row gap-2">
-                                        <div class="d-flex flex-row gap-2 w-50">
-                                            <form method="post" action="{{route('director.leads.manage',$lead)}}"
-                                                  class="d-flex flex-row gap-2">
-                                                @csrf
-                                                @method('patch')
-                                                <select name="manager" class="form-select w-100">
-                                                    @foreach($managers as $manager)
-                                                        @if($manager->status=='free')
-                                                            <option value="{{$manager->id}}">{{$manager->name}}</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                                <input type="submit"
-                                                       class="btn btn-primary text-white w-50 rounded-2  p-2"
-                                                       value="Назначить"/>
-                                            </form>
+                                <th class="fw-bold text-left" scope="col">
+                                    @if(!$lead->manager_id)
+                                        <div id="control-panel" class="d-flex flex-row gap-2">
+                                            <div class="d-flex flex-row gap-2 w-50">
+                                                <form method="post" action="{{route('director.leads.manage',$lead)}}"
+                                                      class="d-flex flex-row gap-2">
+                                                    @csrf
+                                                    @method('patch')
+                                                    <select name="manager" class="form-select w-100">
+                                                        @foreach($managers as $manager)
+                                                            @if($manager->status=='free')
+                                                                <option
+                                                                    value="{{$manager->id}}">{{$manager->name}}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="submit"
+                                                           class="btn btn-primary text-white w-50 rounded-2  p-2"
+                                                           value="Назначить"/>
+                                                </form>
+                                            </div>
+                                            <div class="d-flex flex-row gap-2 w-50">
+                                                <button id="decline-btn"
+                                                        class="btn btn-danger text-white w-50 rounded-2  p-2">
+                                                    Отказ
+                                                </button>
+                                                <button
+                                                    onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
+                                                    class="btn btn-warning text-white w-75 rounded-2  p-2">
+                                                    Редатировать
+                                                </button>
+                                            </div>
+
                                         </div>
-                                        <div class="d-flex flex-row gap-2 w-50">
-                                            <button id="decline-btn"
-                                                    class="btn btn-danger text-white w-50 rounded-2  p-2">
-                                                Отказ
-                                            </button>
-                                            <button
-                                                onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
-                                                class="btn btn-warning text-white w-75 rounded-2  p-2">
-                                                Редатировать
-                                            </button>
+                                    @else
+                                        <div class="d-flex flex-column gap-0">
+                                            <p class="m-0">Принял: {{$lead->accepted}}</p>
+                                            <p class="m-0">Вошёл: {{$lead->entered}}</p>
+                                            <p class="m-0">Вышел: {{$lead->exited}}</p>
+                                            <p class="m-0">Менеджер: {{$lead->getManagerId->name}}</p>
+                                            <p class="m-0">Сумма: {{$lead->check}}</p>
                                         </div>
 
-                                    </div>
-                                @else
-                                    <div class="d-flex flex-column gap-0">
-                                        <p class="m-0">Принял: {{$lead->accepted}}</p>
-                                        <p class="m-0">Вошёл: {{$lead->entered}}</p>
-                                        <p class="m-0">Вышел: {{$lead->exited}}</p>
-                                        <p class="m-0">Менеджер: {{$lead->getManagerId->name}}</p>
-                                        <p class="m-0">Сумма: {{$lead->check}}</p>
-                                    </div>
-
-                                @endif
+                                    @endif
 
 
-                                <p class="fw-normal">Оператор: {{$lead->getOperatorId->name}}</p>
-                            </th>
-                        </tr>
+                                    <p class="fw-normal">Оператор: {{$lead->getOperatorId->name}}</p>
+                                </th>
+                            </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

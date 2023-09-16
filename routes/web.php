@@ -151,4 +151,12 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::delete('/director/deductions/{bonus}/delete', [App\Http\Controllers\BonusController::class, 'deleteDeduction'])->name('director.deductions.delete');
 
 
+    Route::get('/salary/{user}', [App\Http\Controllers\SalaryController::class, 'getMasterSalary'])->name('director.salary');
+
+    Route::get('/avance/week/', [App\Http\Controllers\DirectorController::class, 'avanceView'])->name('director.avance.week');
+    Route::post('/avance/week/pay', [App\Http\Controllers\DirectorController::class, 'payAvance'])->name('director.avance.pay');
+
+    Route::get('/salary/avance/pay', [App\Http\Controllers\DirectorController::class, 'salaryView'])->name('director.salary.pay');
+    Route::patch('/salary/avance/pay/{user}/', [App\Http\Controllers\DirectorController::class, 'paySalary'])->name('director.salary.payall');
+
 });

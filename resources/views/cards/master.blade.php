@@ -11,6 +11,9 @@
             <button id="checkdocs"
                     class="btn btn-warning text-white rounded-2  p-2">Документы
             </button>
+            <button onclick="showBonuses()"
+                    class="btn btn-secondary text-white rounded-2  p-2">Бонусы и удержания
+            </button>
 
             @endrole
         </div>
@@ -33,6 +36,124 @@
         </div>
         @endrole
         @role('director')
+        <div class="d-none" id="bonuses">
+            <div class="d-flex flex-column">
+                <p class="w-100 text-center fw-bold fs-4">Бонусы</p>
+                <table class="table table-bordered table-sm table-light ">
+                    <thead class="">
+                    <tr>
+                        <th class="fw-bold p-2 text-left" scope="col">Дата</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Обоснование</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Сумма</th>
+                        <th class="fw-bold p-2 text-left" scope="col"></th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($bonuses as $bonus)
+                        <tr>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->created_at}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->reason}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->amount}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <form method="post" action="{{route('director.bonus.delete',$bonus)}}">
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" class="btn btn-danger" value="Удалить"/>
+                                </form>
+                            </th>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <form method="post" action="{{route('director.bonuses.create',$master)}}">
+                            @csrf
+                            @method('post')
+                            <input type="hidden" name="type" value="plus"/>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{\Carbon\Carbon::today()->toDateString()}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите обоснование" type="text" name="reason"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите сумму" type="number" name="amount"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input type="submit" class="btn btn-success" value="Выдать"/>
+                            </th>
+                        </form>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="d-flex flex-column">
+                <p class="w-100 text-center fw-bold fs-4">Удержания</p>
+                <table class="table table-bordered table-sm table-light ">
+                    <thead class="">
+                    <tr>
+                        <th class="fw-bold p-2 text-left" scope="col">Дата</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Обоснование</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Сумма</th>
+                        <th class="fw-bold p-2 text-left" scope="col"></th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($deductions as $deduction)
+                        <tr>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->created_at}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->reason}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->amount}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <form method="post" action="{{route('director.bonus.delete',$deduction)}}">
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" class="btn btn-danger" value="Удалить"/>
+                                </form>
+                            </th>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <form method="post" action="{{route('director.bonuses.create',$master)}}">
+                            @csrf
+                            @method('post')
+                            <input type="hidden" name="type" value="minus"/>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{\Carbon\Carbon::today()->toDateString()}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите обоснование" type="text" name="reason"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите сумму" type="number" name="amount"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input type="submit" class="btn btn-danger" value="Удержать"/>
+                            </th>
+                        </form>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
         <div id="docs-pop" class="d-none">
             @foreach($documents as $document)
                 <a href="{{ URL::to('/documents') }}/{{$document}}"
@@ -67,6 +188,18 @@
                     isOpen = false;
                 }
             })
+
+            isBonusesOpen = false;
+
+            function showBonuses() {
+                if (!isBonusesOpen) {
+                    document.getElementById('bonuses').className = 'w-100 row bg-secondary-subtle m-0 p-4 row-cols-2 my-4'
+                    isBonusesOpen = true;
+                } else {
+                    document.getElementById('bonuses').className = 'd-none'
+                    isBonusesOpen = false;
+                }
+            }
 
         </script>
         @endrole
@@ -168,9 +301,9 @@
                 <tr>
                     <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.1}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
-                    <th class="fw-normal text-center" scope="col">0</th>
+                    <th class="fw-normal text-center" scope="col">{{$master->deductions($date)}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{$totalConfirmed*0.1}}</th>
+                        scope="col">{{$master->salary($date)}}</th>
                 </tr>
                 </tbody>
 

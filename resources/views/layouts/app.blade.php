@@ -311,10 +311,10 @@
                                 <a class="dropdown-item" href="{{ route('director.deductions') }}">
                                     Удержания
                                 </a>
-                                <a class="dropdown-item" href="{{route('director.expense')}}">
+                                <a class="dropdown-item" href="{{route('director.avance.week')}}">
                                     Аванс неделя
                                 </a>
-                                <a class="dropdown-item" href="{{route('director.nomenclature')}}">
+                                <a class="dropdown-item" href="{{route('director.salary.pay')}}">
                                     Аванс месяц
                                 </a>
                             </div>

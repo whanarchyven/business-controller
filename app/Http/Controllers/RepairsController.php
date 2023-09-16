@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BonusManager;
 use App\Models\City;
 use App\Models\Lead;
 use App\Models\Repair;
@@ -503,7 +504,7 @@ class RepairsController extends Controller
         foreach ($monthRepairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
             $days[$day - 1]['repairs'] += 1;
-            $days[$day - 1]['repairs_confirmed'] += $repair->check;
+
             $totalRepairs++;
         }
 
@@ -516,6 +517,7 @@ class RepairsController extends Controller
         foreach ($succesfull_repairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
             $days[$day - 1]['successful'] += 1;
+            $days[$day - 1]['repairs_confirmed'] += $repair->check;
             $totalSuccessful++;
         }
 
@@ -551,10 +553,17 @@ class RepairsController extends Controller
             }
             $totalConfirmed += $day['repairs_confirmed'];
         }
+//        dd($monthRepairs, $master->salary($date));
 
         $documents = explode('|', $master->documents);
 
-        return view('cards.master', compact('date', 'dateTitle', 'formattedDate', 'city', 'master', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalRepairs', 'totalConfirmed', 'documents', 'documents'));
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $bonuses = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $master->id, "type" => "plus"])->get();
+        $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $master->id, "type" => "minus"])->get();
+
+        return view('cards.master', compact('date', 'dateTitle', 'formattedDate', 'city', 'master', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalRepairs', 'totalConfirmed', 'documents', 'documents', 'date', 'bonuses', 'deductions'));
     }
 
     public function duplicate(Repair $repair)

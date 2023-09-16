@@ -6,7 +6,172 @@
 
 @section('content')
     <div class="container">
-        <p class="fs-2 fw-bold">{{$user->name}}</p>
+        <div class="d-flex align-items-center gap-3 my-3">
+            <p class="fw-bold mb-0 fs-3">{{$user->name}}</p>
+            @role('director')
+
+            <button id="checkdocs"
+                    class="btn btn-warning text-white rounded-2  p-2">Документы
+            </button>
+            <button onclick="showBonuses()"
+                    class="btn btn-secondary text-white rounded-2  p-2">Бонусы и удержания
+            </button>
+
+            @endrole
+        </div>
+        @role('director')
+        <div class="d-none" id="bonuses">
+            <div class="d-flex flex-column">
+                <p class="w-100 text-center fw-bold fs-4">Бонусы</p>
+                <table class="table table-bordered table-sm table-light ">
+                    <thead class="">
+                    <tr>
+                        <th class="fw-bold p-2 text-left" scope="col">Дата</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Обоснование</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Сумма</th>
+                        <th class="fw-bold p-2 text-left" scope="col"></th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($bonuses as $bonus)
+                        <tr>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->created_at}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->reason}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$bonus->amount}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <form method="post" action="{{route('director.bonus.delete',$bonus)}}">
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" class="btn btn-danger" value="Удалить"/>
+                                </form>
+                            </th>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <form method="post" action="{{route('director.bonuses.create',$user)}}">
+                            @csrf
+                            @method('post')
+                            <input type="hidden" name="type" value="plus"/>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{\Carbon\Carbon::today()->toDateString()}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите обоснование" type="text" name="reason"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите сумму" type="number" name="amount"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input type="submit" class="btn btn-success" value="Выдать"/>
+                            </th>
+                        </form>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="d-flex flex-column">
+                <p class="w-100 text-center fw-bold fs-4">Удержания</p>
+                <table class="table table-bordered table-sm table-light ">
+                    <thead class="">
+                    <tr>
+                        <th class="fw-bold p-2 text-left" scope="col">Дата</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Обоснование</th>
+                        <th class="fw-bold p-2 text-left" scope="col">Сумма</th>
+                        <th class="fw-bold p-2 text-left" scope="col"></th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($deductions as $deduction)
+                        <tr>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->created_at}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->reason}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{$deduction->amount}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <form method="post" action="{{route('director.bonus.delete',$deduction)}}">
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" class="btn btn-danger" value="Удалить"/>
+                                </form>
+                            </th>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <form method="post" action="{{route('director.bonuses.create',$user)}}">
+                            @csrf
+                            @method('post')
+                            <input type="hidden" name="type" value="minus"/>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                {{\Carbon\Carbon::today()->toDateString()}}
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите обоснование" type="text" name="reason"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input placeholder="Введите сумму" type="number" name="amount"
+                                       class="form-control"/>
+                            </th>
+                            <th class="fw-normal p-2 text-left" scope="col">
+                                <input type="submit" class="btn btn-danger" value="Удержать"/>
+                            </th>
+                        </form>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+        <div id="docs-pop" class="d-none">
+            @foreach($documents as $document)
+                <a href="{{ URL::to('/documents') }}/{{$document}}"
+                   class="w-100 border border-2 border-black d-flex"><img
+                        class="w-100 object-fit-cover"
+                        src="{{ URL::to('/documents') }}/{{$document}}"/></a>
+            @endforeach
+        </div>
+        <script>
+            let isOpen = false;
+            document.getElementById('checkdocs').addEventListener('click', () => {
+                if (!isOpen) {
+                    document.getElementById('docs-pop').className = 'w-100 d-flex justify-content-center my-4'
+                    isOpen = true;
+                } else {
+                    document.getElementById('docs-pop').className = 'd-none'
+                    isOpen = false;
+                }
+            })
+
+            isBonusesOpen = false;
+
+            function showBonuses() {
+                if (!isBonusesOpen) {
+                    document.getElementById('bonuses').className = 'w-100 row bg-secondary-subtle m-0 p-4 row-cols-2 my-4'
+                    isBonusesOpen = true;
+                } else {
+                    document.getElementById('bonuses').className = 'd-none'
+                    isBonusesOpen = false;
+                }
+            }
+
+        </script>
+        @endrole
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
@@ -114,7 +279,7 @@
                         @endif
                     @endforeach
                     <th class="fw-normal  text-center" scope="row">{{$totalWorkDays}}
-                        /{{(count($days)-hasRole('director'))}}</th>
+                        /{{(count($days))}}</th>
                 </tr>
 
                 </tbody>
@@ -149,10 +314,10 @@
                             {{$totalWorkDays}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            0
+                            {{$user->deductions($date)}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$totalSuccessful*150+$totalWorkDays*200}}
+                            {{$user->salary($date)}}
                         </th>
 
                     </tr>
