@@ -203,9 +203,11 @@
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="avance">Предоплата</label>
-                                        <input value="{{$repair->lead->avance}}" type="number" class="form-control"
-                                               id='avance' name="avance"
-                                               list="avance">
+                                        <input
+                                            {{\Illuminate\Support\Facades\Auth::user()->isAdmin?'':'disabled'}} value="{{$repair->lead->avance}}"
+                                            type="number" class="form-control"
+                                            id='avance' name="avance"
+                                            list="avance">
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="manager_id">Менеджер</label>
