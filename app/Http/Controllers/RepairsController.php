@@ -569,6 +569,7 @@ class RepairsController extends Controller
     public function duplicate(Repair $repair)
     {
         $newRepair = $repair->replicate();
+        $newRepair->status='in-work';
         $newRepair->save();
         return redirect()->back();
     }

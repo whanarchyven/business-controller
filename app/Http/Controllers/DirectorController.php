@@ -436,11 +436,11 @@ class DirectorController extends Controller
             $totalCheckToday += $managerTodayLead->issued;
         }
 
-        if ($totalCheckToday >= 15000 && $totalCheckToday < 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . Carbon::today()->toDateString()])->first() == null) {
+        if ($totalCheckToday >= 15000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . Carbon::today()->toDateString()])->first() == null) {
             $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
-        if ($totalCheckToday >= 50000 && $totalCheckToday < 100000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . Carbon::today()->toDateString()])->first() == null) {
+        if ($totalCheckToday >= 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . Carbon::today()->toDateString()])->first() == null) {
             $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 50000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }

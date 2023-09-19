@@ -95,7 +95,7 @@
                 <div class="d-flex flex-row gap-2 align-items-center justify-content-center">
                     <p class="fs-1 {{$plan?'text-black':'text-danger'}} m-0">
                         План: {{$plan?$plan->value:'Не назначено'}}
-                        ({{$products_selled}}) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
+                        ({{$products_issued}}) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
                 </div>
 
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
@@ -310,8 +310,8 @@
                 <div class="d-flex flex-row gap-2 align-items-center justify-content-center">
                     <p class="fs-1 {{$plan?'text-black':'text-danger'}} m-0">
                         План: {{$plan?$plan->value:'Не назначено'}}
-                        ({{$plan?(intval($plan->value)-intval($products_selled)):'0'}}
-                        ) {{$plan&&$plan->value<$products_selled?'✅':''}}</p>
+                        ({{$plan?(intval($plan->value)-intval($products_issued)):'0'}}
+                        ) {{$plan&&$plan->value<$products_issued?'✅':''}}</p>
                     @if($user->isAdmin)
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
                             план {{$city_id}}</button>
@@ -329,7 +329,7 @@
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"
-                            class="btn manager-{{$manager->status}}">{{$manager->name}}</button>
+                            class="btn m-2 manager-{{$manager->status}}">{{$manager->name}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">
