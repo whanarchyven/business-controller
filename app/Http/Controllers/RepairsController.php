@@ -568,8 +568,13 @@ class RepairsController extends Controller
 
     public function duplicate(Repair $repair)
     {
+        $temp=$repair->lead;
+        $newLead=Lead::where(["id"=>$temp->id])->first()->replicate();
+        $newLead->save();
+//        dd($newLead);
         $newRepair = $repair->replicate();
         $newRepair->status='in-work';
+        $newRepair->lead_id=$newLead->id;
         $newRepair->save();
         return redirect()->back();
     }
