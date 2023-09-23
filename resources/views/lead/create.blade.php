@@ -23,21 +23,21 @@
                             <div class="form-row row-gap-10">
                                 <div class="form-group my-2">
                                     <label for="city">Город:</label>
-                                    <input type="text" class="form-control" id='city-input' name="city" list="city"
-                                           onchange="updateSubcityOptions()">
-                                    <datalist {{!$user->isAdmin?`disabled`:''}} id="city">
+{{--                                    <input type="text" class="form-control" id='city-input' name="city" list="city"--}}
+{{--                                           onchange="updateSubcityOptions()">--}}
+                                    <select  name="city" class="form-control" {{!$user->isAdmin?`disabled`:''}} id="city">
                                         @if($user->isAdmin)
                                             @foreach($cities as $city)
-                                                <option class="" value="{{$city->name}}"></option>
+                                                <option value="{{$city->name}}">{{$city->name}}</option>
                                             @endforeach
                                         @else
                                             @foreach($cities as $city)
                                                 @if($city->id==$user->city)
-                                                    <option class="" selected value="{{$city->name}}"></option>
+                                                    <option selected value="{{$city->name}}">{{$city->name}}</option>
                                                 @endif
                                             @endforeach
                                         @endif
-                                    </datalist>
+                                    </select>
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="subcity">Подгород</label>

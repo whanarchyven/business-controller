@@ -356,7 +356,7 @@ class RepairsController extends Controller
             "phone" => $data['phone'],
             "job_type" => $data['job_type'],
             "issued" => $data["issued"],
-            "avance" => $data['avance'],
+            "avance" => array_key_exists('avance',$data)?$data['avance']:$lead->avance,
             "manager_id" => $data['manager_id'],
             "note" => $data['note']
         ]);

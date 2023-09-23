@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
 //        $this->call(PermissionSeeder::class);
 //        $this->call(ServiceTypeSeeder::class);
 //        $this->call(CitySeeder::class);
-//        $this->call(UserSeeder::class);
+        $this->call(UserSeeder::class);
 //        $this->call(ManagerCoordinatorSeeder::class);
-        $this->call(TransactionStateSeeder::class);
-        $this->call(BudgetSeeder::class);
+//        $this->call(TransactionStateSeeder::class);
+//        $this->call(BudgetSeeder::class);
     }
 }
