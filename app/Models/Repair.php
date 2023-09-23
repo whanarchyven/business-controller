@@ -25,7 +25,7 @@ class Repair extends Model
 
     public function master()
     {
-        return $this->belongsTo(User::class, 'master_id');
+        return $this->belongsTo(User::class, 'master_id')->withTrashed();
     }
 
     public function expenses()

@@ -137,58 +137,58 @@ class UserSeeder extends Seeder
 //        $tempCoordinator->permissions()->attach(
 //            $readSelfSalary,
 //        );
-
-        $tempDirector1 = new User();
-        $tempDirector1->documents='';
-        $tempDirector1->name = 'Генеральный директор';
-        $tempDirector1->email = 'Gen-director';
-        $tempDirector1->password = bcrypt('GoncharovV88');
-        $tempDirector1->city = 1;
-        $tempDirector1->isAdmin = true;
-        $tempDirector1->save();
-        $tempDirector1->roles()->attach($director);
-        $tempDirector1->permissions()->attach(
-            $createLead,
-        );
-
-        $tempDirector2 = new User();
-        $tempDirector2->documents='';
-        $tempDirector2->name = 'Генеральный руководитель';
-        $tempDirector2->email = 'Gen-ruk';
-        $tempDirector2->password = bcrypt('Eartem24');
-        $tempDirector2->city = 1;
-        $tempDirector2->isAdmin = true;
-        $tempDirector2->save();
-        $tempDirector2->roles()->attach($director);
-        $tempDirector2->permissions()->attach(
-            $createLead,
-        );
-
-        $tempDirector3 = new User();
-        $tempDirector3->documents='';
-        $tempDirector3->name = 'Складской аудитор';
-        $tempDirector3->email = 'AuditorKRD';
-        $tempDirector3->password = bcrypt('OkkKRD01');
-        $tempDirector3->city = 1;
-        $tempDirector3->isAdmin = true;
-        $tempDirector3->save();
-        $tempDirector3->roles()->attach($director);
-        $tempDirector3->permissions()->attach(
-            $createLead,
-        );
-
-        $tempDirector4 = new User();
-        $tempDirector4->documents='';
-        $tempDirector4->name = 'Системный администратор';
-        $tempDirector4->email = 'whanarchyvven';
-        $tempDirector4->password = bcrypt('Whaven1488!');
-        $tempDirector4->city = 1;
-        $tempDirector4->isAdmin = true;
-        $tempDirector4->save();
-        $tempDirector4->roles()->attach($director);
-        $tempDirector4->permissions()->attach(
-            $createLead,
-        );
+//
+//        $tempDirector1 = new User();
+//        $tempDirector1->documents='';
+//        $tempDirector1->name = 'Генеральный директор';
+//        $tempDirector1->email = 'Gen-director';
+//        $tempDirector1->password = bcrypt('GoncharovV88');
+//        $tempDirector1->city = 1;
+//        $tempDirector1->isAdmin = true;
+//        $tempDirector1->save();
+//        $tempDirector1->roles()->attach($director);
+//        $tempDirector1->permissions()->attach(
+//            $createLead,
+//        );
+//
+//        $tempDirector2 = new User();
+//        $tempDirector2->documents='';
+//        $tempDirector2->name = 'Генеральный руководитель';
+//        $tempDirector2->email = 'Gen-ruk';
+//        $tempDirector2->password = bcrypt('Eartem24');
+//        $tempDirector2->city = 1;
+//        $tempDirector2->isAdmin = true;
+//        $tempDirector2->save();
+//        $tempDirector2->roles()->attach($director);
+//        $tempDirector2->permissions()->attach(
+//            $createLead,
+//        );
+//
+//        $tempDirector3 = new User();
+//        $tempDirector3->documents='';
+//        $tempDirector3->name = 'Складской аудитор';
+//        $tempDirector3->email = 'AuditorKRD';
+//        $tempDirector3->password = bcrypt('OkkKRD01');
+//        $tempDirector3->city = 1;
+//        $tempDirector3->isAdmin = true;
+//        $tempDirector3->save();
+//        $tempDirector3->roles()->attach($director);
+//        $tempDirector3->permissions()->attach(
+//            $createLead,
+//        );
+//
+//        $tempDirector4 = new User();
+//        $tempDirector4->documents='';
+//        $tempDirector4->name = 'Системный администратор';
+//        $tempDirector4->email = 'whanarchyvven';
+//        $tempDirector4->password = bcrypt('Whaven1488!');
+//        $tempDirector4->city = 1;
+//        $tempDirector4->isAdmin = true;
+//        $tempDirector4->save();
+//        $tempDirector4->roles()->attach($director);
+//        $tempDirector4->permissions()->attach(
+//            $createLead,
+//        );
 //
 //        $tempDirector5 = new User();
 //        $tempDirector5->documents='';

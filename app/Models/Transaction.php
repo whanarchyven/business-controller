@@ -27,7 +27,7 @@ class Transaction extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'responsible');
+        return $this->belongsTo(User::class, 'responsible')->withTrashed();
     }
 
     public function state()

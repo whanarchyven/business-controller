@@ -1041,7 +1041,20 @@ class DirectorController extends Controller
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
         $transactions = $city->transactions()->whereBetween('created_at', [$startDate, $endDate])->reverse();
 
-
+//        $loop=0;
+//
+//        foreach ($transactions as $transaction){
+//            if($transaction->user){
+//                echo $transaction->user->name;
+//                $loop++;
+//            }
+//            else{
+//                dd($transaction);
+//                echo 'AAAAAAAAAAAA SUKAAAAAAAAAAAAAAA'.$loop;
+//            }
+//        }
+//
+//        dd($transactions);
         return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city'));
     }
 
