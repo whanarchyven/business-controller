@@ -45,15 +45,9 @@
 <div id="app">
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
-            @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
-                <a href="/director" class="clockpage text-black text-decoration-none">
-                    <span class="fw-bold fs-4" id="clock"></span>
-                </a>
-            @else
-                <a href="/" class="clockpage text-black text-decoration-none">
-                    <span class="fw-bold fs-4" id="clock"></span>
-                </a>
-            @endif
+            <a href="/director" class="clockpage text-black text-decoration-none">
+                <span class="fw-bold fs-4" id="clock"></span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
