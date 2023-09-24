@@ -1732,7 +1732,9 @@ class DirectorController extends Controller
         $users = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         foreach ($users as $user) {
-            array_push($managers, $user);
+            if($users->hasRole('manager')){
+                array_push($managers, $user);
+            }
         }
 
         $managersCalendar = array();
