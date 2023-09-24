@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    {{'- Таблица ремонтов'}}
+    {{'- Транзакция'}}
 @endsection
 
 @section('content')

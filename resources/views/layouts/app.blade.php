@@ -326,30 +326,30 @@
                         </li>
                     @endif
 
-                    <li class="nav-item dropdown">
-                        <a class="dropdown-item" href="{{ route('director.statistic.sells') }}">
-                            Статистика
-                        </a>
-                    </li>
-
 {{--                    <li class="nav-item dropdown">--}}
-{{--                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"--}}
-{{--                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>--}}
+{{--                        <a class="dropdown-item" href="{{ route('director.statistic.sells') }}">--}}
 {{--                            Статистика--}}
 {{--                        </a>--}}
+{{--                    </li>--}}
 
-{{--                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">--}}
-{{--                            <a class="dropdown-item" href="{{ route('director.statistic.sells') }}">--}}
-{{--                                Продажи--}}
-{{--                            </a>--}}
-{{--                            <a class="dropdown-item" href="{{ route('director.deductions') }}">--}}
-{{--                                Встречи--}}
-{{--                            </a>--}}
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Статистика
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('director.statistic.sells') }}">
+                                Продажи
+                            </a>
+                            <a class="dropdown-item" href="{{ route('director.statistic.posygramm') }}">
+                                Позиграмма
+                            </a>
 {{--                            <a class="dropdown-item" href="{{route('director.avance.week')}}">--}}
 {{--                                Заявки--}}
 {{--                            </a>--}}
-{{--                        </div>--}}
-{{--                    </li>--}}
+                        </div>
+                    </li>
 
 
                 </ul>

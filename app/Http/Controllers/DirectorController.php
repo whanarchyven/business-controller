@@ -1782,4 +1782,131 @@ class DirectorController extends Controller
     }
 
 
+//    function sortу($a,$b){
+//        return $a[1]['productsConfirmed']-$b[1]['productsConfirmed'];
+//    }
+
+    public function posyGramm(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = City::where(['id' => Auth::user()->city])->first();
+        }
+
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = ' Январь';
+                break;
+            case '02':
+                $dateTitle = ' Февраль';
+                break;
+            case '03':
+                $dateTitle = ' Март';
+                break;
+            case '04':
+                $dateTitle = ' Апрель';
+                break;
+            case '05':
+                $dateTitle = ' Май ';
+                break;
+            case '06':
+                $dateTitle = ' Июнь ';
+                break;
+            case '07':
+                $dateTitle = ' Июль ';
+                break;
+            case '08':
+                $dateTitle = ' Август ';
+                break;
+            case '09':
+                $dateTitle = ' Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = ' Октябрь ';
+                break;
+            case '11':
+                $dateTitle = ' Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = ' Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        if (intval($dateTemp[1]) + 1 < 10) {
+            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
+        } else {
+            if (intval($dateTemp[1]) + 1 > 12) {
+                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($dateTemp[1]) - 1 >= 10) {
+            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
+            }
+        }
+
+
+        $users = User::where(["city" => $city->id])->withTrashed()->get();
+        $managers = array();
+        foreach ($users as $user) {
+            if($user->hasRole('manager')){
+                array_push($managers, $user);
+            }
+        }
+
+        $managersCalendar = array();
+
+        foreach ($managers as $manager) {
+            array_push($managersCalendar, [$manager,'productsConfirmed'=>0,'productsSelled'=>0]);
+        }
+
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city",'=',$city->name],["manager_id","!=",null]])->get();
+
+        $logs=array();
+        foreach ($leads as $lead) {
+            $manager = $lead->getManagerId->id;
+            $neededObject = array_filter(
+                $managersCalendar,
+                function ($e) use (&$manager) {
+                    return $e[0]->id == $manager;
+                }
+            );
+            $neededObject = array_key_first($neededObject);
+            $managersCalendar[$neededObject]['productsSelled']+=intval($lead->check);
+
+            $managersCalendar[$neededObject]['productsConfirmed']+=$lead->repair?intval($lead->repair->check):0;
+        }
+        $managersCalendar=collect($managersCalendar);
+
+        $managersCalendar=$managersCalendar->sortByDesc('productsConfirmed');
+
+//        dd($managersCalendar);
+
+        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date','managersCalendar'));
+    }
+
+
+
 }

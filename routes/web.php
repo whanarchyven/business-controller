@@ -161,6 +161,7 @@ Route::group(['middleware' => 'role:director'], function () {
 
 
     Route::get('/director/statistic/sells', [App\Http\Controllers\DirectorController::class, 'getSellsView'])->name('director.statistic.sells');
+    Route::get('/director/statistic/posygramm', [App\Http\Controllers\DirectorController::class, 'posyGramm'])->name('director.statistic.posygramm');
 
 
 
