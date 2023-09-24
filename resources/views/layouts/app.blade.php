@@ -45,7 +45,12 @@
 <div id="app">
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
+            @role('director')
             <a href="/director" class="clockpage text-black text-decoration-none">
+                <span class="fw-bold fs-4" id="clock"></span>
+            </a>
+            @endrole
+            <a href="/" class="clockpage text-black text-decoration-none">
                 <span class="fw-bold fs-4" id="clock"></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
