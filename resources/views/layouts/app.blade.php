@@ -45,9 +45,15 @@
 <div id="app">
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
-            <a href="/" class="clockpage text-black text-decoration-none">
-                <span class="fw-bold fs-4" id="clock"></span>
-            </a>
+            @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                <a href="/director" class="clockpage text-black text-decoration-none">
+                    <span class="fw-bold fs-4" id="clock"></span>
+                </a>
+            @else
+                <a href="/" class="clockpage text-black text-decoration-none">
+                    <span class="fw-bold fs-4" id="clock"></span>
+                </a>
+            @endif
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -320,6 +326,25 @@
                             </div>
                         </li>
                     @endif
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Статистика
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('director.bonuses') }}">
+                                Продажи
+                            </a>
+                            <a class="dropdown-item" href="{{ route('director.deductions') }}">
+                                Встречи
+                            </a>
+                            <a class="dropdown-item" href="{{route('director.avance.week')}}">
+                                Заявки
+                            </a>
+                        </div>
+                    </li>
 
 
                 </ul>

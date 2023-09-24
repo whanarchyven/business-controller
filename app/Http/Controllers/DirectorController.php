@@ -1039,7 +1039,21 @@ class DirectorController extends Controller
 
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
-        $transactions = $city->transactions()->whereBetween('created_at', [$startDate, $endDate])->reverse();
+        $transactions = $city->transactionsPaginate()->paginate(35);
+        $currentPage=$transactions->currentPage();
+        $totalPages=$transactions->lastPage();
+        $path=$transactions->path();
+//        dd($transactions);
+
+        $paginationLinks=array();
+
+        for($i=1;$i<=$totalPages;$i++){
+            array_push($paginationLinks,$i);
+        }
+
+        $transactions=$transactions->whereBetween('created_at', [$startDate, $endDate]);
+
+//        dd($transactions);
 
 //        $loop=0;
 //
@@ -1055,7 +1069,7 @@ class DirectorController extends Controller
 //        }
 //
 //        dd($transactions);
-        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city'));
+        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city','paginationLinks','currentPage','path','date'));
     }
 
     public function showTransactionDocs(Transaction $transaction)
