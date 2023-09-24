@@ -20,6 +20,7 @@ use App\Models\Transaction;
 use App\Models\TransactionState;
 use App\Models\User;
 use Carbon\Carbon;
+use Faker\Core\Number;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
@@ -1040,18 +1041,18 @@ class DirectorController extends Controller
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
         $transactions = $city->transactionsPaginate()->paginate(35);
-        $currentPage=$transactions->currentPage();
-        $totalPages=$transactions->lastPage();
-        $path=$transactions->path();
+        $currentPage = $transactions->currentPage();
+        $totalPages = $transactions->lastPage();
+        $path = $transactions->path();
 //        dd($transactions);
 
-        $paginationLinks=array();
+        $paginationLinks = array();
 
-        for($i=1;$i<=$totalPages;$i++){
-            array_push($paginationLinks,$i);
+        for ($i = 1; $i <= $totalPages; $i++) {
+            array_push($paginationLinks, $i);
         }
 
-        $transactions=$transactions->whereBetween('created_at', [$startDate, $endDate]);
+        $transactions = $transactions->whereBetween('created_at', [$startDate, $endDate]);
 
 //        dd($transactions);
 
@@ -1069,7 +1070,7 @@ class DirectorController extends Controller
 //        }
 //
 //        dd($transactions);
-        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city','paginationLinks','currentPage','path','date'));
+        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city', 'paginationLinks', 'currentPage', 'path', 'date'));
     }
 
     public function showTransactionDocs(Transaction $transaction)
@@ -1612,5 +1613,171 @@ class DirectorController extends Controller
 
         return redirect()->back();
     }
+
+    public function getDaysInMonthWithWeekdays($month, $year)
+    {
+        $firstDay = strtotime("$year-$month-01");
+        $daysInMonth = date('t', $firstDay);
+
+        $result = array();
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $currentDate = strtotime("$year-$month-$day");
+            $weekDay = date('N', $currentDate); // 1 (понедельник) до 7 (воскресенье)
+
+            $weekDays = array(
+                1 => 'пн',
+                2 => 'вт',
+                3 => 'ср',
+                4 => 'чт',
+                5 => 'пт',
+                6 => 'сб',
+                7 => 'вс'
+            );
+
+            $result[] = array(
+                'day' => $day,
+                'date' => $year . '-' . $month . '-' . ($day < 10 ? '0' . $day : $day),
+                'weekDay' => $weekDays[$weekDay],
+                "productsSelled" => 0,
+                "productsConfirmed" => 0,
+
+            );
+        }
+
+        return $result;
+    }
+
+
+    public function getSellsView(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = City::where(['id' => Auth::user()->city])->first();
+        }
+
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = ' Январь';
+                break;
+            case '02':
+                $dateTitle = ' Февраль';
+                break;
+            case '03':
+                $dateTitle = ' Март';
+                break;
+            case '04':
+                $dateTitle = ' Апрель';
+                break;
+            case '05':
+                $dateTitle = ' Май ';
+                break;
+            case '06':
+                $dateTitle = ' Июнь ';
+                break;
+            case '07':
+                $dateTitle = ' Июль ';
+                break;
+            case '08':
+                $dateTitle = ' Август ';
+                break;
+            case '09':
+                $dateTitle = ' Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = ' Октябрь ';
+                break;
+            case '11':
+                $dateTitle = ' Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = ' Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        if (intval($dateTemp[1]) + 1 < 10) {
+            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
+        } else {
+            if (intval($dateTemp[1]) + 1 > 12) {
+                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($dateTemp[1]) - 1 >= 10) {
+            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
+            }
+        }
+
+        $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+        $users = User::where(["city" => $city->id])->withTrashed()->get();
+        $managers = array();
+        foreach ($users as $user) {
+            array_push($managers, $user);
+        }
+
+        $managersCalendar = array();
+
+        foreach ($managers as $manager) {
+            array_push($managersCalendar, [$manager, $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]),['productsSelled'=>0,'productsConfirmed'=>0]]);
+        }
+
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city",'=',$city->name],["manager_id","!=",null]])->get();
+
+        $logs=array();
+        foreach ($leads as $lead) {
+            $manager = $lead->getManagerId->id;
+            $neededObject = array_filter(
+                $managersCalendar,
+                function ($e) use (&$manager) {
+                    return $e[0]->id == $manager;
+                }
+            );
+            $neededObject = array_key_first($neededObject);
+            $neededDay = array_filter(
+                $managersCalendar[$neededObject][1],
+                function ($e) use (&$lead) {
+                    return $e['date'] == $lead->created_at->toDateString();
+                }
+            );
+//            dd(array_key_first($neededDay));
+            $neededDay=array_key_first($neededDay);
+            $managersCalendar[$neededObject][1][$neededDay]['productsSelled']+=$lead->check;
+            $managersCalendar[$neededObject][1][$neededDay]['productsConfirmed']+=$lead->repair?$lead->repair->check:0;
+            $managersCalendar[$neededObject][2]['productsSelled']+=intval($lead->check);
+//            if($manager==34){
+//                array_push($logs,[$lead,$lead->check]);
+//            }
+            $managersCalendar[$neededObject][2]['productsConfirmed']+=$lead->repair?intval($lead->repair->check):0;
+        }
+
+//        dd($logs);
+
+
+        return view('roles.director.statistic.sells', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'days','managersCalendar'));
+    }
+
 
 }

@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.avance.week').'?date='.$prevMonthLink}}">Предыдущий
+                       href="{{route('director.salary.pay').'?date='.$prevMonthLink}}">Предыдущий
                         месяц</a>
                 </div>
                 <div id="date-head">
@@ -18,7 +18,7 @@
                 </div>
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.avance.week').'?date='.$nextMonthLink}}">Следующий
+                       href="{{route('director.salary.pay').'?date='.$nextMonthLink}}">Следующий
                         месяц</a>
                 </div>
             </div>
@@ -37,25 +37,27 @@
                     </thead>
                     <tbody>
                     @foreach($directors as $director)
-                        <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left summ {{$director->salary($date)-$director->payedSalary($date)<0?'text-danger':'text-black'}}"
-                                scope="col">{{$director->salary($date)-$director->payedSalary($date)}}</th>
-                            <th class=" p-2 fw-bold text-left" scope="col">
-                                @if($director->salary($date)-$director->payedSalary($date)>0)
-                                    <form action="{{route('director.salary.payall',$director)}}" method="post">
-                                        @csrf
-                                        @method('patch')
-                                        <input type="hidden" name="data" value="{{$date}}"/>
-                                        <input type="submit"
-                                               class="btn w-100 btn-success" value="Выплатить"/>
-                                    </form>
-                                @endif
+                        @if(!$director->isAdmin)
+                            <tr class="table-light">
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
+                                <th class="p-2 fw-bold text-left summ {{$director->salary($date)-$director->payedSalary($date)<0?'text-danger':'text-black'}}"
+                                    scope="col">{{$director->salary($date)-$director->payedSalary($date)}}</th>
+                                <th class=" p-2 fw-bold text-left" scope="col">
+                                    @if($director->salary($date)-$director->payedSalary($date)>0)
+                                        <form action="{{route('director.salary.payall',$director)}}" method="post">
+                                            @csrf
+                                            @method('patch')
+                                            <input type="hidden" name="data" value="{{$date}}"/>
+                                            <input type="submit"
+                                                   class="btn w-100 btn-success" value="Выплатить"/>
+                                        </form>
+                                    @endif
 
-                            </th>
-                        </tr>
+                                </th>
+                            </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

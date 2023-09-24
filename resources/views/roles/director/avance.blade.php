@@ -41,27 +41,29 @@
                     </thead>
                     <tbody>
                     @foreach($directors as $director)
-                        <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">
-                                <input class="form-control"
-                                       value="5000"
-                                       type="number"
-                                       name="director{{$loop->index}}"
-                                    {{--                                       max="{{$director->salary($date)}}"--}}
-                                />
-                                <input type="hidden" value="{{$director->id}}" name="directorEmployer{{$loop->index}}">
-                            </th>
-                            <th class=" p-2 fw-bold text-left" scope="col">
-                                <div onclick="window.location.href='{{route('director.directorcard',$director)}}'"
-                                     class="btn w-100 btn-warning">
-                                    Карточка
-                                </div>
-                            </th>
-                        </tr>
+                        @if(!$director->isAdmin)
+                            <tr class="table-light">
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>
+                                <th class="p-2 fw-bold text-left" scope="col">
+                                    <input class="form-control"
+                                           value="5000"
+                                           type="number"
+                                           name="director{{$loop->index}}"
+                                        {{--                                       max="{{$director->salary($date)}}"--}}
+                                    />
+                                    <input type="hidden" value="{{$director->id}}" name="directorEmployer{{$loop->index}}">
+                                </th>
+                                <th class=" p-2 fw-bold text-left" scope="col">
+                                    <div onclick="window.location.href='{{route('director.directorcard',$director)}}'"
+                                         class="btn w-100 btn-warning">
+                                        Карточка
+                                    </div>
+                                </th>
+                            </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

@@ -159,4 +159,9 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/salary/avance/pay', [App\Http\Controllers\DirectorController::class, 'salaryView'])->name('director.salary.pay');
     Route::patch('/salary/avance/pay/{user}/', [App\Http\Controllers\DirectorController::class, 'paySalary'])->name('director.salary.payall');
 
+
+    Route::get('/director/statistic/sells', [App\Http\Controllers\DirectorController::class, 'getSellsView'])->name('director.statistic.sells');
+
+
+
 });
