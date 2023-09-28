@@ -9,7 +9,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Новая заявка</div>
+                    <div class="card-header">Новая заявка </div>
 
                     <div class="card-body">
                         @if (session('status'))
@@ -28,6 +28,14 @@
                                     <select  name="city" class="form-control" {{!$user->isAdmin?`disabled`:''}} id="city">
                                         @if($user->isAdmin)
                                             @foreach($cities as $city)
+                                                <option value="{{$city->name}}">{{$city->name}}</option>
+                                            @endforeach
+                                        @elseif($user->hasRole('operator'))
+                                            @foreach($cities as $city)
+                                                <option value="{{$city->name}}">{{$city->name}}</option>
+                                            @endforeach
+                                        @elseif($user->hasRole('coordinator'))
+                                            @foreach($user->coordinatorCity() as $city)
                                                 <option value="{{$city->name}}">{{$city->name}}</option>
                                             @endforeach
                                         @else

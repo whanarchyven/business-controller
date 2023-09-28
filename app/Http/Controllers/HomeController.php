@@ -31,6 +31,9 @@ class HomeController extends Controller
         if ($user->isAdmin) {
             Session::put('city', $city[0]);
         }
+        elseif ($user->hasRole('coordinator')){
+            Session::put('city',$user->coordinatorCity()[0]);
+        }
         return view('home', compact('user'));
     }
 }

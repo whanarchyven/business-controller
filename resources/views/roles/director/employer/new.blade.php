@@ -63,8 +63,8 @@
                                     <div class="form-group my-2">
                                         <label for="role">Должность</label>
                                         <select onchange="updateSubForm()" id="role" class="form-control" name="role">
-                                            <option value="coordinator">Координатор</option>
                                             <option value="manager">Менеджер</option>
+                                            <option value="coordinator">Координатор</option>
                                             <option value="master">Мастер</option>
                                             @if($director->isAdmin)
                                                 <option value="operator">Оператор</option>
@@ -93,6 +93,20 @@
                                         </div>
                                     @endif
 
+
+                                    @if($director->isAdmin)
+                                        <div id="city-form-coordinator" class="my-2 d-none">
+                                            <label for="city">Доступ к городам</label>
+                                            @foreach($cities as $city)
+                                                <div class="d-flex gap-3">
+                                                    <label>{{$city->name}}</label>
+                                                    <input id="{{$city->name}}" name="{{$city->name}}" type="checkbox"/>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+
                                     {{--                                    <div id="oklad" class="d-none">--}}
                                     {{--                                        <label for="bet">Оклад (дневная ставка)</label>--}}
                                     {{--                                        <input type="tel" class="form-control" id='bet' name="bet" list="bet">--}}
@@ -117,19 +131,17 @@
                             function updateSubForm() {
                                 let select = document.querySelector("#role");
                                 console.log(select.value);
-                                if (select.value == 'manager') {
-                                    document.querySelector('#coordinator-form').className = 'form-group my-2';
-                                    document.getElementById('oklad').className = 'form-group my-2';
-                                } else if (select.value == 'coordinator') {
-                                    document.querySelector('#coordinator-form').className = 'd-none'
-                                    document.getElementById('oklad').className = 'form-group my-2';
-                                } else {
-                                    document.querySelector('#coordinator-form').className = 'd-none'
-                                    document.getElementById('oklad').className = 'd-none';
+                                if (select.value == 'coordinator') {
+                                    document.getElementById('city-form').className = 'd-none';
+                                    document.getElementById('city-form-coordinator').className = 'form-group my-2';
+                                }
+                                else {
+                                    document.getElementById('city-form').className = 'form-group my-2';
+                                    document.getElementById('city-form-coordinator').className = 'd-none';
                                 }
                             }
 
-                            // document.querySelector("#role").addEventListener('select', updateSubForm)
+                            document.querySelector("#role").addEventListener('select', updateSubForm)
                         </script>
                     </div>
                 </div>

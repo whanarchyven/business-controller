@@ -66,7 +66,7 @@ class LeadsController extends Controller
         if ($user->hasRole('operator')) {
             return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['operator_id', '=', $user->id]])->get();
         } else {
-            if ($user->isAdmin) {
+            if ($user->isAdmin||$user->hasRole('coordinator')) {
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', "=", \Illuminate\Support\Facades\Session::get('city')->name]])->get();
             } else {
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city->name]])->get();
@@ -108,7 +108,7 @@ class LeadsController extends Controller
 
         if ($user->hasRole('operator')) {
             $leads = Lead::where([['status', '!=', 'declined'], ['operator_id', '=', $user->id]])->whereDate('created_at', $date)->get();
-        } else if ($user->isAdmin) {
+        } else if ($user->isAdmin||$user->hasRole('coordinator')) {
             $leads = Lead::where([['status', '!=', 'declined'], ['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereDate('created_at', $date)->get();
         } else {
             $leads = Lead::where([['status', '!=', 'declined'], ['city', '=', $city->name]])->whereDate('created_at', $date)->get();
@@ -212,7 +212,7 @@ class LeadsController extends Controller
 
         if ($user->hasRole('operator')) {
             $leads = Lead::where([['status', '=', 'declined'], ['operator_id', '=', $user->id]])->whereDate('created_at', $date)->get();
-        } else if ($user->isAdmin) {
+        } else if ($user->isAdmin||$user->hasRole('coordinator')) {
             $leads = Lead::where([['status', '=', 'declined'], ['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereDate('created_at', $date)->get();
         } else {
             $leads = Lead::where([['status', '=', 'declined'], ['city', '=', $city->name]])->whereDate('created_at', $date)->get();

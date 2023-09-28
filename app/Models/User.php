@@ -69,6 +69,13 @@ class User extends Authenticatable
         return $this->belongsTo(City::class, 'city')->first();
     }
 
+
+    public function coordinatorCity()
+    {
+        return $this->hasManyThrough(City::class,CoordinatorCity::class,'user_id','id')->get();
+    }
+
+
     public function addSalary($salary)
     {
         app(\App\Http\Controllers\SalaryController::class)->addSalary($this, $salary);
@@ -101,5 +108,8 @@ class User extends Authenticatable
         }
         return $totalDeduction;
     }
+
+
+
 
 }

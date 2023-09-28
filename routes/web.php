@@ -50,13 +50,15 @@ Route::group(['middleware' => 'role:coordinator'], function () {
     Route::get('/coordinator/', [App\Http\Controllers\CoordinatorController::class, 'controlTable'])->name('coordinator.managers');
     Route::get('/coordinator/leads/{lead}/edit', [App\Http\Controllers\LeadsController::class, 'edit'])->name('coordinator.leads.edit');
     Route::patch('/coordinator/leads/{lead}', [App\Http\Controllers\CoordinatorController::class, 'update'])->name('coordinator.leads.update');
-    Route::patch('/coordinator/leads/decline/{lead}', [App\Http\Controllers\CoordinatorController::class, 'declineLead'])->name('coordinator.leads.decline');
-    Route::patch('/coordinator/leads/{lead}/manage', [App\Http\Controllers\CoordinatorController::class, 'manageLead'])->name('coordinator.leads.manage');
-    Route::patch('/coordinator/leads/{lead}/change', [App\Http\Controllers\CoordinatorController::class, 'changeManager'])->name('coordinator.leads.changemanager');
+    Route::patch('/coordinator/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('coordinator.leads.decline');
+    Route::patch('/coordinator/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('coordinator.leads.manage');
+    Route::patch('/coordinator/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('coordinator.leads.changemanager');
     Route::get('/coordinator/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('coordinator.managercard');
     Route::patch('/coordinator/managers/{manager}/status', [\App\Http\Controllers\ManagerController::class, 'changeManagerStatus'])->name('coordinator.manager.status');
     Route::patch('/coordinator/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('coordinator.manager.leads.status');
     Route::patch('/coordinator/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('coordinator.manager.leads.close');
+    Route::get('/coordinator/manager/{manager}/operative', [App\Http\Controllers\LeadsController::class, 'managerOperative'])->name('coordinator.manager.operative');
+    Route::get('/coordinator/changecity/{city}', [App\Http\Controllers\CoordinatorController::class, 'changeCity'])->name('coordinator.city.change');
 
 });
 

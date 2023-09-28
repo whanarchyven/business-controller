@@ -387,8 +387,23 @@
                                     @endforeach
                                 </div>
                             </li>
+                        @elseif(\Illuminate\Support\Facades\Auth::user()->hasRole('coordinator'))
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    {{\Illuminate\Support\Facades\Session::has('city')?\Illuminate\Support\Facades\Session::get('city')->name:'Выбрать город'}}
+                                </a>
 
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @foreach(\Illuminate\Support\Facades\Auth::user()->coordinatorCity() as $city)
+                                        <a class="dropdown-item" href="{{route('coordinator.city.change',$city)}}">
+                                            {{$city->name}}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </li>
                         @endif
+
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

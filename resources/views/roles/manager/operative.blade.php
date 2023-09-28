@@ -129,12 +129,12 @@
                                                 Отказ
                                             </button>
                                             <button
-                                                onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
+                                                onclick="window.location='{{route('coordinator.leads.edit',$lead->id)}}'"
                                                 class="btn btn-warning text-white w-100 rounded-2  p-2">
                                                 Редатировать
                                             </button>
                                             <form method="post"
-                                                  action="{{route('director.leads.changemanager',$lead)}}">
+                                                  action="{{route('coordinator.leads.changemanager',$lead)}}">
                                                 @csrf
                                                 @method('patch')
                                                 <input type="hidden" name="manager" value="{{$lead->manager_id}}">
@@ -148,7 +148,7 @@
                                 </div>
                                 <div id="decline-form-second" class="d-none">
                                     <form class="d-flex gap-2 w-100"
-                                          action="{{route('director.leads.decline',$lead->id)}}"
+                                          action="{{route('coordinator.leads.decline',$lead->id)}}"
                                           method="post">
                                         @csrf
                                         @method('PATCH')

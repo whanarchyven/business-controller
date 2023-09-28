@@ -10,13 +10,13 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class CoordinatorController extends Controller
 {
     public function getManagers($city_id)
     {
-        $coordinator = Auth::user();
-        $temp = User::where(['city' => $coordinator->city])->get();
+        $temp = User::where(['city' => $city_id])->get();
 
         $managers = array();
 
@@ -98,6 +98,7 @@ class CoordinatorController extends Controller
     {
         $data = $request->all();
         $lead->update(['status' => 'declined', 'note' => $data['note']]);
+        $lead->getManagerId()->status='free';
         return redirect(route('coordinator.managers'));
     }
 
@@ -126,14 +127,11 @@ class CoordinatorController extends Controller
 
         $data = $request->all();
         $user = Auth::user();
-
-        if ($data && $data['city']) {
-            $city_id = $data['city'];
-        } else {
-            $city_id = Auth::user()->city;
-        }
+        $city_id = Session::get('city')->id;
 
         $city = City::where([['id', '=', $city_id]])->first()->name;
+
+//        dd($city_id);
 
         $leads = $this->getMonthLeads(false, $city);
         $declined = $this->getMonthLeads(true, $city);
@@ -142,18 +140,30 @@ class CoordinatorController extends Controller
         $products_selled = 0;
         $products_issued = 0;
 
+        $repairs = array();
+
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
-            $products_issued += $lead->issued;
+            if ($lead->repair && $lead->repair->status == 'completed') {
+                $products_issued += $lead->repair->check;
+                array_push($repairs, $lead->repair);
+            }
         }
 
         $todayLeads = $this->getTodayLeads(false, $city);
         $todayDeclined = $this->getTodayLeads(true, $city);
 
+
         $todayProductsSelled = 0;
+        $todayProductsIssued = 0;
+        $todayTotalLeads = 0;
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
+            $todayTotalLeads++;
+            if ($lead->repair && $lead->repair->status == 'completed') {
+                $todayProductsIssued += $lead->repair->check;
+            }
         }
 
         $cities = $this->getCities();
@@ -165,7 +175,8 @@ class CoordinatorController extends Controller
 
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
-        return view('roles.coordinator.control', compact('cities', 'user', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'products_issued'));
+
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayTotalLeads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -212,5 +223,11 @@ class CoordinatorController extends Controller
         $manager_statuses = $this->getStatuses();
 
         return [$manager, $manager_statuses];
+    }
+
+    public function changeCity(City $city, Request $request)
+    {
+        $request->session()->put('city', $city);
+        return redirect()->back();
     }
 }

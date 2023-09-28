@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BonusManager;
 use App\Models\City;
+use App\Models\CoordinatorCity;
 use App\Models\DirectorWorkday;
 use App\Models\EmployeerWorkDay;
 use App\Models\Expense;
@@ -114,7 +115,10 @@ class DirectorController extends Controller
     {
         $data = $request->all();
         $lead->update(['status' => 'declined', 'note' => $data['note']]);
-        return redirect(route('director.managers'));
+        $manager=$lead->getManagerId;
+        $manager->status='free';
+        $manager->save();
+        return redirect()->back();
     }
 
     public function update(Lead $lead)
@@ -209,7 +213,11 @@ class DirectorController extends Controller
         $manager->status = 'meeting-managed';
         $manager->save();
 
-        return redirect(route('director.managers'));
+        if(Auth::user()->hasRole('coordinator')){
+            return redirect(route('coordinator.managers'));
+        }else{
+            return redirect(route('director.managers'));
+        }
 
     }
 
@@ -826,6 +834,8 @@ class DirectorController extends Controller
 
         $data = $request->all();
 
+//        dd($data);
+
         if (User::where(["email" => $data['email']])->exists()) {
             return redirect()->back()->with('error', 'Пользователь с таким логином уже существует! Придумайте другой');
         }
@@ -881,6 +891,14 @@ class DirectorController extends Controller
                 break;
             case 'coordinator':
                 $newUser->roles()->attach($coordinator);
+                $cities=City::all();
+                foreach ($cities as $city){
+                    if (array_key_exists(str_replace(' ','_',$city->name),$data)){
+                        $coordCity=new CoordinatorCity(['user_id'=>$newUser->id,"city_id"=>$city->id]);
+                        $coordCity->save();
+                    }
+                }
+//                dd(count($cities));
                 break;
             case 'director':
                 $newUser->roles()->attach($director);

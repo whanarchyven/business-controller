@@ -112,8 +112,8 @@
                                 @endif
                             </th>
                             <th class="fw-bold text-left" scope="col">
-                                @if($lead->check)
-                                    <p class="fw-normal"></p>
+                                @if($lead->check&&!\Illuminate\Support\Facades\Auth::user()->hasRole('operator'))
+                                    <p class="fw-normal">{{$lead->check}}</p>
                                 @else
                                     <p class="fw-normal"></p>
                                 @endif
