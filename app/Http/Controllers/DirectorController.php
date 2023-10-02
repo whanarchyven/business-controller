@@ -225,7 +225,7 @@ class DirectorController extends Controller
     {
         $data = $request->all();
         $manager = User::where([['id', '=', $data['manager']]])->first();
-        $lead->update(["manager_id" => null]);
+        $lead->update(["manager_id" => null,"accepted"=>null,"entered"=>null,]);
         $manager->status = 'free';
         $manager->save();
         $lead->save();

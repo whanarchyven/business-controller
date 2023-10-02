@@ -167,7 +167,7 @@ class LeadsController extends Controller
         $totalLeads = 0;
 
         foreach ($monthLeads as $lead) {
-            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
+            $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
             $days[$day - 1]['leads'] += 1;
             $totalLeads++;
         }
@@ -273,7 +273,7 @@ class LeadsController extends Controller
         $totalLeads = 0;
 
         foreach ($monthLeads as $lead) {
-            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
+            $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
             $days[$day - 1]['leads'] += 1;
             $totalLeads++;
         }
@@ -855,7 +855,7 @@ class LeadsController extends Controller
         }
 
         $totalProductsPercent = 0.1;
-        $conversion = $totalEnter / ($totalNull + $totalEnter);
+        $conversion = $totalEnter / (($totalNull + $totalEnter==0?1:$totalNull + $totalEnter));
 
         if ($conversion >= 0.5) {
             $totalProductsPercent += 0.01;
@@ -896,7 +896,7 @@ class LeadsController extends Controller
         [$manager, $manager_statuses] = app('App\Http\Controllers\CoordinatorController')->getManagerCard($manager->id);
 
 
-        $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
+        $leads = Lead::where([['manager_id', '=', $manager->id], ['issued', '=', null]])->get();
 
 
         if ($manager->hasRole('manager')) {

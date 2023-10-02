@@ -173,6 +173,48 @@
                                            value="entered"/>
                                     <input type="submit" class="btn btn-success w-100" value="Вошёл">
                                 </form>
+                                <div class="d-flex mt-2 flex-column">
+                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                        <div class="d-flex flex-column gap-2 w-100">
+                                            <button id="decline-btn"
+                                                    class="btn btn-danger text-white w-100 rounded-2  p-2">
+                                                Отказ
+                                            </button>
+                                            <button
+                                                onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
+                                                class="btn btn-warning text-white w-100 rounded-2  p-2">
+                                                Редатировать
+                                            </button>
+                                            <form method="post"
+                                                  action="{{route('director.leads.changemanager',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-primary text-white w-100 rounded-2  p-2"
+                                                       value="Сменить менеджера"/>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div id="decline-form-second" class="d-none">
+                                    <form class="d-flex gap-2 w-100"
+                                          action="{{route('director.leads.decline',$lead->id)}}"
+                                          method="post">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input placeholder="Укажите причину отказа" class="form-control" name="note"
+                                               type="text"/>
+                                        <input type="submit" class="my-2 btn btn-danger w-50" value="Отказ">
+                                    </form>
+                                </div>
+                                <script>
+                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
+                                        document.getElementById('control-panel').className = 'd-none';
+                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    })
+                                </script>
                                 {{--                                        <form id="decline-form" class="d-none"--}}
                                 {{--                                              action="{{route('leads.decline',$lead->id)}}"--}}
                                 {{--                                              method="post">--}}
@@ -340,6 +382,48 @@
                                            value="entered"/>
                                     <input type="submit" class="btn btn-success w-100" value="Вошёл">
                                 </form>
+                                <div class="d-flex mt-2 flex-column">
+                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                        <div class="d-flex flex-column gap-2 w-100">
+                                            <button id="decline-btn"
+                                                    class="btn btn-danger text-white w-100 rounded-2  p-2">
+                                                Отказ
+                                            </button>
+                                            <button
+                                                onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
+                                                class="btn btn-warning text-white w-100 rounded-2  p-2">
+                                                Редатировать
+                                            </button>
+                                            <form method="post"
+                                                  action="{{route('director.leads.changemanager',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-primary text-white w-100 rounded-2  p-2"
+                                                       value="Сменить менеджера"/>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div id="decline-form-second" class="d-none">
+                                    <form class="d-flex gap-2 w-100"
+                                          action="{{route('director.leads.decline',$lead->id)}}"
+                                          method="post">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input placeholder="Укажите причину отказа" class="form-control" name="note"
+                                               type="text"/>
+                                        <input type="submit" class="my-2 btn btn-danger w-50" value="Отказ">
+                                    </form>
+                                </div>
+                                <script>
+                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
+                                        document.getElementById('control-panel').className = 'd-none';
+                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    })
+                                </script>
                                 {{--                                        <form id="decline-form" class="d-none"--}}
                                 {{--                                              action="{{route('leads.decline',$lead->id)}}"--}}
                                 {{--                                              method="post">--}}

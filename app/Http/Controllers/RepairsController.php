@@ -349,7 +349,7 @@ class RepairsController extends Controller
         $lead = $repair->lead;
         $city = City::where(["name" => $data['city']])->first();
 
-        $lead->update(["meeting_date" => $data['meeting_date'],
+        $lead->update(["created_at" => $data['created_at'],
             "city" => $city->name,
             "subcity" => array_key_exists('subcity', $data) ? $data['subcity'] : $lead->subcity,
             "address" => $data['address'],

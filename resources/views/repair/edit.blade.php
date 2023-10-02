@@ -106,9 +106,9 @@
                                 <div class="form-group w-50 my-2">
                                     <div class="form-group my-2">
                                         <label for="meeting_date">Дата продажи</label>
-                                        <input value="{{$repair->lead->meeting_date}}" type="date" class="form-control"
-                                               id='meeting_date' name="meeting_date"
-                                               list="meeting_date">
+                                        <input value="{{$repair->lead->created_at->toDateString()}}" type="date" class="form-control"
+                                               id='created_at' name="created_at"
+                                               list="created_at">
                                     </div>
                                     <label for="status">Статус</label>
                                     <select disabled id="status" class="form-control" name="status"

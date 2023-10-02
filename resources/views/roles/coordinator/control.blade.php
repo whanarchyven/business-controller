@@ -128,7 +128,7 @@
                     </thead>
                     <tbody>
                     @foreach($todayLeads as $lead)
-                        @if(!$lead->issued)
+                        @if(!$lead->getManagerId)
                             <tr>
                                 <th class="fw-bold {{$lead->check?"bg-completed":""}} text-left" scope="col">
                                     c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}
@@ -324,7 +324,7 @@
                     </thead>
                     <tbody>
                     @foreach($todayLeads as $lead)
-                        @if(!$lead->issued)
+                        @if(!$lead->getManagerId)
                             <tr>
                                 <th class="fw-bold {{$lead->check?"bg-completed":""}} text-left" scope="col">
                                     c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}

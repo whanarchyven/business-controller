@@ -141,12 +141,16 @@
                             <th class="fw-normal text-left" scope="col">{{$repair->lead->issued}}
                                 /{{$repair->lead->avance}}
                             </th>
-                            <th class="fw-bold text-left" scope="col">
-                                @if($repair->master)
-                                    <p class="fw-normal">{{$repair->master->name}}</p>
-                                @else
-                                    <p class="fw-normal">Не назначено</p>
-                                @endif
+                            <th class="fw-bold  text-left" scope="col">
+                                <div class="d-flex flex-column">
+                                    @if($repair->master)
+                                        <p class="fw-normal">Мастер: <br/><span class="fw-bold">{{$repair->master->name}}</span> </p>
+                                        <p class="fw-normal">Менеджер:<br/> <span class="fw-bold">{{$repair->lead->getManagerId->name}}</span></p>
+                                    @else
+                                        <p class="fw-normal">Мастер: <br/><span class="fw-bold">Не назначено</span></p>
+                                        <p class="fw-normal">Менеджер:<br/> <span class="fw-bold">{{$repair->lead->getManagerId->name}}</span></p>
+                                    @endif
+                                </div>
                             </th>
                             <th class="fw-bold text-left" scope="col">
                                 <div class="d-flex flex-column gap-1">
