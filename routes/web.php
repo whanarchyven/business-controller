@@ -99,6 +99,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/leads/{lead}/accept', [App\Http\Controllers\DirectorController::class, 'acceptLeadView'])->name('director.leads.accept');
     Route::patch('/director/leads/{lead}/close', [App\Http\Controllers\DirectorController::class, 'closeLead'])->name('director.close.lead');
     Route::patch('/director/leads/{lead}/close/null', [App\Http\Controllers\DirectorController::class, 'closeLeadNull'])->name('director.leads.close.null');
+    Route::patch('/director/leads/{lead}/delete', [App\Http\Controllers\LeadsController::class, 'deleteLead'])->name('director.lead.delete');
 
 
     Route::get('/director/nomenclature', [App\Http\Controllers\DirectorController::class, 'nomenclature'])->name('director.nomenclature');
@@ -165,6 +166,11 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/statistic/sells', [App\Http\Controllers\DirectorController::class, 'getSellsView'])->name('director.statistic.sells');
     Route::get('/director/statistic/posygramm', [App\Http\Controllers\DirectorController::class, 'posyGramm'])->name('director.statistic.posygramm');
 
+
+    Route::get('/director/gsm/managers', [App\Http\Controllers\GsmController::class, 'indexGsm'])->name('director.gsm.show.managers');
+    Route::get('/director/gsm/masters', [App\Http\Controllers\GsmController::class, 'indexGsmMaster'])->name('director.gsm.show.masters');
+    Route::post('/director/gsm',[App\Http\Controllers\GsmController::class,'createGsm'])->name('director.gsm.add');
+    Route::patch('/director/gsm/{gsm}/pay',[App\Http\Controllers\GsmController::class,'payGsm'])->name('director.gsm.pay');
 
 
 });

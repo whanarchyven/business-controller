@@ -906,5 +906,11 @@ class LeadsController extends Controller
 
     }
 
+    public function deleteLead(Lead $lead){
+        $lead->repair->delete();
+        $lead->delete();
+        return redirect()->back();
+    }
+
 
 }
