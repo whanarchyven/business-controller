@@ -19,7 +19,7 @@
 
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/director/gsm?date={{\Carbon\Carbon::createFromDate($date)->subWeek()->toDateString()}}&day={{$prevMonday}}">Предыдущая
+                   href="/director/gsm{{$role=='manager'?'/managers':'/masters'}}?date={{\Carbon\Carbon::createFromDate($date)->subWeek()->toDateString()}}&day={{$prevMonday}}">Предыдущая
                     неделя</a>
             </div>
             <div id="date-head">
@@ -27,7 +27,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/director/gsm?date={{\Carbon\Carbon::createFromDate($date)->addWeek()->toDateString()}}&day={{$nextMonday}}">Следующая
+                   href="/director/gsm{{$role=='manager'?'/managers':'/masters'}}?date={{\Carbon\Carbon::createFromDate($date)->addWeek()->toDateString()}}&day={{$nextMonday}}">Следующая
                     неделя</a>
             </div>
 

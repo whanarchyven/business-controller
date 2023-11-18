@@ -98,7 +98,9 @@
                         ) {{$plan&&$plan->value<$products_issued?'✅':''}}</p>
                     @if($user->isAdmin)
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
-                            план {{$city_id}}</button>
+                            план
+                        </button>
+                        <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                         <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form"
                               class="d-none">
                             @csrf
@@ -109,7 +111,7 @@
                         </form>
                     @endif
                 </div>
-                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>
+                {{--                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>--}}
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('coordinator.manager.operative',$manager)}}'"
@@ -166,10 +168,10 @@
                                                 </form>
                                             </div>
                                             <div class="d-flex flex-row gap-2 w-50">
-{{--                                                <button id="decline-btn"--}}
-{{--                                                        class="btn btn-danger text-white w-50 rounded-2  p-2">--}}
-{{--                                                    Отказ--}}
-{{--                                                </button>--}}
+                                                {{--                                                <button id="decline-btn"--}}
+                                                {{--                                                        class="btn btn-danger text-white w-50 rounded-2  p-2">--}}
+                                                {{--                                                    Отказ--}}
+                                                {{--                                                </button>--}}
                                                 <button
                                                     onclick="window.location='{{route('coordinator.leads.edit',$lead->id)}}'"
                                                     class="btn btn-warning text-white w-75 rounded-2  p-2">
@@ -294,7 +296,9 @@
                         ) {{$plan&&$plan->value<$products_issued?'✅':''}}</p>
                     @if($user->isAdmin)
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
-                            план {{$city_id}}</button>
+                            план
+                        </button>
+                        <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                         <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form"
                               class="d-none">
                             @csrf
@@ -305,7 +309,7 @@
                         </form>
                     @endif
                 </div>
-                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>
+                {{--                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>--}}
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"

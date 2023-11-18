@@ -115,6 +115,7 @@ class RepairsController extends Controller
         $city = City::where(["id" => $user->city])->first();
         if ($user->isAdmin) {
             $temp = array();
+
             $repairs = Repair::where([['repair_date', '=', $date]])->get();
             foreach ($repairs as $repair) {
 
@@ -136,6 +137,9 @@ class RepairsController extends Controller
             $repairs = $temp;
         }
 
+//        foreach ($repairs as $repair){
+//            dd($repair->getResult('sdfs'));
+//        }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
 
@@ -241,6 +245,242 @@ class RepairsController extends Controller
         }
 
         return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck'));
+    }
+
+
+    public function search(Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $user = Auth::user();
+        $city = City::where(["id" => $user->city])->first();
+
+
+        if($request->query('client_fullname')){
+            $client_fullname=$request->query('client_fullname');
+        }
+        else{
+            $client_fullname='';
+        }
+
+        if($request->query('address')){
+            $address=$request->query('address');
+        }
+        else{
+            $address='';
+        }
+
+        if($request->query('phone')){
+            $phone=$request->query('phone');
+        }
+        else{
+            $phone='';
+        }
+
+        if($request->query('manager_id')){
+            $manager_id=$request->query('manager_id');
+        }
+        else{
+            $manager_id=0;
+        }
+
+        if($request->query('status')){
+            $status=$request->query('status');
+        }
+        else{
+            $status='';
+        }
+
+        if($request->query('master_id')){
+            $master_id=$request->query('master_id');
+        }
+        else{
+            $master_id=0;
+        }
+
+
+        if ($user->isAdmin) {
+            $temp = array();
+
+            $suka = new Repair();
+            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status);
+            foreach ($repairs as $repair) {
+
+                if ($repair->lead->city == (Session::get('city')->name)) {
+
+                    array_push($temp, $repair);
+                }
+            }
+
+            $repairs = $temp;
+        } else {
+            $temp = array();
+            $suka = new Repair();
+            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status);
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == $city->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
+        }
+
+//        foreach ($repairs as $repair){
+//            dd($repair->getResult('sdfs'));
+//        }
+
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $city = Auth::user()->city;
+
+        $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+        $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'all');
+        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
+        $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
+
+
+        $totalRepairs = 0;
+        $totalDeclined = 0;
+        $totalCompleted = 0;
+
+        foreach ($monthRepairs as $repair) {
+            $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
+            $days[$day - 1]['repairs'] += 1;
+            $totalRepairs++;
+        }
+
+        foreach ($declinedRepairs as $declined) {
+            $day = intval(preg_split("/[^1234567890]/", $declined['repair_date'])[2]);
+            $days[$day - 1]['declined'] += 1;
+            $totalDeclined++;
+        }
+
+        foreach ($completedRepairs as $completed) {
+            $day = intval(preg_split("/[^1234567890]/", $completed['repair_date'])[2]);
+            $days[$day - 1]['completed'] += 1;
+            $totalCompleted++;
+        }
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+
+        $totalCheck = 0;
+        foreach ($repairs as $repair) {
+            $totalCheck += $repair->check;
+        }
+
+
+        $users = User::all();
+        $managers = [];
+        $masters = [];
+        foreach ($users as $user) {
+            if ($user->hasRole('manager') && $user->city == $city) {
+                array_push($managers, $user);
+            } else if ($user->hasRole('master') && $user->city == $city) {
+                array_push($masters, $user);
+            }
+        }
+
+
+        return view('repair.search', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'managers', 'masters','client_fullname','address','phone','manager_id','master_id','status'));
+    }
+
+    public function doSearch(Request $request)
+    {
+        $data = $request->validate([
+            "client_fullname" => '',
+            "address" => '',
+            "phone" => '',
+            "manager_id" => '',
+            "master_id" => '',
+            "status" => '',
+        ]);
+
+        $temp=[];
+        foreach ($data as $key=>$item){
+            if($item!=null){
+                $temp[$key]=$item;
+            }
+        }
+
+        $query='?';
+        $index=1;
+        foreach ($temp as $key=>$item){
+            if($index==count($temp)){
+                $query=$query.$key.'='.$item;
+            }
+            else{
+                $query=$query.$key.'='.$item.'&&';
+                $index++;
+            }
+        }
+        return redirect('/repairs/search/'.$query);
     }
 
     public function update(Repair $repair, Request $request)
@@ -356,7 +596,7 @@ class RepairsController extends Controller
             "phone" => $data['phone'],
             "job_type" => $data['job_type'],
             "issued" => $data["issued"],
-            "avance" => array_key_exists('avance',$data)?$data['avance']:$lead->avance,
+            "avance" => array_key_exists('avance', $data) ? $data['avance'] : $lead->avance,
             "manager_id" => $data['manager_id'],
             "note" => $data['note']
         ]);
@@ -568,13 +808,13 @@ class RepairsController extends Controller
 
     public function duplicate(Repair $repair)
     {
-        $temp=$repair->lead;
-        $newLead=Lead::where(["id"=>$temp->id])->first()->replicate();
+        $temp = $repair->lead;
+        $newLead = Lead::where(["id" => $temp->id])->first()->replicate();
         $newLead->save();
 //        dd($newLead);
         $newRepair = $repair->replicate();
-        $newRepair->status='in-work';
-        $newRepair->lead_id=$newLead->id;
+        $newRepair->status = 'in-work';
+        $newRepair->lead_id = $newLead->id;
         $newRepair->save();
         return redirect()->back();
     }

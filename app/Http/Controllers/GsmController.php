@@ -200,7 +200,9 @@ class GsmController extends Controller
 //        dd($managers_gsm);
 //        dd($managers_gsm);
 
-        return view('gsm.show', compact('date', 'dateTitle', 'formattedDate', 'city', 'days', 'nextMonthLink', 'prevMonthLink','managers_gsm','nextMonday','prevMonday','date'));
+        $role='manager';
+
+        return view('gsm.show', compact('date', 'dateTitle', 'formattedDate', 'city', 'days', 'nextMonthLink', 'prevMonthLink','managers_gsm','nextMonday','prevMonday','date','role'));
     }
 
     public function indexGsmMaster(Request $request)
@@ -342,7 +344,9 @@ class GsmController extends Controller
 //        dd($managers_gsm);
 //        dd($managers_gsm);
 
-        return view('gsm.show', compact('date', 'dateTitle', 'formattedDate', 'city', 'days', 'nextMonthLink', 'prevMonthLink','managers_gsm','nextMonday','prevMonday','date'));
+        $role='master';
+
+        return view('gsm.show', compact('date', 'dateTitle', 'formattedDate', 'city', 'days', 'nextMonthLink', 'prevMonthLink','managers_gsm','nextMonday','prevMonday','date','role'));
     }
 
 

@@ -64,6 +64,10 @@ Route::group(['middleware' => 'role:coordinator'], function () {
 
 
 Route::get('/repairs/', [App\Http\Controllers\RepairsController::class, 'index'])->name('repairs.index');
+Route::get('/repairs/search/', [App\Http\Controllers\RepairsController::class, 'search'])->name('repairs.search');
+
+Route::post('/repairs/search/', [App\Http\Controllers\RepairsController::class, 'doSearch'])->name('repairs.do.search');
+
 Route::get('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 'edit'])->name('repairs.edit');
 Route::patch('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 'update'])->name('repairs.update');
 Route::patch('/repairs/{repair}/update', [App\Http\Controllers\RepairsController::class, 'editRepairViaLead'])->name('repairs.leads.update');

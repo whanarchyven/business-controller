@@ -72,24 +72,27 @@
                     <th class="fw-normal  text-center" scope="row">{{$totalDeclined}}</th>
                 </tr>
 
-                <tr>
-                    <th scope="row text-center">Выполнено</th>
-                    @foreach($days as $day)
-                        @if($day['completed']!=0)
-                            <th class="fw-normal text-center" scope="col">{{$day['completed']}}</th>
-                        @else
-                            <th class="fw-normal text-center" scope="col"></th>
-                        @endif
-                    @endforeach
-                    <th class="fw-normal  text-center" scope="row">{{$totalCompleted}}</th>
-                </tr>
+{{--                <tr>--}}
+{{--                    <th scope="row text-center">Выполнено</th>--}}
+{{--                    @foreach($days as $day)--}}
+{{--                        @if($day['completed']!=0)--}}
+{{--                            <th class="fw-normal text-center" scope="col">{{$day['completed']}}</th>--}}
+{{--                        @else--}}
+{{--                            <th class="fw-normal text-center" scope="col"></th>--}}
+{{--                        @endif--}}
+{{--                    @endforeach--}}
+{{--                    <th class="fw-normal  text-center" scope="row">{{$totalCompleted}}</th>--}}
+{{--                </tr>--}}
 
                 </tbody>
 
             </table>
 
             <div class="bd-cyan-500">
-                <p class="fs-3 text-indigo">Ремонты {{$formattedDate}}</p>
+                <div class="d-flex mb-3 gap-3 align-items-center">
+                    <p class="fs-3 m-0 text-indigo">Ремонты {{$formattedDate}}</p>
+                    <button onclick="window.location='{{route('repairs.search')}}'" class="btn m-0 btn-primary">Поиск по ремонтам</button>
+                </div>
                 <div class="w-100 d-flex flex-row justify-content-between">
                     <div class="d-flex gap-3 mb-4">
                         <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>

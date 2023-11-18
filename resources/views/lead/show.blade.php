@@ -66,14 +66,14 @@
 
             <div class="bd-cyan-500">
                 <p class="fs-3 text-indigo">Заявки {{$formattedDate}}</p>
-                <div class="flex gap-3 mb-4">
-                    <button class="bg-not-managed btn-outline-info border-0 p-2 text-white rounded-3">Не назначено
-                    </button>
-                    <button class="bg-managed btn-outline-info border-0 p-2 text-white rounded-3">Назначено</button>
-                    <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>
-                    <button class="bg-accepted btn-outline-info border-0 p-2 text-white rounded-3">Принято</button>
-                    <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено</button>
-                </div>
+{{--                <div class="flex gap-3 mb-4">--}}
+{{--                    <button class="bg-not-managed btn-outline-info border-0 p-2 text-white rounded-3">Не назначено--}}
+{{--                    </button>--}}
+{{--                    <button class="bg-managed btn-outline-info border-0 p-2 text-white rounded-3">Назначено</button>--}}
+{{--                    <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>--}}
+{{--                    <button class="bg-accepted btn-outline-info border-0 p-2 text-white rounded-3">Принято</button>--}}
+{{--                    <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено</button>--}}
+{{--                </div>--}}
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>

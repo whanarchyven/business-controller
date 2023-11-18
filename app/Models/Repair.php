@@ -48,4 +48,65 @@ class Repair extends Model
         return $summ;
     }
 
+    public function getResult(string $clientName='',string $address='',string $phone='',int $manager_id=0,int $master_id=0,string $status)
+    {
+        $query = [];
+        if ($clientName) {
+            array_push($query,['client_fullname','LIKE', '%'.$clientName.'%']);
+        }
+        if($address){
+            array_push($query,['address','LIKE', '%'.$address.'%']);
+        }
+        if($phone){
+            array_push($query,['phone','LIKE', '%'.$phone.'%']);
+        }
+        if($manager_id!=0){
+            array_push($query,['manager_id','=',$manager_id]);
+        }
+
+//        if ($date) {
+//            $query = $query + ['repair_date','=', $date];
+//        }
+
+
+
+
+        if (empty($query)) {
+            $leads=Lead::all();
+        }
+        else{
+            $leads=Lead::where($query)->get();
+        }
+
+        $result=[];
+
+        foreach ($leads as $lead){
+            if ($lead->repair){
+                if ($status&&!$master_id){
+                    if($lead->repair->status==$status){
+                        array_push($result,$lead->repair);
+                        continue 1;
+                    }
+                }
+                elseif ($master_id&&!$status){
+                    if($lead->repair->master_id==$master_id){
+                        array_push($result,$lead->repair);
+                        continue 1;
+                    }
+                }
+                elseif ($master_id&&$status){
+                    if($lead->repair->master_id==$master_id&&$lead->repair->status==$status){
+                        array_push($result,$lead->repair);
+                        continue 1;
+                    }
+                }
+                else{
+                    array_push($result,$lead->repair);
+                }
+            }
+        }
+
+        return $result;
+    }
+
 }
