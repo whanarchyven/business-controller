@@ -100,11 +100,16 @@
                                     {{--                                           class="my-2 form-control"--}}
                                     {{--                                           name="documents[]"--}}
                                     {{--                                           placeholder="Документы" multiple>--}}
-
+                                    <div class="form-group my-2">
+                                        <label for="chat_bot_id">Код привязки к боту</label>
+                                        <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel" class="form-control" id='chat_bot_id'
+                                               name="chat_bot_id" list="chat_bot_id">
+                                    </div>
                                     <div class="form-group my-2">
                                         <input type="submit" class="form-control bg-primary text-white fw-bold"
                                                value="Сохранить">
                                     </div>
+
                                 </div>
                             </div>
                         </form>

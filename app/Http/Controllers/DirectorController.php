@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
+use GuzzleHttp;
+
 class DirectorController extends Controller
 {
     public function getManagers($city_id)
@@ -115,8 +117,8 @@ class DirectorController extends Controller
     {
         $data = $request->all();
         $lead->update(['status' => 'declined', 'note' => $data['note']]);
-        $manager=$lead->getManagerId;
-        $manager->status='free';
+        $manager = $lead->getManagerId;
+        $manager->status = 'free';
         $manager->save();
         return redirect()->back();
     }
@@ -213,9 +215,19 @@ class DirectorController extends Controller
         $manager->status = 'meeting-managed';
         $manager->save();
 
-        if(Auth::user()->hasRole('coordinator')){
+        $jobTypes=[
+            "1"=>'Окна',"2"=>'Конструкции ПВХ',"3"=>'Многопрофиль',"4"=>'Электрика',
+        ];
+
+        if ($manager->chat_bot_id) {
+            $client = new GuzzleHttp\Client();
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Телефон: </b>' . $lead->phone . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A'.'<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A'.'<b>Замер: </b>' . ($lead->range?'Нет':'Да') . '%0A'.'<b>Диапазон: </b>' . ($lead->measuring?'Нет':'Да') . '%0A'.'<b>Комментарий: </b>' . $lead->comment. '%0A'.'<b>Примечание: </b>' . $lead->note. '%0A');
+        }
+
+
+        if (Auth::user()->hasRole('coordinator')) {
             return redirect(route('coordinator.managers'));
-        }else{
+        } else {
             return redirect(route('director.managers'));
         }
 
@@ -225,7 +237,7 @@ class DirectorController extends Controller
     {
         $data = $request->all();
         $manager = User::where([['id', '=', $data['manager']]])->first();
-        $lead->update(["manager_id" => null,"accepted"=>null,"entered"=>null,]);
+        $lead->update(["manager_id" => null, "accepted" => null, "entered" => null,]);
         $manager->status = 'free';
         $manager->save();
         $lead->save();
@@ -891,10 +903,10 @@ class DirectorController extends Controller
                 break;
             case 'coordinator':
                 $newUser->roles()->attach($coordinator);
-                $cities=City::all();
-                foreach ($cities as $city){
-                    if (array_key_exists(str_replace(' ','_',$city->name),$data)){
-                        $coordCity=new CoordinatorCity(['user_id'=>$newUser->id,"city_id"=>$city->id]);
+                $cities = City::all();
+                foreach ($cities as $city) {
+                    if (array_key_exists(str_replace(' ', '_', $city->name), $data)) {
+                        $coordCity = new CoordinatorCity(['user_id' => $newUser->id, "city_id" => $city->id]);
                         $coordCity->save();
                     }
                 }
@@ -929,6 +941,7 @@ class DirectorController extends Controller
             "birth_date" => '',
             "phone" => "",
             "city" => '',
+            "chat_bot_id" => ''
         ]);
 
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -944,6 +957,7 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
+        $user->chat_bot_id = $data['chat_bot_id'] ? '-' . $data['chat_bot_id'] : $user->chat_bot_id;
         $user->password = bcrypt($result);
         $user->save();
 
@@ -1082,8 +1096,8 @@ class DirectorController extends Controller
 //
 //        dd($transactions);
 
-        $states=TransactionState::all();
-        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city',  'date','states'));
+        $states = TransactionState::all();
+        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city', 'date', 'states'));
     }
 
     public function showTransactionDocs(Transaction $transaction)
@@ -1745,7 +1759,7 @@ class DirectorController extends Controller
         $users = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         foreach ($users as $user) {
-            if($user->hasRole('manager')){
+            if ($user->hasRole('manager')) {
                 array_push($managers, $user);
             }
         }
@@ -1753,15 +1767,15 @@ class DirectorController extends Controller
         $managersCalendar = array();
 
         foreach ($managers as $manager) {
-            array_push($managersCalendar, [$manager, $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]),['productsSelled'=>0,'productsConfirmed'=>0]]);
+            array_push($managersCalendar, [$manager, $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]), ['productsSelled' => 0, 'productsConfirmed' => 0]]);
         }
 
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
 
-        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city",'=',$city->name],["manager_id","!=",null]])->get();
+        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city", '=', $city->name], ["manager_id", "!=", null]])->get();
 
-        $logs=array();
+        $logs = array();
         foreach ($leads as $lead) {
             $manager = $lead->getManagerId->id;
             $neededObject = array_filter(
@@ -1778,20 +1792,20 @@ class DirectorController extends Controller
                 }
             );
 //            dd(array_key_first($neededDay));
-            $neededDay=array_key_first($neededDay);
-            $managersCalendar[$neededObject][1][$neededDay]['productsSelled']+=$lead->check;
-            $managersCalendar[$neededObject][1][$neededDay]['productsConfirmed']+=$lead->repair?$lead->repair->check:0;
-            $managersCalendar[$neededObject][2]['productsSelled']+=intval($lead->check);
+            $neededDay = array_key_first($neededDay);
+            $managersCalendar[$neededObject][1][$neededDay]['productsSelled'] += $lead->check;
+            $managersCalendar[$neededObject][1][$neededDay]['productsConfirmed'] += $lead->repair ? $lead->repair->check : 0;
+            $managersCalendar[$neededObject][2]['productsSelled'] += intval($lead->check);
 //            if($manager==34){
 //                array_push($logs,[$lead,$lead->check]);
 //            }
-            $managersCalendar[$neededObject][2]['productsConfirmed']+=$lead->repair?intval($lead->repair->check):0;
+            $managersCalendar[$neededObject][2]['productsConfirmed'] += $lead->repair ? intval($lead->repair->check) : 0;
         }
 
 //        dd($logs);
 
 
-        return view('roles.director.statistic.sells', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'days','managersCalendar'));
+        return view('roles.director.statistic.sells', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'days', 'managersCalendar'));
     }
 
 
@@ -1881,7 +1895,7 @@ class DirectorController extends Controller
         $users = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         foreach ($users as $user) {
-            if($user->hasRole('manager')){
+            if ($user->hasRole('manager')) {
                 array_push($managers, $user);
             }
         }
@@ -1889,15 +1903,15 @@ class DirectorController extends Controller
         $managersCalendar = array();
 
         foreach ($managers as $manager) {
-            array_push($managersCalendar, [$manager,'productsConfirmed'=>0,'productsSelled'=>0]);
+            array_push($managersCalendar, [$manager, 'productsConfirmed' => 0, 'productsSelled' => 0]);
         }
 
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
 
-        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city",'=',$city->name],["manager_id","!=",null]])->get();
+        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city", '=', $city->name], ["manager_id", "!=", null]])->get();
 
-        $logs=array();
+        $logs = array();
         foreach ($leads as $lead) {
             $manager = $lead->getManagerId->id;
             $neededObject = array_filter(
@@ -1907,19 +1921,18 @@ class DirectorController extends Controller
                 }
             );
             $neededObject = array_key_first($neededObject);
-            $managersCalendar[$neededObject]['productsSelled']+=intval($lead->check);
+            $managersCalendar[$neededObject]['productsSelled'] += intval($lead->check);
 
-            $managersCalendar[$neededObject]['productsConfirmed']+=$lead->repair?intval($lead->repair->check):0;
+            $managersCalendar[$neededObject]['productsConfirmed'] += $lead->repair ? intval($lead->repair->check) : 0;
         }
-        $managersCalendar=collect($managersCalendar);
+        $managersCalendar = collect($managersCalendar);
 
-        $managersCalendar=$managersCalendar->sortByDesc('productsConfirmed');
+        $managersCalendar = $managersCalendar->sortByDesc('productsConfirmed');
 
 //        dd($managersCalendar);
 
-        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date','managersCalendar'));
+        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'managersCalendar'));
     }
-
 
 
 }
