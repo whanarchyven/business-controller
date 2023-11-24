@@ -212,16 +212,17 @@ class DirectorController extends Controller
         $manager = User::where([['id', '=', $data['manager']]])->first();
 
         $lead->update(["manager_id" => $manager->id, "status" => 'managed']);
+        $this->changeBotPhoto($manager,'meeting-managed');
         $manager->status = 'meeting-managed';
         $manager->save();
 
-        $jobTypes=[
-            "1"=>'Окна',"2"=>'Конструкции ПВХ',"3"=>'Многопрофиль',"4"=>'Электрика',
+        $jobTypes = [
+            "1" => 'Окна', "2" => 'Конструкции ПВХ', "3" => 'Многопрофиль', "4" => 'Электрика',
         ];
 
         if ($manager->chat_bot_id) {
             $client = new GuzzleHttp\Client();
-            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Телефон: </b>' . $lead->phone . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A'.'<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A'.'<b>Замер: </b>' . ($lead->range?'Нет':'Да') . '%0A'.'<b>Диапазон: </b>' . ($lead->measuring?'Нет':'Да') . '%0A'.'<b>Комментарий: </b>' . $lead->comment. '%0A'.'<b>Примечание: </b>' . $lead->note. '%0A');
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Телефон: </b>' . $lead->phone . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Замер: </b>' . ($lead->range ? 'Нет' : 'Да') . '%0A' . '<b>Диапазон : </b>' . ($lead->measuring ? 'Нет' : 'Да') . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A' . '<b>Примечание: </b>' . $lead->note . '%0A');
         }
 
 
@@ -233,11 +234,31 @@ class DirectorController extends Controller
 
     }
 
+    public function getLinksToStatuses()
+    {
+        return $links = ["meeting-accepted" => 'https://i.ibb.co/pzq1fBs/accepted.png', "free" => 'https://i.ibb.co/CWHv2SM/free.png', "weekend" => 'https://i.ibb.co/HYqZfnV/weekend.png', "meeting-managed" => "https://i.ibb.co/8zsXb74/managed.png", "dinner" => "https://i.ibb.co/0mNJQLz/dinner.png", "on-meeting" => "https://i.ibb.co/chyhmjN/on-meeting.png", "delaying" => 'https://i.ibb.co/xfgpKH5/delaying.png'];
+    }
+
+    public function changeBotPhoto(User $user,$status){
+        if ($user->chat_bot_id) {
+            $client = new GuzzleHttp\Client();
+            $response = $client->request('POST', 'https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/setChatPhoto?chat_id=' . $user->chat_bot_id, [
+                'multipart' => [
+                    [
+                        'name' => 'photo',
+                        'contents' => fopen($this->getLinksToStatuses()[$status], 'r')
+                    ],
+                ]
+            ]);
+        }
+    }
+
     public function changeManager(Lead $lead, Request $request)
     {
         $data = $request->all();
         $manager = User::where([['id', '=', $data['manager']]])->first();
         $lead->update(["manager_id" => null, "accepted" => null, "entered" => null,]);
+        $this->changeBotPhoto($manager,'free');
         $manager->status = 'free';
         $manager->save();
         $lead->save();

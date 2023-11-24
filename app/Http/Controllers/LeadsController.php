@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\CoordinatorController;
 use MongoDB\Driver\Session;
-
+use GuzzleHttp;
 
 class LeadsController extends Controller
 {
@@ -529,9 +529,28 @@ class LeadsController extends Controller
     public function getManagerLeads()
     {
         $manager = Auth::user();
-        $leads = Lead::where([['manager_id', '=', $manager->id]])->get();
+        $leads = Lead::where([['manager_id', '=', $manager->id],['issued','=',null]])->get();
 
         return view('roles.manager.leads', compact('leads', 'manager'));
+    }
+
+    public function getLinksToStatuses()
+    {
+        return $links = ["meeting-accepted" => 'https://i.ibb.co/pzq1fBs/accepted.png', "free" => 'https://i.ibb.co/CWHv2SM/free.png', "weekend" => 'https://i.ibb.co/HYqZfnV/weekend.png', "meeting-managed" => "https://i.ibb.co/8zsXb74/managed.png", "dinner" => "https://i.ibb.co/0mNJQLz/dinner.png", "on-meeting" => "https://i.ibb.co/chyhmjN/on-meeting.png", "delaying" => 'https://i.ibb.co/xfgpKH5/delaying.png'];
+    }
+
+    public function changeBotPhoto(User $user,$status){
+        if ($user->chat_bot_id) {
+            $client = new GuzzleHttp\Client();
+            $response = $client->request('POST', 'https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/setChatPhoto?chat_id=' . $user->chat_bot_id, [
+                'multipart' => [
+                    [
+                        'name' => 'photo',
+                        'contents' => fopen($this->getLinksToStatuses()[$status], 'r')
+                    ],
+                ]
+            ]);
+        }
     }
 
     public function changeLeadStatus(Lead $lead)
@@ -547,14 +566,17 @@ class LeadsController extends Controller
         if ($data['status'] == 'accepted') {
             $lead->update(['status' => 'accepted']);
             $manager->status = 'meeting-accepted';
+            $this->changeBotPhoto($manager,'meeting-accepted');
             $manager->save();
         } else if ($data['status'] == 'entered') {
             $lead->update(['status' => 'in-work']);
             $manager->status = 'on-meeting';
+            $this->changeBotPhoto($manager,'on-meeting');
             $manager->save();
             $operator->save();
         } else if ($data['status'] == 'exited') {
             $manager->status = 'free';
+            $this->changeBotPhoto($manager,'free');
             $manager->save();
         }
 
