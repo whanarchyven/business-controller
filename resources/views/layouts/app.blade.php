@@ -338,8 +338,11 @@
                                 <a class="dropdown-item" href="{{route('director.avance.week')}}">
                                     Аванс неделя
                                 </a>
-                                <a class="dropdown-item" href="{{route('director.salary.pay')}}">
+                                <a class="dropdown-item" href="{{route('director.avance.month')}}">
                                     Аванс месяц
+                                </a>
+                                <a class="dropdown-item" href="{{route('director.salary.pay')}}">
+                                    Ведомость сотрудники
                                 </a>
                             </div>
                         </li>

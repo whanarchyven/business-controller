@@ -68,37 +68,42 @@ class BonusController extends Controller
                 $dateTitle = 'Декабрь ';
                 break;
         }
-        $dateTitle = $dateTitle . $dateTemp[0];
+        $dateTitle = $dateTemp[2].' '. $dateTitle . $dateTemp[0];
 
         $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
 
 
         $lexems = preg_split("/[^1234567890]/", $date);
 
-        if (intval($lexems[1]) + 1 < 10) {
-            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
-        } else {
-            if (intval($lexems[1]) + 1 > 12) {
-                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
-            } else {
-                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
-            }
-        }
+//        if (intval($lexems[1]) + 1 < 10) {
+//            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+//        } else {
+//            if (intval($lexems[1]) + 1 > 12) {
+//                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+//            } else {
+//                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+//            }
+//        }
+//
+//        if (intval($lexems[1]) - 1 >= 10) {
+//            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+//        } else {
+//            if (intval(intval($lexems[1]) - 1 <= 0)) {
+//                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+//            } else {
+//                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+//            }
+//        }
 
-        if (intval($lexems[1]) - 1 >= 10) {
-            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
-        } else {
-            if (intval(intval($lexems[1]) - 1 <= 0)) {
-                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
-            } else {
-                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
-            }
-        }
+        $prevMonthLink=Carbon::createFromDate($date)->subDays(1)->toDateString();
+        $nextMonthLink=Carbon::createFromDate($date)->addDays(1)->toDateString();
 
         $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+//        dd(Carbon::today()->toDateString());
 
-        $bonuses = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["city_id" => $city->id, "type" => "plus"])->get();
+        $bonuses = BonusManager::where(["city_id" => $city->id, "type" => "plus"])->whereDate("created_at",Carbon::createFromDate($date)->toDateString())->get();
+
 
         $bonuses15k = array();
         $bonuses50k = array();

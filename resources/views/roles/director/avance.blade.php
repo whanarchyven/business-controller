@@ -26,89 +26,89 @@
                 </div>
             </div>
 
-            <div class="mt-4">
-                <p class="fw-bold fs-2">Руководитель</p>
-                <table class="table table-bordered table-sm table-secondary ">
-                    <thead>
-                    <tr>
-                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>
-                        <th class="p-2 fw-bold text-left" scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($directors as $director)
-                        @if(!$director->isAdmin)
-                            <tr class="table-light">
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>
-                                <th class="p-2 fw-bold text-left" scope="col">
-                                    <input class="form-control"
-                                           value="5000"
-                                           type="number"
-                                           name="director{{$loop->index}}"
-                                        {{--                                       max="{{$director->salary($date)}}"--}}
-                                    />
-                                    <input type="hidden" value="{{$director->id}}" name="directorEmployer{{$loop->index}}">
-                                </th>
-                                <th class=" p-2 fw-bold text-left" scope="col">
-                                    <div onclick="window.location.href='{{route('director.directorcard',$director)}}'"
-                                         class="btn w-100 btn-warning">
-                                        Карточка
-                                    </div>
-                                </th>
-                            </tr>
-                        @endif
-                    @endforeach
-                    </tbody>
+{{--            <div class="mt-4">--}}
+{{--                <p class="fw-bold fs-2">Руководитель</p>--}}
+{{--                <table class="table table-bordered table-sm table-secondary ">--}}
+{{--                    <thead>--}}
+{{--                    <tr>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col"></th>--}}
+{{--                    </tr>--}}
+{{--                    </thead>--}}
+{{--                    <tbody>--}}
+{{--                    @foreach($directors as $director)--}}
+{{--                        @if(!$director->isAdmin)--}}
+{{--                            <tr class="table-light">--}}
+{{--                                <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>--}}
+{{--                                <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>--}}
+{{--                                <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>--}}
+{{--                                <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>--}}
+{{--                                <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                    <input class="form-control"--}}
+{{--                                           value="5000"--}}
+{{--                                           type="number"--}}
+{{--                                           name="director{{$loop->index}}"--}}
+{{--                                        --}}{{--                                       max="{{$director->salary($date)}}"--}}
+{{--                                    />--}}
+{{--                                    <input type="hidden" value="{{$director->id}}" name="directorEmployer{{$loop->index}}">--}}
+{{--                                </th>--}}
+{{--                                <th class=" p-2 fw-bold text-left" scope="col">--}}
+{{--                                    <div onclick="window.location.href='{{route('director.directorcard',$director)}}'"--}}
+{{--                                         class="btn w-100 btn-warning">--}}
+{{--                                        Карточка--}}
+{{--                                    </div>--}}
+{{--                                </th>--}}
+{{--                            </tr>--}}
+{{--                        @endif--}}
+{{--                    @endforeach--}}
+{{--                    </tbody>--}}
 
-                </table>
-            </div>
+{{--                </table>--}}
+{{--            </div>--}}
 
-            <div class="mt-4">
-                <p class="fw-bold fs-2">Менеджеры</p>
-                <table class="table table-bordered table-sm table-secondary ">
-                    <thead>
-                    <tr>
-                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>
-                        <th class="p-2 fw-bold text-left" scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($managers as $manager)
-                        <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->name}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->salary($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">
-                                <input class="form-control"
-                                       value="5000"
-                                       {{--                                       max="{{$manager->salary($date)}}" type="number"--}}
-                                       name="manager{{$loop->index}}"/>
-                                <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">
-                            </th>
-                            <th class="p-2 fw-bold text-left" scope="col">
-                                <div onclick="window.location.href='{{route('director.managercard',$manager)}}'"
-                                     class="btn w-100 btn-warning">
-                                    Карточка
-                                </div>
-                            </th>
-                        </tr>
-                    @endforeach
-                    </tbody>
+{{--            <div class="mt-4">--}}
+{{--                <p class="fw-bold fs-2">Менеджеры</p>--}}
+{{--                <table class="table table-bordered table-sm table-secondary ">--}}
+{{--                    <thead>--}}
+{{--                    <tr>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col"></th>--}}
+{{--                    </tr>--}}
+{{--                    </thead>--}}
+{{--                    <tbody>--}}
+{{--                    @foreach($managers as $manager)--}}
+{{--                        <tr class="table-light">--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->name}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->payedSalary($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->salary($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                <input class="form-control"--}}
+{{--                                       value="5000"--}}
+{{--                                       --}}{{--                                       max="{{$manager->salary($date)}}" type="number"--}}
+{{--                                       name="manager{{$loop->index}}"/>--}}
+{{--                                <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">--}}
+{{--                            </th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                <div onclick="window.location.href='{{route('director.managercard',$manager)}}'"--}}
+{{--                                     class="btn w-100 btn-warning">--}}
+{{--                                    Карточка--}}
+{{--                                </div>--}}
+{{--                            </th>--}}
+{{--                        </tr>--}}
+{{--                    @endforeach--}}
+{{--                    </tbody>--}}
 
-                </table>
-            </div>
+{{--                </table>--}}
+{{--            </div>--}}
 
             <div class="mt-4">
                 <p class="fw-bold fs-2">Операторы</p>

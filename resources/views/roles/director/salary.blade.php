@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    {{'- Аванс месяц'}}
+    {{'- Ведомость сотрудники'}}
 @endsection
 
 @section('content')
