@@ -978,7 +978,7 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
-        $user->chat_bot_id = $data['chat_bot_id'] ? '-' . $data['chat_bot_id'] : $user->chat_bot_id;
+        $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
         $user->password = bcrypt($result);
         $user->save();
 
