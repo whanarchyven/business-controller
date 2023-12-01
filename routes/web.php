@@ -81,6 +81,7 @@ Route::get('/card/director/{director}', [App\Http\Controllers\DirectorController
 
 Route::patch('/director/leads/{lead}/sendPhone', [App\Http\Controllers\DirectorController::class, 'sendPhone'])->name('director.leads.sendPhone');
 Route::patch('/director/leads/{lead}/sendAddress', [App\Http\Controllers\DirectorController::class, 'sendAddress'])->name('director.leads.sendAddress');
+Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
 
 Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/', [App\Http\Controllers\DirectorController::class, 'controlTable'])->name('director.managers');
@@ -88,7 +89,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/leads/{lead}', [App\Http\Controllers\DirectorController::class, 'update'])->name('director.leads.update');
     Route::patch('/director/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('director.leads.decline');
     Route::patch('/director/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('director.leads.manage');
-    Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
+
 
 
     Route::post('/director/director/{director}/addworkday', [App\Http\Controllers\DirectorController::class, 'addWorkDay'])->name('director.add.workday');

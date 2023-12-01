@@ -321,7 +321,7 @@
                         </div>
                     </li>
 
-                    @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                    @if(\Illuminate\Support\Facades\Auth::user()->hasRole('director'))
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
