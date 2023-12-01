@@ -28,4 +28,37 @@ class City extends Model
     {
         return $this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->orderBy('created_at','desc');
     }
+
+    public function getTransactionQuery(string $date='',string $description='',int $state=0,string $type='',int $responsible=0)
+    {
+        $query = [];
+        if ($date!='') {
+            array_push($query,['transactions.created_at','LIKE', '%'.$date.'%']);
+        }
+        if($description!=''){
+            array_push($query,['description','LIKE', '%'.$description.'%']);
+        }
+        if($state){
+            array_push($query,['state_id','=', $state]);
+        }
+        if($responsible){
+            array_push($query,['responsible','=', $responsible]);
+        }
+        if($type!=''){
+            array_push($query,['type','=',$type]);
+        }
+
+//        dd($query);
+
+        if (empty($query)) {
+            $result=$this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->get();
+        }
+        else{
+            $result=$this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->where($query)->get();
+        }
+
+
+        return $result;
+    }
+
 }

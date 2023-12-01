@@ -118,8 +118,11 @@ class DirectorController extends Controller
         $data = $request->all();
         $lead->update(['status' => 'declined', 'note' => $data['note']]);
         $manager = $lead->getManagerId;
-        $manager->status = 'free';
-        $manager->save();
+        if ($manager){
+            $manager->status = 'free';
+            $this->changeBotPhoto($manager,'free');
+            $manager->save();
+        }
         return redirect()->back();
     }
 
@@ -222,7 +225,7 @@ class DirectorController extends Controller
 
         if ($manager->chat_bot_id) {
             $client = new GuzzleHttp\Client();
-            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Телефон: </b>' . $lead->phone . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Замер: </b>' . ($lead->range ? 'Нет' : 'Да') . '%0A' . '<b>Диапазон : </b>' . ($lead->measuring ? 'Нет' : 'Да') . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A' . '<b>Примечание: </b>' . $lead->note . '%0A');
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Замер: </b>' . ($lead->range ? 'Нет' : 'Да') . '%0A' . '<b>Диапазон : </b>' . ($lead->measuring ? 'Нет' : 'Да') . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A' . '<b>Примечание: </b>' . $lead->note . '%0A');
         }
 
 
@@ -264,6 +267,29 @@ class DirectorController extends Controller
         $lead->save();
         return redirect()->back();
     }
+
+    public function sendPhone(Lead $lead, Request $request)
+    {
+        $data = $request->all();
+        $manager = User::where([['id', '=', $data['manager']]])->first();
+        if ($manager->chat_bot_id) {
+            $client = new GuzzleHttp\Client();
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' .'<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Телефон: </b>' . $lead->phone .'%0A');
+        }
+        return redirect()->back();
+    }
+
+    public function sendAddress(Lead $lead, Request $request)
+    {
+        $data = $request->all();
+        $manager = User::where([['id', '=', $data['manager']]])->first();
+        if ($manager->chat_bot_id) {
+            $client = new GuzzleHttp\Client();
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' .'<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address .'%0A');
+        }
+        return redirect()->back();
+    }
+
 
     public function getStatuses()
     {
@@ -956,14 +982,7 @@ class DirectorController extends Controller
 
     public function updateUser(User $user, Request $request)
     {
-        $data = $request->validate([
-            "name" => '',
-            "email" => '',
-            "birth_date" => '',
-            "phone" => "",
-            "city" => '',
-            "chat_bot_id" => ''
-        ]);
+        $data = $request->all();
 
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $count = mb_strlen($chars);
@@ -978,8 +997,21 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
-        $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
+        if($user->hasRole('manager')){
+            $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
+        }
         $user->password = bcrypt($result);
+        if(Auth::user()->isAdmin&&$user->hasRole('coordinator')){
+            CoordinatorCity::where(["user_id"=>$user->id])->delete();
+            $cities = City::all();
+            foreach ($cities as $city) {
+                if (array_key_exists(str_replace(' ', '_', $city->name), $data)) {
+                    $coordCity = new CoordinatorCity(['user_id' => $user->id, "city_id" => $city->id]);
+                    $coordCity->save();
+                }
+            }
+
+        }
         $user->save();
 
 
@@ -1120,6 +1152,93 @@ class DirectorController extends Controller
         $states = TransactionState::all();
         return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city', 'date', 'states'));
     }
+
+
+    public function searchTransactions(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = City::where(['id' => Auth::user()->city])->first();
+        }
+
+        if($request->query('state')){
+            $state=$request->query('state');
+        }
+        else{
+            $state=0;
+        }
+
+        if($request->query('description')){
+            $description=$request->query('description');
+        }
+        else{
+            $description='';
+        }
+
+        if($request->query('type')){
+            $type=$request->query('type');
+        }
+        else{
+            $type='';
+        }
+
+        if($request->query('responsible')){
+            $responsible=$request->query('responsible');
+        }
+        else{
+            $responsible=0;
+        }
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = '';
+        }
+
+//        dd($transactions);
+
+        $transactions=$city->getTransactionQuery($date,$description,$state,$type,$responsible);
+
+        $allUsers=User::all();
+
+        $states = TransactionState::all();
+        return view('roles.director.transactions_search', compact('transactions', 'city', 'date', 'states','date','description','state','type','responsible','allUsers'));
+    }
+
+    public function doSearchTransaction(Request $request)
+    {
+        $data = $request->validate([
+            "date" => '',
+            "description" => '',
+            "state" => '',
+            "type" => '',
+            "responsible" => '',
+        ]);
+
+        $temp=[];
+        foreach ($data as $key=>$item){
+            if($item!=null){
+                $temp[$key]=$item;
+            }
+        }
+
+        $query='?';
+        $index=1;
+        foreach ($temp as $key=>$item){
+            if($index==count($temp)){
+                $query=$query.$key.'='.$item;
+            }
+            else{
+                $query=$query.$key.'='.$item.'&&';
+                $index++;
+            }
+        }
+        return redirect('/director/transactions/search/'.$query);
+    }
+
+
 
     public function showTransactionDocs(Transaction $transaction)
     {

@@ -72,7 +72,14 @@ class User extends Authenticatable
 
     public function coordinatorCity()
     {
-        return $this->hasManyThrough(City::class,CoordinatorCity::class,'user_id','id')->get();
+     return $this->hasManyThrough(
+         City::class, // Целевая модель, которую вы хотите получить
+         CoordinatorCity::class, // Промежуточная модель
+         'user_id', // Внешний ключ в промежуточной модели CoordinatorCity
+         'id', // Локальный ключ в модели User
+         'id', // Локальный ключ в целевой модели City
+         'city_id' // Внешний ключ в промежуточной модели CoordinatorCity
+     )->get();
     }
 
 

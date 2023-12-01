@@ -7,27 +7,10 @@
 @section('content')
     <div class="container">
 
-        <div class="d-flex justify-content-between">
-            <div>
-                <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.transactions')}}?date={{$prevMonthLink}}">Предыдущий
-                    месяц</a>
-            </div>
-            <div id="date-head">
-                <p class="fs-3">{{$dateTitle}}</p>
-            </div>
-            <div>
-                <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.transactions')}}?date={{$nextMonthLink}}">Следующий
-                    месяц</a>
-            </div>
-        </div>
-
         <div class="">
             <div class="bd-cyan-500">
                 <div class="d-flex flex-row gap-3">
-                    <p class="fs-3 text-indigo">Транзакции за {{$dateTitle}}, {{$city->name}}</p>
-                    <button class="btn btn-primary h-25" onclick="window.location.href='{{route('director.transactions.search')}}'">Поиск транзакций</button>
+                    <p class="fs-3 text-indigo">Поиск транзакций</p>
                 </div>
                 <a id="top"></a>
                 <a href="#top" style="width: 60px; height: 60px; border-radius: 9999px; right: 20px; bottom: 150px" class="d-flex p-3 justify-content-center align-items-center position-fixed bg-secondary">
@@ -40,6 +23,59 @@
                         <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"></path>
                     </svg>
                 </a>
+                <form method="post" action="{{route('director.transactions.do.search')}}" class="my-3 mb-6 d-grid gap-2">
+                    @csrf
+                    @method('post')
+                    <div class="row">
+                        <div class="d-flex col flex-column gap-2">
+                            <p class="m-0">Дата</p>
+                            <input class="form-control" type="date" value="{{$date?$date:''}}" name="date"/>
+                        </div>
+                        <div class="d-flex col flex-column gap-2">
+                            <p class="m-0">Тип</p>
+                            <select name="type" class="form-control">
+                                <option value="">Не выбрано</option>
+                                <option {{$type=='receipt'?'selected':''}} value="receipt">Приход</option>
+                                <option {{$type=='expense'?'selected':''}} value="expense">Расход</option>
+                            </select>
+                        </div>
+                        <div class="d-flex col flex-column gap-2">
+                            <p class="m-0">Статья ID</p>
+                            <input placeholder="{{$state?\App\Models\TransactionState::where(["id"=>$state])->first()->code.\App\Models\TransactionState::where(["id"=>$state])->first()->name:''}}" class="form-control" list="state-list" id="state" name="state" />
+                            <datalist id="state-list">
+                                @foreach($states as $stateTemp)
+                                    <option value="{{$stateTemp->id}}">{{$stateTemp->code}} {{$stateTemp->name}}</option>
+                                @endforeach
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="d-flex col flex-column gap-2">
+                            <p class="m-0">Основание</p>
+                            <input class="form-control" value="{{$description?$description:''}}" name="description"/>
+                        </div>
+                        <div class="d-flex col flex-column gap-2">
+                            <p class="m-0">Ответственный ID</p>
+                            <input placeholder="{{$responsible?\App\Models\User::where(["id"=>$responsible])->first()->name:''}}" class="form-control" list="responsible-list" id="responsible" name="responsible" />
+                            <datalist id="responsible-list">
+                                @foreach($allUsers as $user)
+                                    @if($user->city==$city->id)
+                                        <option data-text="{{$user->name}}" value="{{$user->id}}">{{$user->name}}</option>
+                                    @endif
+                                @endforeach
+                            </datalist>
+                        </div>
+
+                    </div>
+
+                    <div class="row ">
+                        <input class="btn btn-primary" type="submit" value="Поиск" />
+                    </div>
+                    <div class="row ">
+                        <div onclick="window.location='{{route('director.transactions.search')}}'" class="btn m-0 btn-danger">Сброс</div>
+                    </div>
+
+                </form>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>
@@ -89,59 +125,6 @@
 
                 </table>
                 <a id="bottom"></a>
-                <div class="bg-secondary bg-opacity-25 p-2">
-                    <p class="fw-bold fs-3">Новая транзакция</p>
-                    <form class="d-grid" enctype="multipart/form-data" action="{{route('director.transactions.store')}}"
-                          method="post">
-                        @csrf
-                        @method('post')
-                        <div class="row">
-                            <div class="d-flex col gap-2">
-                                <label for="state">Статья транзакции</label>
-                                <select name="state" class="form-select">
-                                    @foreach($states as $state)
-                                        <option value="{{$state->code}}">{{$state->code}} {{$state->name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="d-flex col my-2 flex-row gap-3">
-                                <p class="m-0">Тип транзакции</p>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="receipt"
-                                           id="receipt" checked>
-                                    <label class="form-check-label" for="receipt">
-                                        Приход
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="expense"
-                                           id="expense">
-                                    <label class="form-check-label" for="expense">
-                                        Расход
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col my-2">
-                                <label for="value">Сумма транзакции</label>
-                                <input type="number" class="form-control" id='value' name="value">
-                            </div>
-                            <div class="d-flex flex-column col">
-                                <label for="documents">Документы</label>
-                                <input enctype="multipart/form-data"
-                                       type="file"
-                                       class="my-2 form-control"
-                                       name="documents[]"
-                                       placeholder="Документы" multiple>
-                            </div>
-                            <div class="form-group my-2">
-                                <input type="submit" class="form-control bg-primary text-white fw-bold"
-                                       value="Отправить">
-                            </div>
-                        </div>
-                    </form>
-                </div>
             </div>
 
         </div>

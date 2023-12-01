@@ -142,6 +142,24 @@
                                                        class="btn btn-primary text-white w-100 rounded-2  p-2"
                                                        value="Сменить менеджера"/>
                                             </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendPhone',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-dark text-white w-100 rounded-2  p-2"
+                                                       value="Отправить номер"/>
+                                            </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendAddress',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-light text-black w-100 rounded-2  p-2"
+                                                       value="Отправить адрес"/>
+                                            </form>
                                         </div>
 
                                     </div>
@@ -194,6 +212,24 @@
                                                        class="btn btn-primary text-white w-100 rounded-2  p-2"
                                                        value="Сменить менеджера"/>
                                             </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendPhone',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-dark text-white w-100 rounded-2  p-2"
+                                                       value="Отправить номер"/>
+                                            </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendAddress',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-light text-black w-100 rounded-2  p-2"
+                                                       value="Отправить адрес"/>
+                                            </form>
                                         </div>
 
                                     </div>
@@ -234,7 +270,7 @@
                                            value="exited"/>
                                     <input type="submit" class="btn btn-success w-100" value="Вышел">
                                 </form>
-                            @elseif(!$lead->check)
+                            @elseif(!$lead->issued)
                                 {{--                                        <button id="success" class="my-2 btn btn-success w-100">Успешно</button>--}}
                                 {{--                                        <button id="otkaz" class="my-2 btn btn-danger w-100">Отказ</button>--}}
                                 {{--                                        <form id="decline-form-second" class="d-none"--}}
@@ -351,6 +387,24 @@
                                                        class="btn btn-primary text-white w-100 rounded-2  p-2"
                                                        value="Сменить менеджера"/>
                                             </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendPhone',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-dark text-white w-100 rounded-2  p-2"
+                                                       value="Отправить номер"/>
+                                            </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendAddress',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-light text-black w-100 rounded-2  p-2"
+                                                       value="Отправить адрес"/>
+                                            </form>
                                         </div>
 
                                     </div>
@@ -403,6 +457,25 @@
                                                        class="btn btn-primary text-white w-100 rounded-2  p-2"
                                                        value="Сменить менеджера"/>
                                             </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendPhone',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-dark text-white w-100 rounded-2  p-2"
+                                                       value="Отправить номер"/>
+                                            </form>
+                                            <form method="post"
+                                                  action="{{route('director.leads.sendAddress',$lead)}}">
+                                                @csrf
+                                                @method('patch')
+                                                <input type="hidden" name="manager" value="{{$lead->manager_id}}">
+                                                <input type="submit"
+                                                       class="btn btn-light text-black w-100 rounded-2  p-2"
+                                                       value="Отправить адрес"/>
+                                            </form>
+
                                         </div>
 
                                     </div>

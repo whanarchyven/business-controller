@@ -79,6 +79,8 @@ Route::get('/card/operator/{user}', [App\Http\Controllers\LeadsController::class
 Route::get('/card/master/{master}', [App\Http\Controllers\RepairsController::class, 'masterCard'])->name('director.mastercard');
 Route::get('/card/director/{director}', [App\Http\Controllers\DirectorController::class, 'directorCard'])->name('director.directorcard');
 
+Route::patch('/director/leads/{lead}/sendPhone', [App\Http\Controllers\DirectorController::class, 'sendPhone'])->name('director.leads.sendPhone');
+Route::patch('/director/leads/{lead}/sendAddress', [App\Http\Controllers\DirectorController::class, 'sendAddress'])->name('director.leads.sendAddress');
 
 Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/', [App\Http\Controllers\DirectorController::class, 'controlTable'])->name('director.managers');
@@ -87,6 +89,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('director.leads.decline');
     Route::patch('/director/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('director.leads.manage');
     Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
+
 
     Route::post('/director/director/{director}/addworkday', [App\Http\Controllers\DirectorController::class, 'addWorkDay'])->name('director.add.workday');
     Route::delete('/director/director/{director}/removeworkday', [App\Http\Controllers\DirectorController::class, 'removeWorkDay'])->name('director.delete.workday');
@@ -141,6 +144,10 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/getcity/', [App\Http\Controllers\DirectorController::class, 'getCity'])->name('admin.city.get');
 
     Route::get('/director/transactions/', [App\Http\Controllers\DirectorController::class, 'getTransactionsView'])->name('director.transactions');
+
+    Route::get('/director/transactions/search', [App\Http\Controllers\DirectorController::class, 'searchTransactions'])->name('director.transactions.search');
+    Route::post('/director/transactions/search', [App\Http\Controllers\DirectorController::class, 'doSearchTransaction'])->name('director.transactions.do.search');
+
     Route::get('/director/transactions/new', [App\Http\Controllers\TransactionController::class, 'newTransactionView'])->name('director.transactions.new');
     Route::post('/director/transactions/store', [App\Http\Controllers\TransactionController::class, 'storeNewTransaction'])->name('director.transactions.store');
     Route::get('/director/transactions/{transaction}', [App\Http\Controllers\DirectorController::class, 'showTransactionDocs'])->name('director.transactions.docs');

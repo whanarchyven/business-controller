@@ -80,9 +80,21 @@
                                             <select id="city" class="form-control" name="city">
                                                 @foreach($cities as $city)
                                                     <option
-                                                        {{$city->id==$user->city?`selevted`:''}} value="{{$city->id}}">{{$city->name}}</option>
+                                                        {{$city->id==$user->city?'selected':''}} value="{{$city->id}}">{{$city->name}}</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                    @endif
+
+                                    @if($director->isAdmin&&$user->hasRole('coordinator'))
+                                        <div id="city-form-coordinator" class="my-2">
+                                            <label for="city">Доступ к городам</label>
+                                            @foreach($cities as $city)
+                                                <div class="d-flex gap-3">
+                                                    <label>{{$city->name}}</label>
+                                                    <input {{array_search($city->id,array_column($user->coordinatorCity()->toArray(),'id'))!==false?'checked':''}} id="{{$city->name}}" name="{{$city->name}}" type="checkbox"/>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @endif
 
@@ -100,11 +112,13 @@
                                     {{--                                           class="my-2 form-control"--}}
                                     {{--                                           name="documents[]"--}}
                                     {{--                                           placeholder="Документы" multiple>--}}
-                                    <div class="form-group my-2">
-                                        <label for="chat_bot_id">Код привязки к боту</label>
-                                        <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel" class="form-control" id='chat_bot_id'
-                                               name="chat_bot_id" list="chat_bot_id">
-                                    </div>
+                                    @if($user->hasRole('manager'))
+                                        <div class="form-group my-2">
+                                            <label for="chat_bot_id">Код привязки к боту</label>
+                                            <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel" class="form-control" id='chat_bot_id'
+                                                   name="chat_bot_id" list="chat_bot_id">
+                                        </div>
+                                    @endif
                                     <div class="form-group my-2">
                                         <input type="submit" class="form-control bg-primary text-white fw-bold"
                                                value="Сохранить">
@@ -114,24 +128,6 @@
                             </div>
                         </form>
 
-                        <script>
-                            function updateSubForm() {
-                                let select = document.querySelector("#role");
-                                console.log(select.value);
-                                if (select.value == 'manager') {
-                                    document.querySelector('#coordinator-form').className = 'form-group my-2';
-                                    document.getElementById('oklad').className = 'form-group my-2';
-                                } else if (select.value == 'coordinator') {
-                                    document.querySelector('#coordinator-form').className = 'd-none'
-                                    document.getElementById('oklad').className = 'form-group my-2';
-                                } else {
-                                    document.querySelector('#coordinator-form').className = 'd-none'
-                                    document.getElementById('oklad').className = 'd-none';
-                                }
-                            }
-
-                            // document.querySelector("#role").addEventListener('select', updateSubForm)
-                        </script>
                     </div>
                 </div>
             </div>

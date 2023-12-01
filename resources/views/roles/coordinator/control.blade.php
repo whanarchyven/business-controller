@@ -370,6 +370,7 @@
                                                         class="btn btn-danger text-white w-50 rounded-2  p-2">
                                                     Отказ
                                                 </button>
+
                                                 <button
                                                     onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
                                                     class="btn btn-warning text-white w-75 rounded-2  p-2">
@@ -378,6 +379,23 @@
                                             </div>
 
                                         </div>
+                                        <div id="decline-form-second" class="d-none">
+                                            <form class="d-flex gap-2 w-100"
+                                                  action="{{route('director.leads.decline',$lead->id)}}"
+                                                  method="post">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input placeholder="Укажите причину отказа" class="form-control" name="note"
+                                                       type="text"/>
+                                                <input type="submit" class="my-2 btn btn-danger w-50" value="Отказ">
+                                            </form>
+                                        </div>
+                                        <script>
+                                            document.getElementById('decline-btn')?.addEventListener('click', () => {
+                                                document.getElementById('control-panel').className = 'd-none';
+                                                document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                            })
+                                        </script>
                                     @else
                                         <div class="d-flex flex-column gap-0">
                                             <p class="m-0">Принял: {{$lead->accepted}}</p>
