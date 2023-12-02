@@ -43,7 +43,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th class="fw-bold text-left" scope="col">{{count($leads)}}</th>
+                                <th class="fw-bold text-left" scope="col">{{$meetings}}</th>
                                 <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($declined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_selled}}</th>
@@ -68,7 +68,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th class="fw-bold text-left" scope="col">{{count($todayLeads)}}</th>
+                                <th class="fw-bold text-left" scope="col">{{$todayMeetings}}</th>
                                 <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($todayDeclined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsSelled}}</th>
@@ -100,7 +100,6 @@
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
                             план
                         </button>
-                        <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                         <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form"
                               class="d-none">
                             @csrf
@@ -109,13 +108,20 @@
                             <input name="city" type="hidden" value="{{$city_id}}">
                             <input type="submit" value="Изменить" class="btn h-50 fw-bold btn-warning"/>
                         </form>
+                        <script>
+                            document.getElementById('change-plan-btn').addEventListener('click',()=>{
+                                document.getElementById('change-plan-btn').className='d-none'
+                                document.getElementById('change-plan-form').className='d-flex'
+                            })
+                        </script>
                     @endif
+                    <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                 </div>
                 {{--                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>--}}
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('coordinator.manager.operative',$manager)}}'"
-                            class="btn m-2 manager-{{$manager->status}}">{{$manager->name}}</button>
+                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.count($managers_leads[$manager->name]).' ]'}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">
@@ -158,7 +164,7 @@
                                                         @foreach($managers as $manager)
                                                             @if($manager->status=='free')
                                                                 <option
-                                                                    value="{{$manager->id}}">{{$manager->name}}</option>
+                                                                    value="{{$manager->id}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1]}}</option>
                                                             @endif
                                                         @endforeach
                                                     </select>
@@ -241,7 +247,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th class="fw-bold text-left" scope="col">{{count($leads)}}</th>
+                                <th class="fw-bold text-left" scope="col">{{$meetings}}</th>
                                 <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($declined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_selled}}</th>
@@ -266,7 +272,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th class="fw-bold text-left" scope="col">{{count($todayLeads)}}</th>
+                                <th class="fw-bold text-left" scope="col">{{$todayMeetings}}</th>
                                 <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($todayDeclined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsSelled}}</th>
@@ -298,7 +304,6 @@
                         <button id="change-plan-btn" class="btn h-50 fw-bold btn-warning">Изменить
                             план
                         </button>
-                        <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                         <form action="{{route('director.changeplan')}}" method="post" id="change-plan-form"
                               class="d-none">
                             @csrf
@@ -307,13 +312,20 @@
                             <input name="city" type="hidden" value="{{$city_id}}">
                             <input type="submit" value="Изменить" class="btn h-50 fw-bold btn-warning"/>
                         </form>
+                        <script>
+                            document.getElementById('change-plan-btn').addEventListener('click',()=>{
+                                document.getElementById('change-plan-btn').className='d-none'
+                                document.getElementById('change-plan-form').className='d-flex'
+                            })
+                        </script>
                     @endif
+                    <button id="stocks" class="btn h-50 fw-bold btn-primary">Запасы времени</button>
                 </div>
                 {{--                <p class="text-center w-100 fs-1">Заявок сегодня: {{$todayTotalLeads}}</p>--}}
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"
-                            class="btn m-2 manager-{{$manager->status}}">{{$manager->name}}</button>
+                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.count($managers_leads[$manager->name]).' ]'}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">
@@ -356,7 +368,7 @@
                                                         @foreach($managers as $manager)
                                                             @if($manager->status=='free')
                                                                 <option
-                                                                    value="{{$manager->id}}">{{$manager->name}}</option>
+                                                                    value="{{$manager->id}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1]}}</option>
                                                             @endif
                                                         @endforeach
                                                     </select>

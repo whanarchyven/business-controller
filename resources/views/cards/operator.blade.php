@@ -259,7 +259,7 @@
                                         <input class="p-0 bg-transparent border-0" type="submit" value="✔️">
                                     </form>
                                 @else
-                                    <p>✔️</p>
+                                    <p>✔️ {{$day['workDay']}}</p>
                                 @endif
                             </th>
                         @else
@@ -305,7 +305,7 @@
                             0
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$totalSuccessful*150}}
+                            {{$other*150 + $okna*200}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
                             {{$totalWorkDays*200}}

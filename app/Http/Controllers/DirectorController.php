@@ -169,11 +169,15 @@ class DirectorController extends Controller
 
         $products_selled = 0;
         $products_issued = 0;
+        $meetings=0;
 
         $repairs = array();
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
+            if($lead->entered){
+                $meetings++;
+            }
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $products_issued += $lead->repair->check;
                 array_push($repairs, $lead->repair);
@@ -186,11 +190,13 @@ class DirectorController extends Controller
 
         $todayProductsSelled = 0;
         $todayProductsIssued = 0;
-        $todayTotalLeads = 0;
+        $todayMeetings = 0;
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
-            $todayTotalLeads++;
+            if($lead->entered){
+                $todayMeetings++;
+            }
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $todayProductsIssued += $lead->repair->check;
             }
@@ -198,6 +204,15 @@ class DirectorController extends Controller
 
         $cities = $this->getCities();
         $managers = $this->getManagers($city_id);
+        $managers_leads=[];
+        foreach ($managers as $manager){
+            $managers_leads[$manager->name]=[];
+            foreach ($todayLeads as $todayLead){
+                if ($todayLead->manager_id==$manager->id&&$todayLead->entered){
+                    array_push($managers_leads[$manager->name],$todayLead->id);
+                }
+            }
+        }
 
         $date = Carbon::now()->toDateString();
         $yearTemp = preg_split("/[^1234567890]/", $date)[0];
@@ -206,7 +221,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayTotalLeads'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings','meetings','managers_leads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -225,7 +240,8 @@ class DirectorController extends Controller
 
         if ($manager->chat_bot_id) {
             $client = new GuzzleHttp\Client();
-            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Замер: </b>' . ($lead->range ? 'Нет' : 'Да') . '%0A' . '<b>Диапазон : </b>' . ($lead->measuring ? 'Нет' : 'Да') . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A' . '<b>Примечание: </b>' . $lead->note . '%0A');
+//            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Замер: </b>' . ($lead->range ? 'Нет' : 'Да') . '%0A' . '<b>Диапазон : </b>' . ($lead->measuring ? 'Нет' : 'Да') . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A' . '<b>Примечание: </b>' . $lead->note . '%0A');
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=<b>Новая заявка для ' . $manager->name . '</b>%0A' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A' . '<b>Ожидает: </b>' . $lead->time_period . '%0A' . '<b>Тип работ: </b>' . $jobTypes[$lead->job_type] . '%0A' . '<b>Комментарий: </b>' . $lead->comment . '%0A');
         }
 
 

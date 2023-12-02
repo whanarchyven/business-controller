@@ -308,8 +308,21 @@ class SalaryController extends Controller
 
         $startDate = Carbon::createFromDate($date[0], $date[1], 1)->startOfMonth();
         $endDate = Carbon::createFromDate($date[0], $date[1], 1)->endOfMonth();
-        $leads = count(Lead::whereBetween('created_at', [$startDate, $endDate])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get());
-        $leadsSalary = 150 * $leads;
+        $leads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
+
+        $okna=0;
+        $other=0;
+
+        foreach ($leads as $lead){
+            if($lead->job_type==1){
+                $okna++;
+            }
+            else{
+                $other++;
+            }
+        }
+
+        $leadsSalary=$okna*200 + $other*150;
 
         $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get());
         $daysSalary = $workDays * 200;

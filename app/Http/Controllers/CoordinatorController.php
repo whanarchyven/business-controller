@@ -140,10 +140,15 @@ class CoordinatorController extends Controller
         $products_selled = 0;
         $products_issued = 0;
 
+        $meetings=0;
+
         $repairs = array();
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
+            if($lead->entered){
+                $meetings++;
+            }
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $products_issued += $lead->repair->check;
                 array_push($repairs, $lead->repair);
@@ -156,11 +161,13 @@ class CoordinatorController extends Controller
 
         $todayProductsSelled = 0;
         $todayProductsIssued = 0;
-        $todayTotalLeads = 0;
+        $todayMeetings = 0;
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
-            $todayTotalLeads++;
+            if($lead->entered){
+                $todayMeetings++;
+            }
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $todayProductsIssued += $lead->repair->check;
             }
@@ -168,6 +175,15 @@ class CoordinatorController extends Controller
 
         $cities = $this->getCities();
         $managers = $this->getManagers($city_id);
+        $managers_leads=[];
+        foreach ($managers as $manager){
+            $managers_leads[$manager->name]=[];
+            foreach ($todayLeads as $todayLead){
+                if ($todayLead->manager_id==$manager->id&&$todayLead->entered){
+                    array_push($managers_leads[$manager->name],$todayLead->id);
+                }
+            }
+        }
 
         $date = Carbon::now()->toDateString();
         $yearTemp = preg_split("/[^1234567890]/", $date)[0];
@@ -176,7 +192,7 @@ class CoordinatorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayTotalLeads'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings','meetings','managers_leads'));
     }
 
     public function manageLead(Lead $lead, Request $request)

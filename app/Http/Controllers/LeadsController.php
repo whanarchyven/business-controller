@@ -85,7 +85,7 @@ class LeadsController extends Controller
             case 'all':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['operator_id', '=', $operator_id]])->get();
             case 'successful':
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'in-work'], ['operator_id', '=', $operator_id]])->orWhere([['status', '=', 'accepted'], ['operator_id', '=', $operator_id]])->orWhere([['status', '=', 'completed'], ['operator_id', '=', $operator_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'in-work'], ['operator_id', '=', $operator_id]])->orWhere([['status', '=', 'completed'], ['operator_id', '=', $operator_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
             case 'declined':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['operator_id', '=', $operator_id]])->get();
             default:
@@ -378,6 +378,10 @@ class LeadsController extends Controller
         $totalDeclined = 0;
         $totalSuccessful = 0;
 
+        $okna=0;
+        $other=0;
+
+
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
             $days[$day - 1]['leads'] += 1;
@@ -394,6 +398,12 @@ class LeadsController extends Controller
             $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
             $days[$day - 1]['successful'] += 1;
             $totalSuccessful++;
+            if($lead->job_type==1){
+                $okna++;
+            }
+            else{
+                $other++;
+            }
         }
 
 
@@ -442,7 +452,7 @@ class LeadsController extends Controller
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => "minus"])->get();
         $documents = explode('|', $user->documents);
 
-        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'weekends', 'bonuses', 'deductions', 'documents'));
+        return view('cards.operator', compact('date', 'dateTitle', 'formattedDate', 'city', 'user', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'weekends', 'bonuses', 'deductions', 'documents','okna','other'));
     }
 
 
@@ -490,10 +500,16 @@ class LeadsController extends Controller
 
         $tempUser = Auth::user();
 
-        if ($tempUser->hasRole('operator') && EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $tempUser->id])->first() == null) {
-            $workDay = new EmployeerWorkDay(["user_id" => $tempUser->id]);
-            $workDay->save();
-        }
+
+//        if ($tempUser->hasRole('operator') && !EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $tempUser->id])->first()) {
+////            dd('suka');
+//            $successful_leads = Lead::whereDate('created_at',Carbon::today()->toDateString())->where([['status', '=', 'in-work'], ['operator_id', '=', $tempUser->id]])->orWhere([['status', '=', 'accepted'], ['operator_id', '=', $tempUser->id]])->orWhere([['status', '=', 'completed'], ['operator_id', '=', $tempUser->id]])->whereDate('created_at',Carbon::today()->toDateString())->get();
+////            dd(count($successful_leads));
+//            if(count($successful_leads)>=1){
+//                $workDay = new EmployeerWorkDay(["user_id" => $tempUser->id]);
+//                $workDay->save();
+//            }
+//        }
 
         $lead = Lead::create($data);
         return redirect()->route('leads.index');
@@ -570,6 +586,11 @@ class LeadsController extends Controller
             $manager->save();
         } else if ($data['status'] == 'entered') {
             $lead->update(['status' => 'in-work']);
+            if (!EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $operator->id])->first()) {
+                $workDay = new EmployeerWorkDay(["user_id" => $operator->id]);
+                $workDay->save();
+            }
+
             $manager->status = 'on-meeting';
             $this->changeBotPhoto($manager,'on-meeting');
             $manager->save();
