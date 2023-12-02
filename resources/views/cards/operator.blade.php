@@ -259,7 +259,7 @@
                                         <input class="p-0 bg-transparent border-0" type="submit" value="✔️">
                                     </form>
                                 @else
-                                    <p>✔️ {{$day['workDay']}}</p>
+                                    <p>✔️</p>
                                 @endif
                             </th>
                         @else

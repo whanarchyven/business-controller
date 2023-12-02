@@ -304,14 +304,15 @@ class SalaryController extends Controller
     {
         $city = $user->city();
         $deductions = $user->deductions($date);
-        $date = explode('-', $date);
 
-        $startDate = Carbon::createFromDate($date[0], $date[1], 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($date[0], $date[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
+        $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
         $leads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
 
         $okna=0;
         $other=0;
+
+//        dd($leads);
 
         foreach ($leads as $lead){
             if($lead->job_type==1){

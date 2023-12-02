@@ -107,15 +107,15 @@
                             <div class="d-flex col my-2 flex-row gap-3">
                                 <p class="m-0">Тип транзакции</p>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="receipt"
-                                           id="receipt" checked>
+                                    <input class="form-check-input" type="radio" name="type"
+                                           value="receipt" id="receipt" checked>
                                     <label class="form-check-label" for="receipt">
                                         Приход
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="expense"
-                                           id="expense">
+                                    <input class="form-check-input" type="radio" name="type"
+                                           value="expense" id="expense">
                                     <label class="form-check-label" for="expense">
                                         Расход
                                     </label>

@@ -84,6 +84,14 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                    @else
+                                        <div id="city-form" class="my-2">
+                                            <label for="city">Город</label>
+                                            <select id="city" class="form-control" name="city">
+                                                <option
+                                                    value="{{$director->city()->id}}">{{$director->city()->name}}</option>
+                                            </select>
+                                        </div>
                                     @endif
 
                                     @if($director->isAdmin&&$user->hasRole('coordinator'))

@@ -51,6 +51,7 @@ class TransactionController extends Controller
     public function storeNewTransaction(Request $request)
     {
         $data = $request->all();
+//        dd($data);
         $user = Auth::user();
         if ($user->isAdmin) {
             $city = \Illuminate\Support\Facades\Session::get('city');
@@ -71,10 +72,10 @@ class TransactionController extends Controller
             }
         }
         $documents = implode('|', $documents);
-        if ($data['receipt']) {
+        if ($data['type']=='receipt') {
             $receipt = $this->newReceipt($state->id, 'Ручная транзакция: Приход', $data['value'], $user->id, $city->id, $documents);
         } else {
-            $expense = $this->newExpense($state->id, 'Ручная транзакция: Приход', $data['value'], $user->id, $city->id, $documents);
+            $expense = $this->newExpense($state->id, 'Ручная транзакция: Расход', $data['value'], $user->id, $city->id, $documents);
         }
 
         return redirect(route('director.transactions'));

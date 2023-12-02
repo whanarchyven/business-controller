@@ -38,9 +38,9 @@ class CoordinatorController extends Controller
     public function getMonthLeads($isDeclined, $city)
     {
         $date = Carbon::now()->toDateString();
-        $startDate = Carbon::createFromDate(intval(preg_split("/[^1234567890]/", $date)[0]), intval(preg_split("/[^1234567890]/", $date)[1]), 1)->startOfMonth();
-        $endDate = Carbon::createFromDate(intval(preg_split("/[^1234567890]/", $date)[0]), intval(preg_split("/[^1234567890]/", $date)[1]), 1)->endOfMonth();
-        return Lead::whereBetween('meeting_date', [$startDate, $endDate])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city]])->get();
+        $startDate = Carbon::createFromDate($date)->startOfMonth();
+        $endDate = Carbon::createFromDate($date)->endOfMonth();
+        return Lead::whereBetween('meeting_date', [$startDate->toDateString(), $endDate->toDateString()])->where([['status', $isDeclined ? '=' : '!=', 'declined'], ['city', '=', $city]])->get();
 
     }
 

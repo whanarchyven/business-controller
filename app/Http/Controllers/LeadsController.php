@@ -85,7 +85,7 @@ class LeadsController extends Controller
             case 'all':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['operator_id', '=', $operator_id]])->get();
             case 'successful':
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'in-work'], ['operator_id', '=', $operator_id]])->orWhere([['status', '=', 'completed'], ['operator_id', '=', $operator_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['entered', '!=', null], ['operator_id', '=', $operator_id]])->get();
             case 'declined':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['operator_id', '=', $operator_id]])->get();
             default:
@@ -372,6 +372,7 @@ class LeadsController extends Controller
         $successful_leads = $this->getOperatorMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $user->id);
         $declined_leads = $this->getOperatorMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $user->id);
 
+//        dd($successful_leads);
 //        dd($successful_leads);
 
         $totalLeads = 0;
@@ -745,6 +746,7 @@ class LeadsController extends Controller
         $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $manager->id);
         $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $manager->id);
         $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $manager->id);
+
 
         $totalMeetings = 0;
         $totalDeclined = 0;

@@ -117,6 +117,11 @@
                                 @else
                                     <p class="fw-normal"></p>
                                 @endif
+                                    @if($lead->avance&&!\Illuminate\Support\Facades\Auth::user()->hasRole('operator'))
+                                        <p class="fw-normal">({{$lead->avance}})</p>
+                                    @else
+                                        <p class="fw-normal"></p>
+                                    @endif
                             </th>
                             <th class="fw-bold text-left" scope="col">
                                 <button onclick="window.location='{{route('leads.edit',$lead->id)}}'"
