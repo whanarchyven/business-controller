@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\Gsm;
 use App\Models\Lead;
+use App\Models\Repair;
 use App\Models\TransactionState;
 use App\Models\User;
 use Carbon\Carbon;
@@ -43,6 +44,7 @@ class GsmController extends Controller
             'weekDay' => $weekDays[Carbon::createFromDate($day_start)->weekday()],
             "gsm"=>0,
             "gsm_id"=>'',
+            "repairs"=>0,
             "gsm_is_payed"=>false,
             "total_gsm"=>0]);
 
@@ -52,6 +54,7 @@ class GsmController extends Controller
                 'weekDay' => $weekDays[Carbon::createFromDate($day_start)->addDay($i)->weekday()],
                 "gsm"=>0,
                 "gsm_id"=>'',
+                "repairs"=>0,
                 "gsm_is_payed"=>false,
                 "total_gsm"=>0]);
         }
@@ -183,6 +186,7 @@ class GsmController extends Controller
 //                        if($dt==6){
 //                            dd($manager_days,$dt,$found_key);
 //                        }
+
                         if($found_key!='suka'){
                             $manager_days[$found_key]["gsm"]=$mg->amount;
                             $manager_days[$found_key]["gsm_id"]=$mg->id;
@@ -338,9 +342,20 @@ class GsmController extends Controller
                     }
                 }
                 array_push($managers_gsm,[$manager,$manager_days,$total_gsm]);
+
+                $counter=0;
+
+                foreach ($managers_gsm[0][1] as $day){
+                    $repairs=Repair::whereDate("repair_date",Carbon::createFromDate($day["date"])->toDateString())->where(["master_id"=>$manager->id])->get();
+//                    dd($repairs);
+                    $managers_gsm[0][1][$counter]["repairs"]=count($repairs);
+                    $counter++;
+                }
+
             }
         }
 
+//        dd($managers_gsm);
 //        dd($managers_gsm);
 //        dd($managers_gsm);
 

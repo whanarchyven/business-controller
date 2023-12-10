@@ -60,17 +60,17 @@
                                         <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
                                             @csrf
                                             @method('post')
-                                            <input type="hidden" name="amount" value="250">
+                                            <input type="hidden" name="amount" value="{{$mg[0]->hasRole('master')?($mg_day['repairs']>1?$mg_day["repairs"]*100-100:0):'250'}}">
                                             <input type="hidden" name="city" value={{$city->id}}>
                                             <input type="hidden" name="manager" value={{$mg[0]->id}}>
                                             <input type="hidden" name="date" value={{$mg_day['date']}}>
-                                            <input class="btn btn-primary" type="submit" value="Стандарт">
+                                            <input class="btn btn-primary" {{$mg[0]->hasRole('master')?($mg_day['repairs']>1?'':'disabled'):''}} type="submit" value="Стандарт">
                                         </form>
                                         <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
                                             @csrf
                                             @method('post')
                                             <input required
-                                                   class="form-control mb-2" placeholder="250" type="number"
+                                                   class="form-control mb-2" placeholder="{{$mg[0]->hasRole('master')?($mg_day['repairs']>1?$mg_day["repairs"]*100-100:0):'250'}}" type="number"
                                                    name="amount">
                                             <input type="hidden" name="city" value={{$city->id}}>
                                             <input type="hidden" name="manager" value={{$mg[0]->id}}>

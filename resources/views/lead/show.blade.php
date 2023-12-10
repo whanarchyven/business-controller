@@ -65,7 +65,10 @@
             </table>
 
             <div class="bd-cyan-500">
-                <p class="fs-3 text-indigo">Заявки {{$formattedDate}}</p>
+                <div class="d-flex justify-content-between">
+                    <p class="fs-3 text-indigo">Заявки {{$formattedDate}}</p>
+                    <p class="fs-3 text-indigo">Суммарный чек: {{$totalCheck}} ({{$totalAvance}})</p>
+                </div>
 {{--                <div class="flex gap-3 mb-4">--}}
 {{--                    <button class="bg-not-managed btn-outline-info border-0 p-2 text-white rounded-3">Не назначено--}}
 {{--                    </button>--}}

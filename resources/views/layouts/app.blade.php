@@ -367,6 +367,14 @@
                             <a class="dropdown-item" href="{{ route('director.statistic.posygramm') }}">
                                 Позиграмма
                             </a>
+
+                            @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                <a class="dropdown-item" href="{{ route('director.statistic.posygramm.cities') }}">
+                                    Позиграмма города
+                                </a>
+                            @endif
+
+
 {{--                            <a class="dropdown-item" href="{{route('director.avance.week')}}">--}}
 {{--                                Заявки--}}
 {{--                            </a>--}}

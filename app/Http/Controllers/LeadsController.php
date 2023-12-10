@@ -166,6 +166,18 @@ class LeadsController extends Controller
 
         $totalLeads = 0;
 
+        $totalCheck=0;
+        $totalAvance=0;
+
+        foreach ($leads as $lead){
+            if($lead->check){
+                $totalCheck+=$lead->check;
+            }
+            if($lead->avance){
+                $totalAvance+=$lead->avance;
+            }
+        }
+
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
             $days[$day - 1]['leads'] += 1;
@@ -195,7 +207,7 @@ class LeadsController extends Controller
         }
 
 
-        return view('lead.show', compact('leads', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink'));
+        return view('lead.show', compact('leads', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink','totalCheck','totalAvance'));
     }
 
     public function getDeclined(Request $request)

@@ -82,12 +82,11 @@ Route::get('/card/director/{director}', [App\Http\Controllers\DirectorController
 Route::patch('/director/leads/{lead}/sendPhone', [App\Http\Controllers\DirectorController::class, 'sendPhone'])->name('director.leads.sendPhone');
 Route::patch('/director/leads/{lead}/sendAddress', [App\Http\Controllers\DirectorController::class, 'sendAddress'])->name('director.leads.sendAddress');
 Route::patch('/director/leads/{lead}/change', [App\Http\Controllers\DirectorController::class, 'changeManager'])->name('director.leads.changemanager');
-
+Route::patch('/director/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('director.leads.decline');
 Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/', [App\Http\Controllers\DirectorController::class, 'controlTable'])->name('director.managers');
     Route::get('/director/leads/{lead}/edit', [App\Http\Controllers\LeadsController::class, 'edit'])->name('director.leads.edit');
     Route::patch('/director/leads/{lead}', [App\Http\Controllers\DirectorController::class, 'update'])->name('director.leads.update');
-    Route::patch('/director/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('director.leads.decline');
     Route::patch('/director/leads/{lead}/manage', [App\Http\Controllers\DirectorController::class, 'manageLead'])->name('director.leads.manage');
 
 
@@ -181,6 +180,7 @@ Route::group(['middleware' => 'role:director'], function () {
 
     Route::get('/director/statistic/sells', [App\Http\Controllers\DirectorController::class, 'getSellsView'])->name('director.statistic.sells');
     Route::get('/director/statistic/posygramm', [App\Http\Controllers\DirectorController::class, 'posyGramm'])->name('director.statistic.posygramm');
+    Route::get('/director/statistic/posygramm/cities', [App\Http\Controllers\DirectorController::class, 'posyCitites'])->name('director.statistic.posygramm.cities');
 
 
     Route::get('/director/gsm/managers', [App\Http\Controllers\GsmController::class, 'indexGsm'])->name('director.gsm.show.managers');

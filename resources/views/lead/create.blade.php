@@ -29,21 +29,27 @@
                                         @if($user->isAdmin)
                                             @foreach($cities as $city)
                                                 @if($city->id!=999)
-                                                    <option value="{{$city->name}}">{{$city->name}}</option>
+                                                    <option {{\Illuminate\Support\Facades\Session::get('city')->id==$city->id?'selected':''}} value="{{$city->name}}">{{$city->name}}</option>
                                                 @endif
                                             @endforeach
                                         @elseif($user->hasRole('operator'))
                                             @foreach($cities as $city)
-                                                <option value="{{$city->name}}">{{$city->name}}</option>
+                                                @if($city->id!=999)
+                                                    <option {{$user->city==$city->id?'selected':''}} value="{{$city->name}}">{{$city->name}}</option>
+                                                @endif
                                             @endforeach
                                         @elseif($user->hasRole('coordinator'))
                                             @foreach($user->coordinatorCity() as $city)
-                                                <option value="{{$city->name}}">{{$city->name}}</option>
+                                                @if($city->id!=999)
+                                                    <option {{\Illuminate\Support\Facades\Session::get('city')->id==$city->id?'selected':''}}  value="{{$city->name}}">{{$city->name}}</option>
+                                                @endif
                                             @endforeach
                                         @else
                                             @foreach($cities as $city)
                                                 @if($city->id==$user->city)
-                                                    <option selected value="{{$city->name}}">{{$city->name}}</option>
+                                                    @if($city->id!=999)
+                                                        <option selected value="{{$city->name}}">{{$city->name}}</option>
+                                                    @endif
                                                 @endif
                                             @endforeach
                                         @endif

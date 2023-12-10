@@ -103,7 +103,7 @@
                         <button class="bg-refund  p-2 text-white rounded-3">Возврат
                         </button>
                     </div>
-                    <p class="fs-3 fw-bold">Суммарный чек за день: {{$totalCheck}}</p>
+                    <p class="my-4 fw-bold fs-3">Суммарный чек: {{$totalCheck}} ({{$totalAvance}})</p>
                 </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>

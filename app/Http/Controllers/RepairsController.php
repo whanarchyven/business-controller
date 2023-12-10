@@ -240,11 +240,19 @@ class RepairsController extends Controller
         }
 
         $totalCheck = 0;
+        $totalAvance=0;
         foreach ($repairs as $repair) {
-            $totalCheck += $repair->check;
+            if($repair->status=='completed'){
+                $totalCheck += $repair->check;
+            }
+        }
+        foreach ($repairs as $repair) {
+            if($repair->status!='refund'){
+                $totalAvance += $repair->lead->avance;
+            }
         }
 
-        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck'));
+        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck','totalAvance'));
     }
 
 
@@ -431,8 +439,16 @@ class RepairsController extends Controller
         }
 
         $totalCheck = 0;
+        $totalAvance=0;
         foreach ($repairs as $repair) {
-            $totalCheck += $repair->check;
+            if($repair->status=='completed'){
+                $totalCheck += $repair->check;
+            }
+        }
+        foreach ($repairs as $repair) {
+            if($repair->status!='refund'){
+                $totalAvance += $repair->lead->avance;
+            }
         }
 
 
@@ -448,7 +464,8 @@ class RepairsController extends Controller
         }
 
 
-        return view('repair.search', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'managers', 'masters','client_fullname','address','phone','manager_id','master_id','status'));
+
+        return view('repair.search', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'managers', 'masters','client_fullname','address','phone','manager_id','master_id','status','totalAvance'));
     }
 
     public function doSearch(Request $request)

@@ -149,6 +149,7 @@
                     </div>
 
                 </form>
+                <p class="my-4 fw-bold fs-3">Суммарный чек: {{$totalCheck}} ({{$totalAvance}})</p>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>
