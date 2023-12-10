@@ -49,7 +49,7 @@
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">
                                     <input class="form-control"
-                                           value="5000"
+                                           required value="5000"
                                            type="number"
                                            name="director{{$loop->index}}"
                                                                                max="{{$director->salary($date)}}"
@@ -92,7 +92,7 @@
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->salary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <input class="form-control"
-                                       value="5000"
+                                       required value="5000"
                                                                               max="{{$manager->salary($date)}}" type="number"
                                        name="manager{{$loop->index}}"/>
                                 <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">

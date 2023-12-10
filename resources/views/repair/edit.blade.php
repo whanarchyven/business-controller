@@ -36,7 +36,7 @@
                                     <input type="hidden" name="status" value="completed"/>
                                     <div>
                                         <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>
-                                        <input enctype="multipart/form-data"
+                                        <input required enctype="multipart/form-data"
                                                id="docs"
                                                type="file"
                                                class="m-0 h-100 form-control"
@@ -67,7 +67,7 @@
                                     <input type="hidden" name="refund" value="{{$repair->lead->avance}}"/>
                                     <div>
                                         <label class="form-label fs-6 m-0" for="docs">Загрузите документы</label>
-                                        <input enctype="multipart/form-data"
+                                        <input required enctype="multipart/form-data"
                                                id="docs"
                                                type="file"
                                                class="m-0 h-100 form-control"
@@ -149,7 +149,9 @@
                                         {{--                            <option value="Самара">Самара</option>--}}
                                         {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
                                         @foreach($cities as $city)
-                                            <option class="" value="{{$city->name}}"></option>
+                                            @if($city->id!=999)
+                                                <option class="" value="{{$city->name}}"></option>
+                                            @endif
                                         @endforeach
                                     </datalist>
                                     <div class="form-group my-2">
@@ -228,9 +230,15 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    @if($repair->master_id)
+                                        <div class="form-group d-flex gap-3 my-2">
+                                            <label for="master_boost">Мастер 15 %</label>
+                                            <input type="checkbox" {{$repair->master_boost?'checked':''}} name="master_boost" id="master_boost" class="form-check"/>
+                                        </div>
+                                    @endif
                                     <div class="form-group my-2">
                                         <label for="works">Список работ</label>
-                                        <textarea name="works" class="form-control"></textarea>
+                                        <textarea name="works" class="form-control">{{$repair->works?$repair->works:''}}</textarea>
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="note">Примечание</label>

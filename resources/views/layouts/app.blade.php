@@ -373,6 +373,15 @@
                         </div>
                     </li>
 
+                    @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-item" href="{{ route('director.transactions.mainoffice') }}">
+                                Гл. офис
+                            </a>
+                        </li>
+                    @endif
+
+
 
                 </ul>
                 @endrole
@@ -403,9 +412,11 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     @foreach($cities=\App\Models\City::all() as $city)
-                                        <a class="dropdown-item" href="{{route('admin.city.change',$city)}}">
-                                            {{$city->name}}
-                                        </a>
+                                        @if($city->id!=999)
+                                            <a class="dropdown-item" href="{{route('admin.city.change',$city)}}">
+                                                {{$city->name}}
+                                            </a>
+                                        @endif
                                     @endforeach
                                 </div>
                             </li>

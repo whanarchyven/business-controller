@@ -28,7 +28,9 @@
                                     <select  name="city" class="form-control" {{!$user->isAdmin?`disabled`:''}} id="city">
                                         @if($user->isAdmin)
                                             @foreach($cities as $city)
-                                                <option value="{{$city->name}}">{{$city->name}}</option>
+                                                @if($city->id!=999)
+                                                    <option value="{{$city->name}}">{{$city->name}}</option>
+                                                @endif
                                             @endforeach
                                         @elseif($user->hasRole('operator'))
                                             @foreach($cities as $city)
@@ -53,7 +55,7 @@
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="address">Адрес</label>
-                                    <input type="text" class="form-control" id='address' name="address" list="address">
+                                    <input required type="text" class="form-control" id='address' name="address" list="address">
                                 </div>
                                 {{--                                <div class="form-group my-2">--}}
                                 {{--                                    <label for="meeting_date">Дата встречи</label>--}}
@@ -72,12 +74,12 @@
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="client_fullname">ФИО клиента</label>
-                                    <input type="text" class="form-control" id='client_fullname' name="client_fullname"
+                                    <input required type="text" class="form-control" id='client_fullname' name="client_fullname"
                                            list="client_fullname">
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="phone">Номер телефона</label>
-                                    <input type="tel" class="form-control" id='phone' name="phone" list="phone">
+                                    <input required type="tel" class="form-control" id='phone' name="phone" list="phone">
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="job_type">Тип работ</label>

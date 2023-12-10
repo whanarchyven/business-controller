@@ -299,7 +299,7 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed*0.1}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$master->salary($date)}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center" scope="col">{{$master->deductions($date)}}</th>
                     <th class="fw-normal text-center"

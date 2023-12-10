@@ -483,7 +483,7 @@ class DirectorController extends Controller
 
         //здесь будем бонусы выписывать
 
-        $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents), "status" => 'completed']);
+
 
 
         $repair = new Repair();
@@ -491,6 +491,8 @@ class DirectorController extends Controller
         $repair->check = 0;
         $repair->repair_date = $data['repair_date'];
         $repair->save();
+
+        $lead->update(["issued" => $data['issued'], "avance" => $data['avance'], "documents" => implode("|", $documents), "status" => 'completed']);
 
         if ($data['avance'] && $data['avance'] > 0) {
             $state = TransactionState::getByCode('1.1.');
@@ -694,8 +696,24 @@ class DirectorController extends Controller
             $minus->remain = $minus->remain - $date['quantity' . $i];
             $minus->save();
         }
-        return (redirect(route('director.nomenclature')));
+        return (redirect(route('director.expense')));
     }
+
+    public function declineExpense(Repair $repair, Request $request)
+    {
+        $id=$repair->materials[0]->expense_id;
+        foreach ($repair->materials as $material){
+//            dd($material);
+            $minus = Nomenclature::where(["id" => $material->nomenclature_id])->first();
+            $minus->remain = $minus->remain + $material->quantity;
+            $minus->save();
+            $material->delete();
+//            dd('deleted');
+        }
+        $expense=Expense::where(['id'=>$id])->delete(); //Удаляем expense
+        return redirect()->back();
+    }
+
 
     public function managersView(Request $request)
     {
@@ -1168,6 +1186,113 @@ class DirectorController extends Controller
         $states = TransactionState::all();
         return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city', 'date', 'states'));
     }
+
+
+
+    public function getMainOffice(Request $request)
+    {
+        $user = Auth::user();
+        $city = City::where(['id' => 999])->first();
+
+
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = ' Январь';
+                break;
+            case '02':
+                $dateTitle = ' Февраль';
+                break;
+            case '03':
+                $dateTitle = ' Март';
+                break;
+            case '04':
+                $dateTitle = ' Апрель';
+                break;
+            case '05':
+                $dateTitle = ' Май ';
+                break;
+            case '06':
+                $dateTitle = ' Июнь ';
+                break;
+            case '07':
+                $dateTitle = ' Июль ';
+                break;
+            case '08':
+                $dateTitle = ' Август ';
+                break;
+            case '09':
+                $dateTitle = ' Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = ' Октябрь ';
+                break;
+            case '11':
+                $dateTitle = ' Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = ' Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        if (intval($dateTemp[1]) + 1 < 10) {
+            $nextMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) + 1)) . '-01';
+        } else {
+            if (intval($dateTemp[1]) + 1 > 12) {
+                $nextMonthLink = intval($dateTemp[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($dateTemp[1]) - 1 >= 10) {
+            $prevMonthLink = $dateTemp[0] . ('-' . (intval($dateTemp[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($dateTemp[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($dateTemp[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $dateTemp[0] . ('-0' . (intval($dateTemp[1]) - 1)) . '-01';
+            }
+        }
+
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+        $transactions = $city->transactionsPaginate()->get()->reverse();
+
+//        dd($transactions);
+
+        $transactions = $transactions->whereBetween('created_at', [$startDate, $endDate]);
+
+
+//        dd($transactions);
+
+//        $loop=0;
+//
+//        foreach ($transactions as $transaction){
+//            if($transaction->user){
+//                echo $transaction->user->name;
+//                $loop++;
+//            }
+//            else{
+//                dd($transaction);
+//                echo 'AAAAAAAAAAAA SUKAAAAAAAAAAAAAAA'.$loop;
+//            }
+//        }
+//
+//        dd($transactions);
+
+        $states = TransactionState::all();
+        return view('roles.director.transactions', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'transactions', 'city', 'date', 'states'));
+    }
+
 
 
     public function searchTransactions(Request $request)

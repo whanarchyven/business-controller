@@ -90,7 +90,7 @@
                     @foreach($leads as $lead)
                         <tr>
                             <th class="fw-bold bg-{{$lead->status}} text-left" scope="col">
-                                <p class="mb-0">Заявка от {{$lead->created_at}}<br/></p>
+                                <p class="mb-0">Заявка #{{$lead->id}} от {{$lead->created_at}}<br/></p>
                                 {{$lead->city}}<br/>
                                 c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}
                                 до {{preg_split("/[^1234567890]/", $lead->time_period)[1]}}

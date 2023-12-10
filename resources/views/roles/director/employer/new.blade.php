@@ -35,7 +35,7 @@
                                 <div class="form-group my-2">
                                     <div class="form-group my-2">
                                         <label for="email">Логин</label>
-                                        <input type="text" class="form-control" id='email'
+                                        <input required type="text" class="form-control" id='email'
                                                name="email">
                                     </div>
                                     {{--                                    <div class="form-group my-2">--}}
@@ -45,20 +45,20 @@
                                     {{--                                    </div>--}}
                                     <div class="form-group my-2">
                                         <label for="name">ФИО</label>
-                                        <input type="text" class="form-control" id='name'
+                                        <input required type="text" class="form-control" id='name'
                                                name="name"
                                                list="name">
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="birth_date">Дата рождения</label>
-                                        <input type="date" class="form-control" id='birth_date' name="birth_date"
+                                        <input required type="date" class="form-control" id='birth_date' name="birth_date"
                                                list="birth_date">
                                     </div>
 
 
                                     <div class="form-group my-2">
                                         <label for="phone">Номер телефона</label>
-                                        <input type="tel" class="form-control" id='phone' name="phone" list="phone">
+                                        <input required type="tel" class="form-control" id='phone' name="phone" list="phone">
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="role">Должность</label>
@@ -87,7 +87,9 @@
                                             <label for="city">Город</label>
                                             <select id="city" class="form-control" name="city">
                                                 @foreach($cities as $city)
-                                                    <option value="{{$city->id}}">{{$city->name}}</option>
+                                                    @if($city->id!=999)
+                                                        <option value="{{$city->id}}">{{$city->name}}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -98,10 +100,12 @@
                                         <div id="city-form-coordinator" class="my-2 d-none">
                                             <label for="city">Доступ к городам</label>
                                             @foreach($cities as $city)
-                                                <div class="d-flex gap-3">
+                                                @if($city->id!=999)
+                                                    <div class="d-flex gap-3">
                                                     <label>{{$city->name}}</label>
                                                     <input id="{{$city->name}}" name="{{$city->name}}" type="checkbox"/>
                                                 </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     @endif

@@ -30,18 +30,20 @@
                                 <div class="form-group my-2">
                                     <div class="form-group my-2">
                                         <label for="email">Логин</label>
-                                        <input value="{{$user->email}}" type="text" class="form-control" id='email'
+                                        <input required value="{{$user->email}}" type="text" class="form-control"
+                                               id='email'
                                                name="email">
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="name">ФИО</label>
-                                        <input value="{{$user->name}}" type="text" class="form-control" id='name'
+                                        <input required value="{{$user->name}}" type="text" class="form-control"
+                                               id='name'
                                                name="name"
                                                list="name"/>
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="birth_date">Дата рождения</label>
-                                        <input value="{{$user->birth_date}}" type="date" class="form-control"
+                                        <input required value="{{$user->birth_date}}" type="date" class="form-control"
                                                id='birth_date' name="birth_date"
                                                list="birth_date">
                                     </div>
@@ -49,7 +51,8 @@
 
                                     <div class="form-group my-2">
                                         <label for="phone">Номер телефона</label>
-                                        <input value="{{$user->phone}}" type="tel" class="form-control" id='phone'
+                                        <input required value="{{$user->phone}}" type="tel" class="form-control"
+                                               id='phone'
                                                name="phone" list="phone">
                                     </div>
                                     {{--                                    <div class="form-group my-2">--}}
@@ -79,8 +82,10 @@
                                             <label for="city">Город</label>
                                             <select id="city" class="form-control" name="city">
                                                 @foreach($cities as $city)
-                                                    <option
-                                                        {{$city->id==$user->city?'selected':''}} value="{{$city->id}}">{{$city->name}}</option>
+                                                    @if($city->id!=999)
+                                                        <option
+                                                            {{$city->id==$user->city?'selected':''}} value="{{$city->id}}">{{$city->name}}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -98,10 +103,14 @@
                                         <div id="city-form-coordinator" class="my-2">
                                             <label for="city">Доступ к городам</label>
                                             @foreach($cities as $city)
-                                                <div class="d-flex gap-3">
-                                                    <label>{{$city->name}}</label>
-                                                    <input {{array_search($city->id,array_column($user->coordinatorCity()->toArray(),'id'))!==false?'checked':''}} id="{{$city->name}}" name="{{$city->name}}" type="checkbox"/>
-                                                </div>
+                                                @if($city->id!=999)
+                                                    <div class="d-flex gap-3">
+                                                        <label>{{$city->name}}</label>
+                                                        <input
+                                                            {{array_search($city->id,array_column($user->coordinatorCity()->toArray(),'id'))!==false?'checked':''}} id="{{$city->name}}"
+                                                            name="{{$city->name}}" type="checkbox"/>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     @endif
@@ -123,7 +132,8 @@
                                     @if($user->hasRole('manager'))
                                         <div class="form-group my-2">
                                             <label for="chat_bot_id">Код привязки к боту</label>
-                                            <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel" class="form-control" id='chat_bot_id'
+                                            <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel"
+                                                   class="form-control" id='chat_bot_id'
                                                    name="chat_bot_id" list="chat_bot_id">
                                         </div>
                                     @endif

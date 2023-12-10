@@ -283,11 +283,11 @@ class SalaryController extends Controller
         $totalConfirmed = 0;
         foreach ($repairs as $repair) {
             if ($repair->lead->city == $city->name) {
-                $totalConfirmed += $repair->check;
+                $totalConfirmed += ($repair->check*($repair->master_boost?0.15:0.1));
             }
         }
 
-        $totalSalary = $totalConfirmed * 0.1;
+        $totalSalary = $totalConfirmed;
 
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;

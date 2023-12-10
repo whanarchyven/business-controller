@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
 @section('title')
-    {{'- Таблица ремонтов'}}
+    {{'- Таблица расходов'}}
 @endsection
 
 @section('content')
     <div class="container">
-
+        <p class="fw-bold mb-4 fs-2">Выдача материала</p>
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/repairs?date={{$prevMonthLink}}">Предыдущий
+                   href="/director/expenses?date={{$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -18,7 +18,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/repairs?date={{$nextMonthLink}}">Следующий
+                   href="/director/expenses?date={{$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>
@@ -43,7 +43,7 @@
                     <th class="fw-normal text-center" scope="row">Число</th>
                     @foreach($days as $day)
                         <th class="text-primary text-center" scope="col"><a
-                                href="/repairs/?date={{$day['link']}}">{{$day['day']}}</a>
+                                href="/director/expenses?date={{$day['link']}}">{{$day['day']}}</a>
                         </th>
                     @endforeach
                     <th class="fw-normal text-center" scope="row">Итого</th>
@@ -60,29 +60,6 @@
                     @endforeach
                     <th class="fw-normal  text-center" scope="row">{{$totalRepairs}}</th>
                 </tr>
-                <tr>
-                    <th scope="row text-center">Отказы</th>
-                    @foreach($days as $day)
-                        @if($day['declined']!=0)
-                            <th class="fw-normal text-center" scope="col">{{$day['declined']}}</th>
-                        @else
-                            <th class="fw-normal text-center" scope="col"></th>
-                        @endif
-                    @endforeach
-                    <th class="fw-normal  text-center" scope="row">{{$totalDeclined}}</th>
-                </tr>
-
-{{--                <tr>--}}
-{{--                    <th scope="row text-center">Выполнено</th>--}}
-{{--                    @foreach($days as $day)--}}
-{{--                        @if($day['completed']!=0)--}}
-{{--                            <th class="fw-normal text-center" scope="col">{{$day['completed']}}</th>--}}
-{{--                        @else--}}
-{{--                            <th class="fw-normal text-center" scope="col"></th>--}}
-{{--                        @endif--}}
-{{--                    @endforeach--}}
-{{--                    <th class="fw-normal  text-center" scope="row">{{$totalCompleted}}</th>--}}
-{{--                </tr>--}}
 
                 </tbody>
 
@@ -91,7 +68,6 @@
             <div class="bd-cyan-500">
                 <div class="d-flex mb-3 gap-3 align-items-center">
                     <p class="fs-3 m-0 text-indigo">Ремонты {{$formattedDate}}</p>
-                    <button onclick="window.location='{{route('repairs.search')}}'" class="btn m-0 btn-primary">Поиск по ремонтам</button>
                 </div>
                 <div class="w-100 d-flex flex-row justify-content-between">
                     <div class="d-flex gap-3 mb-4">
@@ -103,7 +79,6 @@
                         <button class="bg-refund  p-2 text-white rounded-3">Возврат
                         </button>
                     </div>
-                    <p class="fs-3 fw-bold">Суммарный чек за день: {{$totalCheck}}</p>
                 </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
@@ -114,6 +89,7 @@
                         <th class="fw-bold text-left" scope="col">Примечание</th>
                         <th class="fw-bold text-left" scope="col">Сумма</th>
                         <th class="fw-bold text-left" scope="col">Специалисты</th>
+                        <th class="fw-bold text-left" scope="col">Выданный материал</th>
                         <th class="fw-bold text-left" scope="col">Редактировать</th>
                         <th class="fw-bold text-left" scope="col"></th>
                     </tr>
@@ -122,20 +98,13 @@
                     @foreach($repairs as $repair)
                         <tr>
                             <th class="fw-bold bg-{{$repair->status}} text-left" scope="col">
-                                <div class="d-flex flex-column
-                                 gap-3">
+                                <div class="d-flex flex-column gap-3">
                                     <p class="mb-0">Заявка от {{$repair->lead->created_at}}<br/></p>
                                     {{$repair->lead->city}}<br/>
                                     c {{preg_split("/[^1234567890]/", $repair->lead->time_period)[0]}}
                                     до {{preg_split("/[^1234567890]/", $repair->lead->time_period)[1]}}
                                     <p class="mb-0">{{$repair->contract_number?'Договор: #'.$repair->contract_number:''}}<br/></p>
-                                    <form method="post" action="{{route('repairs.duplicate',$repair)}}">
-                                        @csrf
-                                        @method('post')
-                                        <input type="submit" class="btn btn-primary mt-3" value="Дублировать">
-                                    </form>
                                 </div>
-
                             </th>
                             <th class="fw-bold text-left" scope="col">
                                 <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$repair->lead->client_fullname}}</p>
@@ -160,22 +129,31 @@
                                     @endif
                                 </div>
                             </th>
+                            <th class="fw-bold  text-left" scope="col">
+                                <div class="d-flex flex-column">
+                                    @if($repair->materials&&count($repair->materials)>0)
+                                        @foreach($repair->materials as $material)
+                                            <p>{{$material->nomenclature->name}}
+                                                - {{$material->quantity}} {{$material->nomenclature->unit}}</p>
+                                        @endforeach
+                                    @else
+                                        <p class="fw-normal"><span class="fw-bold">Нет выданных материалов</span></p>
+                                    @endif
+                                </div>
+                            </th>
                             <th class="fw-bold text-left" scope="col">
                                 <div class="d-flex flex-column gap-1">
                                     <button onclick="window.location='{{route('repairs.edit',$repair)}}'"
-                                            class="btn btn-warning text-white rounded-2 w-100 p-2">
-                                        Редатировать
+                                            class="btn btn-secondary text-white rounded-2 w-100 p-2">
+                                        Карточка
                                     </button>
-                                    <form class="d-flex flex-column gap-1" method="post"
-                                          action="{{route('repairs.update',$repair)}}">
-                                        @csrf
-                                        @method('patch')
-                                        <input required type="date" class="form-control"
-                                               id='repair_date' name="repair_date" list="repair_date">
-                                        <input type="hidden" class="form-control"
-                                               id='status' value="{{$repair->status}}" name="status" list="status">
-                                        <input type="submit" class="btn btn-primary w-100" value="Перенос">
-                                    </form>
+                                    <button onclick="window.location.href='{{route('director.expense.new',$repair)}}'"
+                                            class="btn btn-primary">Выдать материал
+                                    </button>
+                                    @if(\Illuminate\Support\Facades\Auth::user()->isAdmin && count($repair->materials)>0)
+                                        <button onclick="window.location.href='{{route('director.expense.decline',$repair)}}'"
+                                                class="btn btn-danger">Отменить материал</button>
+                                    @endif
                                 </div>
                             </th>
                             <th class="fw-bold {{round(($repair->lead->issued*($repair->master?($repair->master_boost?0.55:0.6):0.7)-$repair->materialPrice())/($repair->lead->issued)*100)>=50?'bg-completed':'bg-declined'}} text-left" scope="col">

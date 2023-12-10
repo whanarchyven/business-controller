@@ -40,7 +40,9 @@
                                         {{--                            <option value="Самара">Самара</option>--}}
                                         {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
                                         @foreach($cities as $city)
-                                            <option class="" value="{{$city->name}}"></option>
+                                            @if($city->id!=999)
+                                                <option class="" value="{{$city->name}}"></option>
+                                            @endif
                                         @endforeach
                                     </datalist>
                                 </div>
@@ -168,7 +170,9 @@
                                         {{--                            <option value="Самара">Самара</option>--}}
                                         {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
                                         @foreach($cities as $city)
-                                            <option class="" value="{{$city->name}}"></option>
+                                            @if($city->id!=999)
+                                                <option class="" value="{{$city->name}}"></option>
+                                            @endif
                                         @endforeach
                                     </datalist>
                                 </div>
@@ -297,7 +301,9 @@
                                         {{--                            <option value="Самара">Самара</option>--}}
                                         {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
                                         @foreach($cities as $city)
-                                            <option class="" value="{{$city->name}}"></option>
+                                            @if($city->id!=999)
+                                                <option class="" value="{{$city->name}}"></option>
+                                            @endif
                                         @endforeach
                                     </datalist>
                                 </div>

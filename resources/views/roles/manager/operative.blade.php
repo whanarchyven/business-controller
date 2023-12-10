@@ -290,7 +290,7 @@
                                     @method('PATCH')
                                     <div class="form-group d-flex flex-column">
                                         <label for="check">Сумма</label>
-                                        <input class="form-control w-100 my-2" name="check" type="number"/>
+                                        <input required class="form-control w-100 my-2" name="check" type="number"/>
                                         {{--                                                <label for="note">Примечание</label>--}}
                                         {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
                                         {{--                                                          type="text"></textarea>--}}
@@ -536,7 +536,7 @@
                                     @method('PATCH')
                                     <div class="form-group d-flex flex-column">
                                         <label for="check">Сумма</label>
-                                        <input class="form-control w-100 my-2" name="check" type="number"/>
+                                        <input required class="form-control w-100 my-2" name="check" type="number"/>
                                         {{--                                                <label for="note">Примечание</label>--}}
                                         {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
                                         {{--                                                          type="text"></textarea>--}}

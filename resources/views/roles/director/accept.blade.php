@@ -21,16 +21,16 @@
                                     <div class="d-flex gap-5 align-items-center">
                                         <div class="w-50">
                                             <label for="issued">Чек встречи</label>
-                                            <input class="form-control" type="number" name="issued"
+                                            <input required class="form-control" type="number" name="issued"
                                                    value="{{$lead->check}}"/>
                                         </div>
                                         <div class="w-50">
                                             <label for="check">Предоплата</label>
-                                            <input class="form-control" type="number" name="avance"/>
+                                            <input required class="form-control" type="number" name="avance"/>
                                         </div>
                                     </div>
                                     <label>Дата ремонта</label>
-                                    <input type="date" class="form-control"
+                                    <input required type="date" class="form-control"
                                            id='repair_date' name="repair_date" list="repair_date">
                                     <label for="manager_id">Менеджер</label>
                                     <select name="manager_id" class="form-select">
@@ -40,7 +40,7 @@
                                         @endforeach
                                     </select>
                                     <label for="documents">Документы</label>
-                                    <input enctype="multipart/form-data" type="file"
+                                    <input required enctype="multipart/form-data" type="file"
                                            class="my-2 form-control"
                                            name="documents[]"
                                            placeholder="Документы" multiple>
@@ -62,7 +62,7 @@
                                     <div class="d-flex gap-5 align-items-center">
                                         <div class="w-50">
                                             <label for="issued">Чек встречи</label>
-                                            <input class="form-control" type="number" name="issued"
+                                            <input required class="form-control" type="number" name="issued"
                                                    value="{{$lead->check}}"/>
                                         </div>
                                     </div>

@@ -120,8 +120,9 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/receipt/new', [App\Http\Controllers\DirectorController::class, 'receipt'])->name('director.receipt');
     Route::post('/director/receipt/store', [App\Http\Controllers\DirectorController::class, 'newReceipt'])->name('director.receipt.store');
 
-    Route::get('/director/expenses/', [App\Http\Controllers\DirectorController::class, 'expense'])->name('director.expense');
+    Route::get('/director/expenses/', [App\Http\Controllers\RepairsController::class, 'expenseMaterialShow'])->name('director.expense');
     Route::get('/director/expenses/{repair}/new', [App\Http\Controllers\DirectorController::class, 'newExpense'])->name('director.expense.new');
+    Route::get('/director/expenses/{repair}/decline', [App\Http\Controllers\DirectorController::class, 'declineExpense'])->name('director.expense.decline');
     Route::post('/director/expense/{repair}/store', [App\Http\Controllers\DirectorController::class, 'expenseStore'])->name('director.expense.store');
 
 
@@ -145,6 +146,8 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/getcity/', [App\Http\Controllers\DirectorController::class, 'getCity'])->name('admin.city.get');
 
     Route::get('/director/transactions/', [App\Http\Controllers\DirectorController::class, 'getTransactionsView'])->name('director.transactions');
+
+    Route::get('/director/transactions/mainoffice', [App\Http\Controllers\DirectorController::class, 'getMainOffice'])->name('director.transactions.mainoffice');
 
     Route::get('/director/transactions/search', [App\Http\Controllers\DirectorController::class, 'searchTransactions'])->name('director.transactions.search');
     Route::post('/director/transactions/search', [App\Http\Controllers\DirectorController::class, 'doSearchTransaction'])->name('director.transactions.do.search');

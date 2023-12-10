@@ -574,6 +574,8 @@ class RepairsController extends Controller
     {
         $data = $request->all();
 
+//        dd($data);
+
         $documents = array();
         if ($files = $request->file('documents')) {
             $i = 1;
@@ -611,6 +613,14 @@ class RepairsController extends Controller
             "check" => $data['issued']
 
         ]);
+
+        if(array_key_exists('master_boost',$data)){
+            $repair->master_boost=true;
+        }
+        else{
+            $repair->master_boost=false;
+        }
+
         $repair->save();
 
         return (redirect(route('repairs.index')));
@@ -818,5 +828,152 @@ class RepairsController extends Controller
         $newRepair->save();
         return redirect()->back();
     }
+
+
+
+    public function expenseMaterialShow(Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $user = Auth::user();
+        $city = City::where(["id" => $user->city])->first();
+        if ($user->isAdmin) {
+            $temp = array();
+
+            $repairs = Repair::where([['repair_date', '=', $date]])->get();
+            foreach ($repairs as $repair) {
+
+                if ($repair->lead->city == (Session::get('city')->name)) {
+
+                    array_push($temp, $repair);
+                }
+            }
+
+            $repairs = $temp;
+        } else {
+            $temp = array();
+            $repairs = Repair::where([['repair_date', '=', $date]])->get();
+            foreach ($repairs as $repair) {
+                if ($repair->lead->city == $city->name) {
+                    array_push($temp, $repair);
+                }
+            }
+            $repairs = $temp;
+        }
+
+//        foreach ($repairs as $repair){
+//            dd($repair->getResult('sdfs'));
+//        }
+
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $city = Auth::user()->city;
+
+        $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+        $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'all');
+        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
+        $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
+
+
+        $totalRepairs = 0;
+        $totalDeclined = 0;
+        $totalCompleted = 0;
+
+        foreach ($monthRepairs as $repair) {
+            $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
+            $days[$day - 1]['repairs'] += 1;
+            $totalRepairs++;
+        }
+
+        foreach ($declinedRepairs as $declined) {
+            $day = intval(preg_split("/[^1234567890]/", $declined['repair_date'])[2]);
+            $days[$day - 1]['declined'] += 1;
+            $totalDeclined++;
+        }
+
+        foreach ($completedRepairs as $completed) {
+            $day = intval(preg_split("/[^1234567890]/", $completed['repair_date'])[2]);
+            $days[$day - 1]['completed'] += 1;
+            $totalCompleted++;
+        }
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+
+        $totalCheck = 0;
+        foreach ($repairs as $repair) {
+            $totalCheck += $repair->check;
+        }
+
+        return view('repair.expense', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck'));
+    }
+
+
 
 }

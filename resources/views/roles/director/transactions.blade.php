@@ -95,6 +95,9 @@
                           method="post">
                         @csrf
                         @method('post')
+                        @if(\Illuminate\Support\Facades\Request::path()=='director/transactions/mainoffice')
+                            <input type="hidden" name="ismainoffice" value="1"/>
+                        @endif
                         <div class="row">
                             <div class="d-flex col gap-2">
                                 <label for="state">Статья транзакции</label>
@@ -125,11 +128,12 @@
                         <div class="row">
                             <div class="form-group col my-2">
                                 <label for="value">Сумма транзакции</label>
-                                <input type="number" class="form-control" id='value' name="value">
+                                <input required type="number" class="form-control" id='value' name="value">
+
                             </div>
                             <div class="d-flex flex-column col">
                                 <label for="documents">Документы</label>
-                                <input enctype="multipart/form-data"
+                                <input required enctype="multipart/form-data"
                                        type="file"
                                        class="my-2 form-control"
                                        name="documents[]"

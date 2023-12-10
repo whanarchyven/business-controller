@@ -29,7 +29,7 @@
                         </div>
                         <div class="w-25">
                             <label for="quantity1">Количество</label>
-                            <input type="number" name="quantity1" class="form-control">
+                            <input required type="number" name="quantity1" class="form-control">
                         </div>
                     </div>
                 </div>

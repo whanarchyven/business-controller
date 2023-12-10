@@ -20,15 +20,15 @@
                                 <div class="d-flex gap-5 align-items-center">
                                     <div class="w-50">
                                         <label for="name">Название</label>
-                                        <input class="form-control" type="text" name="name"/>
+                                        <input required class="form-control" type="text" name="name"/>
                                     </div>
                                     <div class="w-50">
                                         <label for="unit">Единица измерения</label>
-                                        <input class="form-control" type="text" name="unit"/>
+                                        <input required class="form-control" type="text" name="unit"/>
                                     </div>
                                     <div class="w-50">
                                         <label for="price">Цена за ед. измерения</label>
-                                        <input class="form-control" type="text" name="price"/>
+                                        <input required class="form-control" type="text" name="price"/>
                                     </div>
                                     <input type="hidden"
                                            value="{{$user->isAdmin?\Illuminate\Support\Facades\Session::get('city')->id:$user->city}}"

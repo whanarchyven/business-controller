@@ -131,8 +131,8 @@
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->salary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <input class="form-control"
-                                       value="5000"
+                                <input class="form-control" required
+                                       value="5000" onchange="checkPay()"
                                        {{--                                       max="{{$operator->salary($date)}}"--}}
                                        type="number"
                                        name="operator{{$loop->index}}"/>
@@ -172,7 +172,7 @@
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->salary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <input onchange="checkPay()" class="form-control"
+                                <input onchange="checkPay()" required class="form-control"
                                        value="5000"
                                        {{--                                       max="{{$master->salary($date)}}" type="number"--}}
                                        name="master{{$loop->index}}"/>

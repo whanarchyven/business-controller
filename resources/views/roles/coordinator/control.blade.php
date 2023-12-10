@@ -397,7 +397,7 @@
                                                   method="post">
                                                 @csrf
                                                 @method('PATCH')
-                                                <input placeholder="Укажите причину отказа" class="form-control" name="note"
+                                                <input required placeholder="Укажите причину отказа" class="form-control" name="note"
                                                        type="text"/>
                                                 <input type="submit" class="my-2 btn btn-danger w-50" value="Отказ">
                                             </form>

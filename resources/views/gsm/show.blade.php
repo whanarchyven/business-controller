@@ -69,7 +69,8 @@
                                         <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
                                             @csrf
                                             @method('post')
-                                            <input class="form-control mb-2" placeholder="250" type="number"
+                                            <input required
+                                                   class="form-control mb-2" placeholder="250" type="number"
                                                    name="amount">
                                             <input type="hidden" name="city" value={{$city->id}}>
                                             <input type="hidden" name="manager" value={{$mg[0]->id}}>
