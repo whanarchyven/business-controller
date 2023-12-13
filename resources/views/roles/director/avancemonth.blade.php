@@ -46,13 +46,13 @@
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->name}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->salary($date)}}</th>
+                                <th class="p-2 fw-bold text-left summ {{$director->salary($date)-$director->payedSalary($date)<0?'text-danger':'text-black'}}"
+                                    scope="col">{{$director->salary($date)-$director->payedSalary($date)}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">
                                     <input class="form-control"
                                            required value="5000"
                                            type="number"
                                            name="director{{$loop->index}}"
-                                                                               max="{{$director->salary($date)}}"
                                     />
                                     <input type="hidden" value="{{$director->id}}" name="directorEmployer{{$loop->index}}">
                                 </th>
@@ -89,11 +89,11 @@
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->name}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->salary($date)}}</th>
+                            <th class="p-2 fw-bold text-left summ {{$manager->salary($date)-$manager->payedSalary($date)<0?'text-danger':'text-black'}}"
+                                scope="col">{{$manager->salary($date)-$manager->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <input class="form-control"
-                                       required value="5000"
-                                                                              max="{{$manager->salary($date)}}" type="number"
+                                       required value="5000" type="number"
                                        name="manager{{$loop->index}}"/>
                                 <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">
                             </th>

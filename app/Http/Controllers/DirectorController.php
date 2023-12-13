@@ -206,10 +206,10 @@ class DirectorController extends Controller
         $managers = $this->getManagers($city_id);
         $managers_leads=[];
         foreach ($managers as $manager){
-            $managers_leads[$manager->name]=[];
+            $managers_leads[$manager->name]=0;
             foreach ($todayLeads as $todayLead){
                 if ($todayLead->manager_id==$manager->id&&$todayLead->entered){
-                    array_push($managers_leads[$manager->name],$todayLead->id);
+                    $managers_leads[$manager->name]+=$todayLead->issued;
                 }
             }
         }
@@ -1678,9 +1678,10 @@ class DirectorController extends Controller
         if ($director->isAdmin) {
             $city = Session::get('city');
         } else {
-            $city = $director->city;
+            $city = $director->city();
         }
 
+//        dd($director->city());
         $dateTemp = preg_split("/[^1234567890]/", $date);
         $dateTitle = '';
         switch ($dateTemp[1]) {
@@ -1785,7 +1786,7 @@ class DirectorController extends Controller
         if ($director->isAdmin) {
             $city = Session::get('city');
         } else {
-            $city = $director->city;
+            $city = $director->city();
         }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
@@ -1921,7 +1922,7 @@ class DirectorController extends Controller
         if ($director->isAdmin) {
             $city = Session::get('city');
         } else {
-            $city = $director->city;
+            $city = $director->city();
         }
 
         $dateTemp = preg_split("/[^1234567890]/", $date);

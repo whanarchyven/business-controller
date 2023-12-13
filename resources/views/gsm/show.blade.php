@@ -57,26 +57,55 @@
                             @if($mg_day['gsm']==0)
                                 <th class="fw-normal p-3 text-center" scope="col">
                                     <div class="d-flex flex-column gap-3">
-                                        <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
-                                            @csrf
-                                            @method('post')
-                                            <input type="hidden" name="amount" value="{{$mg[0]->hasRole('master')?($mg_day['repairs']>1?$mg_day["repairs"]*100-100:0):'250'}}">
-                                            <input type="hidden" name="city" value={{$city->id}}>
-                                            <input type="hidden" name="manager" value={{$mg[0]->id}}>
-                                            <input type="hidden" name="date" value={{$mg_day['date']}}>
-                                            <input class="btn btn-primary" {{$mg[0]->hasRole('master')?($mg_day['repairs']>1?'':'disabled'):''}} type="submit" value="Стандарт">
-                                        </form>
-                                        <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
-                                            @csrf
-                                            @method('post')
-                                            <input required
-                                                   class="form-control mb-2" placeholder="{{$mg[0]->hasRole('master')?($mg_day['repairs']>1?$mg_day["repairs"]*100-100:0):'250'}}" type="number"
-                                                   name="amount">
-                                            <input type="hidden" name="city" value={{$city->id}}>
-                                            <input type="hidden" name="manager" value={{$mg[0]->id}}>
-                                            <input type="hidden" name="date" value={{$mg_day['date']}}>
-                                            <input class="btn btn-secondary" type="submit" value="Другое">
-                                        </form>
+                                        @if($mg[0]->hasRole('master'))
+                                            <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
+                                                @csrf
+                                                @method('post')
+                                                <input type="hidden" name="amount" value="{{($mg_day['repairs']>1?$mg_day["repairs"]*100-100:0)}}">
+                                                <input type="hidden" name="city" value={{$city->id}}>
+                                                <input type="hidden" name="manager" value={{$mg[0]->id}}>
+                                                <input type="hidden" name="date" value={{$mg_day['date']}}>
+                                                <input class="btn btn-primary" {{($mg_day['repairs']>1?'':'disabled')}} type="submit" value="Стандарт">
+                                            </form>
+                                        @endif
+                                            @if($mg[0]->hasRole('manager'))
+                                                <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
+                                                    @csrf
+                                                    @method('post')
+                                                    <input type="hidden" name="amount" value="{{($mg_day['repairs']>=1?250:0)}}">
+                                                    <input type="hidden" name="city" value={{$city->id}}>
+                                                    <input type="hidden" name="manager" value={{$mg[0]->id}}>
+                                                    <input type="hidden" name="date" value={{$mg_day['date']}}>
+                                                    <input class="btn btn-primary" {{($mg_day['repairs']>=1?'':'disabled')}} type="submit" value="Стандарт">
+                                                </form>
+                                            @endif
+                                        @if($mg[0]->hasRole('master'))
+                                            <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
+                                                @csrf
+                                                @method('post')
+                                                <input required
+                                                       class="form-control mb-2" placeholder="{{$mg_day['repairs']>1?$mg_day["repairs"]*100-100:0}}" type="number"
+                                                       name="amount">
+                                                <input type="hidden" name="city" value={{$city->id}}>
+                                                <input type="hidden" name="manager" value={{$mg[0]->id}}>
+                                                <input type="hidden" name="date" value={{$mg_day['date']}}>
+                                                <input class="btn btn-secondary" type="submit" value="Другое">
+                                            </form>
+                                        @endif
+                                        @if($mg[0]->hasRole('manager'))
+                                            <form method="post" class="w-100" action="{{route('director.gsm.add')}}">
+                                                @csrf
+                                                @method('post')
+                                                <input required
+                                                       class="form-control mb-2" placeholder="{{$mg_day['repairs']>=1?250:0}}" type="number"
+                                                       name="amount">
+                                                <input type="hidden" name="city" value={{$city->id}}>
+                                                <input type="hidden" name="manager" value={{$mg[0]->id}}>
+                                                <input type="hidden" name="date" value={{$mg_day['date']}}>
+                                                <input class="btn btn-secondary" type="submit" value="Другое">
+                                            </form>
+                                        @endif
+                                        <p>{{$mg[0]->hasRole('master')?'Ремонты: ':'Встречи: '}} {{$mg_day['repairs']}}</p>
                                     </div>
                                 </th>
                             @else
@@ -93,6 +122,7 @@
                                                 <input class="btn btn-success" type="submit" value="Выдать">
                                             </form>
                                         @endif
+                                        <p>{{$mg[0]->hasRole('master')?'Ремонты: ':'Встречи: '}} {{$mg_day['repairs']}}</p>
                                     </div>
                                 </th>
 
@@ -101,15 +131,15 @@
                         <th class="fw-normal p-3 text-center" scope="col">
                             <div class="d-flex gap-3 flex-column">
                                 <p>{{$mg[2]}}</p>
-{{--                                <form method="post" action="{{route('director.gsm.add')}}">--}}
-{{--                                    @csrf--}}
-{{--                                    @method('post')--}}
-{{--                                    <input type="hidden" name="amount" value={{$mg[2]}}>--}}
-{{--                                    <input type="hidden" name="city" value={{$city->id}}>--}}
-{{--                                    <input type="hidden" name="manager" value={{$mg[0]->id}}>--}}
-{{--                                    <input type="hidden" name="date" value={{$mg_day['date']}}>--}}
-{{--                                    <input class="btn btn-primary" type="submit" value="Выдать">--}}
-{{--                                </form>--}}
+                                <form method="post" action="{{route('director.gsm.payall')}}">
+                                    @csrf
+                                    @method('post')
+                                    <input type="hidden" name="manager" value={{$mg[0]->id}}>
+                                    <input type="hidden" name="start_date" value={{$mg[1][0]['date']}}>
+                                    <input type="hidden" name="end_date" value={{$mg[1][5]['date']}}>
+                                    <input name="role" type="hidden" value="{{$mg[0]->hasRole('manager')?'manager':'master'}}">
+                                    <input class="btn btn-primary" {{$mg[3]?'disabled':''}} type="submit" value="{{$mg[3]?'Весь ГСМ выдан':'Выдать неделю'}}">
+                                </form>
                             </div>
                         </th>
                     </tr>

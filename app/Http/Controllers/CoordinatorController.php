@@ -177,10 +177,10 @@ class CoordinatorController extends Controller
         $managers = $this->getManagers($city_id);
         $managers_leads=[];
         foreach ($managers as $manager){
-            $managers_leads[$manager->name]=[];
+            $managers_leads[$manager->name]=0;
             foreach ($todayLeads as $todayLead){
                 if ($todayLead->manager_id==$manager->id&&$todayLead->entered){
-                    array_push($managers_leads[$manager->name],$todayLead->id);
+                    $managers_leads[$manager->name]+=$todayLead->issued;
                 }
             }
         }

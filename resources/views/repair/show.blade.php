@@ -52,7 +52,7 @@
                     <th scope="row text-center">Ремонты</th>
                     @foreach($days as $day)
                         @if($day['repairs']!=0)
-                            <th class="fw-normal text-center {{$day['repairs']==$day['completed']?'bg-completed':''}}"
+                            <th class="fw-normal text-center {{$day['repairs']==$day['completed']+$day['declined']?'bg-completed':''}}"
                                 scope="col">{{$day['repairs']}}</th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>
@@ -95,13 +95,13 @@
                 </div>
                 <div class="w-100 d-flex flex-row justify-content-between">
                     <div class="d-flex gap-3 mb-4">
-                        <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>
-                        <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно
-                        </button>
-                        <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено
-                        </button>
-                        <button class="bg-refund  p-2 text-white rounded-3">Возврат
-                        </button>
+{{--                        <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>--}}
+{{--                        <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно--}}
+{{--                        </button>--}}
+{{--                        <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено--}}
+{{--                        </button>--}}
+{{--                        <button class="bg-refund  p-2 text-white rounded-3">Возврат--}}
+{{--                        </button>--}}
                     </div>
                     <p class="my-4 fw-bold fs-3">Суммарный чек: {{$totalCheck}} ({{$totalAvance}})</p>
                 </div>

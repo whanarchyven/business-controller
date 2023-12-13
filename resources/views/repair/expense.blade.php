@@ -70,15 +70,15 @@
                     <p class="fs-3 m-0 text-indigo">Ремонты {{$formattedDate}}</p>
                 </div>
                 <div class="w-100 d-flex flex-row justify-content-between">
-                    <div class="d-flex gap-3 mb-4">
-                        <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>
-                        <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно
-                        </button>
-                        <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено
-                        </button>
-                        <button class="bg-refund  p-2 text-white rounded-3">Возврат
-                        </button>
-                    </div>
+{{--                    <div class="d-flex gap-3 mb-4">--}}
+{{--                        <button class="bg-in-work btn-outline-info border-0 p-2 text-white rounded-3">В работе</button>--}}
+{{--                        <button class="bg-declined btn-outline-info border-0 p-2 text-white rounded-3">Отказанно--}}
+{{--                        </button>--}}
+{{--                        <button class="bg-completed btn-outline-info border-0 p-2 text-white rounded-3">Выполнено--}}
+{{--                        </button>--}}
+{{--                        <button class="bg-refund  p-2 text-white rounded-3">Возврат--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
                 </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>

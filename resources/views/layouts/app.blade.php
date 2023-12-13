@@ -381,13 +381,7 @@
                         </div>
                     </li>
 
-                    @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
-                        <li class="nav-item dropdown">
-                            <a class="dropdown-item" href="{{ route('director.transactions.mainoffice') }}">
-                                Гл. офис
-                            </a>
-                        </li>
-                    @endif
+
 
 
 
@@ -426,6 +420,11 @@
                                             </a>
                                         @endif
                                     @endforeach
+                                        @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                            <a class="dropdown-item" href="{{ route('director.transactions.mainoffice') }}">
+                                                Гл. офис
+                                            </a>
+                                        @endif
                                 </div>
                             </li>
                         @elseif(\Illuminate\Support\Facades\Auth::user()->hasRole('coordinator'))

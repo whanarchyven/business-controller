@@ -188,5 +188,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::post('/director/gsm',[App\Http\Controllers\GsmController::class,'createGsm'])->name('director.gsm.add');
     Route::patch('/director/gsm/{gsm}/pay',[App\Http\Controllers\GsmController::class,'payGsm'])->name('director.gsm.pay');
 
+    Route::post('/director/gsm/payall',[App\Http\Controllers\GsmController::class,'payAllGsm'])->name('director.gsm.payall');
+
 
 });

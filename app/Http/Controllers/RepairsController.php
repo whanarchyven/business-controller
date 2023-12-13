@@ -505,6 +505,8 @@ class RepairsController extends Controller
         $data = $request->all();
 
 
+
+
         if ($data['status'] == 'completed' && ($repair->status == 'declined' || $repair->status == 'in-work')) {
             $repair->check = $repair->lead->issued;
             $repair->save();
@@ -536,13 +538,13 @@ class RepairsController extends Controller
         if (key_exists('repair_date', $data)) {
             $repair->repair_date = $data['repair_date'];
         }
-        $repair->save();
+
 
         if ($data['status'] == 'completed' && $repair->lead->issued > $repair->lead->avance) {
             $state = TransactionState::getByCode('1.2.');
             $desc = 'Ремонт от ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
             $value = $repair->check - $repair->lead->avance;
-            $responsible = $repair->lead->getManagerId->id;
+            $responsible = Auth::user()->id;
             $documents = implode("|", $documents);
             $city_id = City::where(['name' => $repair->lead->city])->first()->id;
             $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $city_id, $documents);
@@ -552,12 +554,14 @@ class RepairsController extends Controller
             $state = TransactionState::getByCode('1.5.');
             $desc = 'Возврат по договору ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
             $value = $repair->lead->avance;
-            $responsible = $repair->lead->getManagerId->id;
+            $responsible = Auth::user()->id;
             $documents = implode("|", $documents);
             $city_id = City::where(['name' => $repair->lead->city])->first()->id;
             $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, $documents);
             $transaction->save();
         }
+
+        $repair->save();
         return redirect()->back();
     }
 

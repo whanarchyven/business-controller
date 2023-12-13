@@ -121,7 +121,7 @@
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('coordinator.manager.operative',$manager)}}'"
-                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.count($managers_leads[$manager->name]).' ]'}}</button>
+                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.$managers_leads[$manager->name].' ]'}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">
@@ -325,7 +325,7 @@
                 <p class="text-center w-100 fs-1">Список менеджеров</p>
                 @foreach($managers as $manager)
                     <button onclick="window.location.href='{{route('director.manager.operative',$manager)}}'"
-                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.count($managers_leads[$manager->name]).' ]'}}</button>
+                            class="btn m-2 manager-{{$manager->status}}">{{explode(' ',$manager->name)[0].' '.explode(' ',$manager->name)[1].' [ '.$managers_leads[$manager->name].' ]'}}</button>
                 @endforeach
 
                 <table class="table table-bordered mt-3 table-sm table-secondary ">

@@ -73,11 +73,11 @@
                                     {{\Carbon\Carbon::today()->toDateString()}}
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
-                                    <input placeholder="Введите обоснование" type="text" name="reason"
+                                    <input required placeholder="Введите обоснование" type="text" name="reason"
                                            class="form-control"/>
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
-                                    <input placeholder="Введите сумму" type="number" name="amount"
+                                    <input required placeholder="Введите сумму" type="number" name="amount"
                                            class="form-control"/>
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
@@ -131,11 +131,11 @@
                                     {{\Carbon\Carbon::today()->toDateString()}}
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
-                                    <input placeholder="Введите обоснование" type="text" name="reason"
+                                    <input required placeholder="Введите обоснование" type="text" name="reason"
                                            class="form-control"/>
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
-                                    <input placeholder="Введите сумму" type="number" name="amount"
+                                    <input required placeholder="Введите сумму" type="number" name="amount"
                                            class="form-control"/>
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
