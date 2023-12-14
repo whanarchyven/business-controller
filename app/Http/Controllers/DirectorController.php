@@ -620,6 +620,8 @@ class DirectorController extends Controller
 
         $date = array_slice($date, 2, count($date));
 
+        $totalPrice=0;
+        $totalCart='';
 
         for ($i = 1; $i <= count($date) / 2; $i++) {
             $nomenclature_receipt = new NomenclatureReceipt();
@@ -631,8 +633,19 @@ class DirectorController extends Controller
 
             $plus = Nomenclature::where(["id" => $date['nomenclature' . $i]])->first();
             $plus->remain += $date['quantity' . $i];
+            $totalPrice+=($plus->price*$date['quantity'.$i]);
+            $totalCart.=$plus->name.' '.$date['quantity'.$i].' '.$plus->unit.', ';
+            $city=City::where(["id"=>$plus->city_id])->first();
             $plus->save();
         }
+
+        $state = TransactionState::getByCode('2.02.2.');
+        $desc = 'Закупка материала ' . $city->name.': '.$totalCart;
+        $value = $totalPrice;
+        $responsible = Auth::user()->id;
+        $documents = '';
+        $city_id = $city->id;
+        $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, $documents);
         return (redirect(route('director.nomenclature')));
     }
 
