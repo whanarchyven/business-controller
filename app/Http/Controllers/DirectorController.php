@@ -2422,7 +2422,7 @@ class DirectorController extends Controller
         }
 
 
-        $cities=City::all();
+        $cities=City::where([["id","!=",999]]);
 
         $citiesCalendar = array();
 
