@@ -207,16 +207,16 @@
                                     </button>
                                 </div>
                             </th>
-                            <th class="fw-bold {{round(($repair->lead->issued*($repair->master?($repair->master_boost?0.55:0.6):0.7)-$repair->materialPrice())/($repair->lead->issued)*100)>=50?'bg-completed':'bg-declined'}} text-left" scope="col">
+                            <th class="fw-bold {{$repair->lead->marge()>=35?'bg-completed':'bg-declined'}} text-left" scope="col">
                                 <p class="m-0 fw-normal">Сумма ремонта: <span class="fw-bold">{{$repair->lead->issued}}</span></p>
                                 <p class="m-0 fw-normal">Стоимость материала: <span class="fw-bold">{{$repair->materialPrice()}}</span></p>
                                 <p class="m-0 fw-normal">ЗП мастера: <span class="fw-bold">{{$repair->master?$repair->lead->issued*($repair->master_boost?0.15:0.1):0}}</span></p>
-                                <p class="m-0 fw-normal">ЗП менеджера: <span class="fw-bold">{{$repair->lead->issued*0.1}}</span></p>
+                                <p class="m-0 fw-normal">ЗП менеджера: <span class="fw-bold">{{$repair->lead->issued*0.2}}</span></p>
                                 <p class="m-0 fw-normal">Прочие затраты: <span class="fw-bold">{{$repair->lead->issued*0.2}}</span></p>
                                 <p class="m-0 fw-normal">
-                                    Прибыль: <span class="fw-bold">{{$repair->lead->issued*0.7-($repair->master?$repair->lead->issued*($repair->master_boost?0.15:0.1):0)-$repair->materialPrice()}} <br/>
+                                    Прибыль: <span class="fw-bold">{{$repair->lead->profit()}} <br/>
                                     - <br/>
-                                    {{round(($repair->lead->issued*($repair->master?($repair->master_boost?0.55:0.6):0.7)-$repair->materialPrice())/($repair->lead->issued)*100)}}%</span></p>
+                                    {{$repair->lead->marge()}}%</span></p>
 
                             </th>
                         </tr>

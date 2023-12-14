@@ -132,7 +132,6 @@ class DirectorController extends Controller
         $user = Auth::user()->id;
         $data['status'] = 'not-managed';
 
-
         if (isset($data['measuring'])) {
             $data['measuring'] == 'on' ? $data['measuring'] = true : $data['measuring'] = false;
         }
@@ -140,6 +139,11 @@ class DirectorController extends Controller
         if (isset($data['range'])) {
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
+
+        if (array_key_exists('check',$data)){
+            $data['status']='in-work';
+        }
+
 //        dd($data);
         $lead->update($data);
         return redirect()->route('director.managers');
@@ -460,6 +464,7 @@ class DirectorController extends Controller
                 array_push($managers, $manager);
             }
         }
+
 
 
         return view('roles.director.accept', compact('lead', 'managers'));
@@ -1441,7 +1446,7 @@ class DirectorController extends Controller
     {
         $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
-        return $leads = Repair::where([['status', '=', 'completed']])->whereBetween('created_at', [$startDate, $endDate])->get();
+        return $leads = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
 
     }
 
@@ -1521,21 +1526,28 @@ class DirectorController extends Controller
 
         $days = $this->getDirectorDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
+
         $monthLeads = $this->getDirectorMonthLeads($dateTemp[0], $dateTemp[1], $city->name);
 
 
-        $temp = array();
-        foreach ($monthLeads as $lead) {
-            if ($lead->lead->city == $city->name) {
-                array_push($temp, $lead);
+
+        $suka=[];
+
+        foreach ($monthLeads as $monthLead){
+            if($city->name==$monthLead->lead->city){
+                array_push($suka,$monthLead);
             }
         }
-        $monthLeads = $temp;
 
+        $monthLeads=$suka;
+
+//        dd($monthLeads);
 
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['repair_date'])[2]);
-            $days[$day - 1]['repairs_confirmed'] += $lead->check;
+            if($lead->lead->marge()>=35&&$lead->status=='completed'){
+                $days[$day - 1]['repairs_confirmed'] += $lead->check;
+            }
 //            echo $lead->check;
 //            echo array_search($lead->getManagerId->id, $days[$day - 1]['managers']);
             if (in_array($lead->lead->getManagerId->id, $days[$day - 1]['managers']) == false) {

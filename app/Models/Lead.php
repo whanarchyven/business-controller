@@ -31,4 +31,20 @@ class Lead extends Model
     {
         return $this->hasOne(Repair::class, 'lead_id');
     }
+
+    public function profit(){
+        $lead=$this;
+        $repair=$this->repair;
+        $marge=$lead->issued*0.6-($repair->master?$lead->issued*($repair->master_boost?0.15:0.1):0)-$repair->materialPrice();
+//        dd($marge);
+        return $marge;
+    }
+    public function marge(){
+        $lead=$this;
+        $marge=$this->profit();
+
+        $marge_percent=round($marge/$lead->issued*100);
+//        dd($marge);
+        return $marge_percent;
+    }
 }

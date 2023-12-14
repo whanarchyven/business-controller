@@ -494,6 +494,8 @@ class LeadsController extends Controller
             'measuring' => '',
             'note' => '',
         ]);
+
+
         $user = Auth::user()->id;
         $data['operator_id'] = $user;
         $data['status'] = 'not-managed';
@@ -531,6 +533,8 @@ class LeadsController extends Controller
     public function update(Lead $lead)
     {
         $data = \request()->all();
+
+
         $user = Auth::user()->id;
         $data['operator_id'] = $user;
         $data['status'] = 'not-managed';
@@ -543,6 +547,11 @@ class LeadsController extends Controller
         if (isset($data['range'])) {
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
+
+        if (array_key_exists('check',$data)){
+            $data['status']='in-work';
+        }
+
         $lead->update($data);
         if (Auth::user()->hasRole('operator')) {
             return redirect()->route('leads.index');
@@ -756,8 +765,25 @@ class LeadsController extends Controller
         $days = $this->getManagerDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
         $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $manager->id);
+
+//        dd($monthLeads);
+
         $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $manager->id);
         $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $manager->id);
+
+        $leads_temp=[];
+
+        foreach ($monthLeads as $lead){
+            if($lead->repair){
+                if($lead->marge()>=35&&$lead->repair->status!='declined'){
+                    array_push($leads_temp,$lead);
+                }
+            }
+            else{
+                array_push($leads_temp,$lead);
+            }
+        }
+        $monthLeads=$leads_temp;
 
 
         $totalMeetings = 0;
@@ -766,17 +792,25 @@ class LeadsController extends Controller
         $totalNull = 0;
         $totalEnter = 0;
 
+
+
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
             $days[$day - 1]['meetings'] += 1;
             $days[$day - 1]['products_selled'] += $lead['check'];
             $days[$day - 1]['products_issued'] += $lead['issued'];
-            $days[$day - 1]['products_confirmed'] += $lead->repair ? $lead->repair->check : 0;
+            $days[$day - 1]['products_confirmed'] += $lead->repair&&$lead->marge()>=35 ? $lead->repair->check : 0;
             $totalMeetings++;
             if ($lead->entered) {
                 $totalEnter++;
             }
+            if($lead->check!=null){
+                $days[$day - 1]['successful'] += 1;
+                $totalSuccessful++;
+            }
         }
+
+
 
         foreach ($declined_leads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
@@ -787,11 +821,6 @@ class LeadsController extends Controller
             }
         }
 
-        foreach ($successful_leads as $lead) {
-            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
-            $days[$day - 1]['successful'] += 1;
-            $totalSuccessful++;
-        }
 
 
         $lexems = preg_split("/[^1234567890]/", $date);
@@ -821,7 +850,6 @@ class LeadsController extends Controller
         $totalIssued = 0;
         $totalConfirmed = 0;
 
-        $leads = Lead::where([['manager_id', '=', $manager->id], ['check', '=', null]])->get();
 
         $documents = explode('|', $manager->documents);
 
@@ -912,7 +940,14 @@ class LeadsController extends Controller
         }
 
         $totalProductsPercent = 0.1;
-        $conversion = $totalEnter / (($totalNull + $totalEnter==0?1:$totalNull + $totalEnter));
+        if ($totalEnter != 0) {
+            $conversion = $totalEnter / ($totalNull + $totalEnter);
+        } else {
+            $conversion = 0;
+        }
+//        dd($conversion);
+
+//        dd($conversion,$totalEnter ,$totalNull + $totalEnter );
 
         if ($conversion >= 0.5) {
             $totalProductsPercent += 0.01;
@@ -930,7 +965,7 @@ class LeadsController extends Controller
 //        dd($okladSallary);
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'leads', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary'));
         }
 
 

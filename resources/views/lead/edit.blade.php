@@ -340,11 +340,11 @@
                                            id='client_fullname' name="client_fullname"
                                            list="client_fullname">
                                 </div>
-                                <div class="form-group my-2">
-                                    <label for="phone">Номер телефона</label>
-                                    <input type="tel" class="form-control" id='phone' name="phone"
-                                           value="{{$lead->phone}}" list="phone">
-                                </div>
+                                    <div class="form-group my-2">
+                                        <label for="phone">Номер телефона</label>
+                                        <input type="tel" class="form-control" id='phone' name="phone"
+                                               value="{{$lead->phone}}" list="phone">
+                                    </div>
                                 <div class="form-group my-2">
                                     <label for="job_type">Тип работ</label>
                                     <select id="job_type" class="form-control" name="job_type"
@@ -386,6 +386,13 @@
                                     <textarea rows="3" type="text" class="form-control" id='note' name="note"
                                               list="note">{{$lead->note}}</textarea>
                                 </div>
+                                @if($lead->check!==null)
+                                    <div class="form-group my-2">
+                                        <label for="check">Чек встречи</label>
+                                        <input type="tel" class="form-control" id='check' name="check"
+                                               value="{{$lead->check}}" list="check">
+                                    </div>
+                                @endif
                                 @if($lead->status=='declined')
                                     <div class="form-group my-2">
                                         <label for="job_type">Статус</label>
