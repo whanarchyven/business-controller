@@ -107,7 +107,8 @@
                                 <div class="form-group w-50 my-2">
                                     <div class="form-group my-2">
                                         <label for="meeting_date">Дата продажи</label>
-                                        <input value="{{$repair->lead->created_at->toDateString()}}" type="date" class="form-control"
+                                        <input value="{{$repair->lead->created_at->toDateString()}}" type="date"
+                                               class="form-control"
                                                id='created_at' name="created_at"
                                                list="created_at">
                                     </div>
@@ -234,12 +235,15 @@
                                     @if($repair->master_id)
                                         <div class="form-group d-flex gap-3 my-2">
                                             <label for="master_boost">Мастер 15 %</label>
-                                            <input type="checkbox" {{$repair->master_boost?'checked':''}} name="master_boost" id="master_boost" class="form-check"/>
+                                            <input type="checkbox"
+                                                   {{$repair->master_boost?'checked':''}} name="master_boost"
+                                                   id="master_boost" class="form-check"/>
                                         </div>
                                     @endif
                                     <div class="form-group my-2">
                                         <label for="works">Список работ</label>
-                                        <textarea name="works" class="form-control">{{$repair->works?$repair->works:''}}</textarea>
+                                        <textarea name="works"
+                                                  class="form-control">{{$repair->works?$repair->works:''}}</textarea>
                                     </div>
                                     <div class="form-group my-2">
                                         <label for="note">Примечание</label>
@@ -259,6 +263,19 @@
                                                 - {{$material->quantity}} {{$material->nomenclature->unit}}</p>
                                         @endforeach
                                     </div>
+                                    <div class="my-3 p-1 d-flex flex-column gap-1">
+                                        <p class="{{$repair->lead->marge()>=35?'text-success':'text-danger'}} fw-bold">
+                                            Маржинальность заявки: {{$repair->lead->marge()}}%</p>
+                                        @if($repair->lead->marge()<35&&\Illuminate\Support\Facades\Auth::user()->isAdmin)
+                                            <div class="form-group d-flex gap-3">
+                                                <label for="salary_debuff fw-bold">Не идёт в зачет</label>
+                                                <input type="checkbox"
+                                                       {{$repair->lead->salary_debuff?'checked':''}} name="salary_debuff"
+                                                       id="salary_debuff" class="form-check"/>
+                                            </div>
+                                        @endif
+                                    </div>
+
 
                                 </div>
 
@@ -266,6 +283,11 @@
                             <div class="form-group my-2">
                                 <input type="submit" class="form-control bg-primary text-white fw-bold"
                                        value="Отправить">
+                            </div>
+                            <div class="form-group my-2">
+                                <div onclick="window.location.href='/repairs'" class="form-control bg-secondary d-flex justify-content-center cursor-pointer text-white fw-bold">
+                                    Назад
+                                </div>
                             </div>
 
                         </form>

@@ -285,7 +285,7 @@
                     <th class="fw-bold text-center" scope="col">Оклад</th>
                     <th class="fw-bold text-center" scope="col">Рабочих дней</th>
                     <th class="fw-bold text-center" scope="col">Фактический оклад</th>
-{{--                    <th class="fw-bold text-center" scope="col">Общ.сумма бонусов</th>--}}
+                    <th class="fw-bold text-center" scope="col">НЕЗАЧЕТ чеки</th>
                     <th class="fw-bold text-center" scope="col">Общ.сумма удержаний</th>
                     <th class="fw-bold text-center" scope="col">Сумма к выдаче</th>
                 </tr>
@@ -298,7 +298,7 @@
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{$totalConfirmed>=1000000?'-':round($totalWorkDays*50000/(count($days)-$weekends))}}</th>
-{{--                    <th class="fw-normal text-center" scope="col">{{$totalBonus}}</th>--}}
+                    <th class="fw-normal text-center" scope="col">{{$lowMargeChecksDeduction}} ({{count($lowMargeChecks)}} шт.)</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{$director->salary($date)}}</th>

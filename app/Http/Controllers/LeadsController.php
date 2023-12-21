@@ -682,7 +682,7 @@ class LeadsController extends Controller
             case 'all':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['manager_id', '=', $manager_id]])->get();
             case 'successful':
-                return Lead::where([['status', '=', 'completed'], ['manager_id', '=', $manager_id]])->orWhere([['status', '=', 'in-work'], ['manager_id', '=', $manager_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+                return Lead::where([['issued', '>', 0], ['manager_id', '=', $manager_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
             case 'declined':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['manager_id', '=', $manager_id]])->get();
             default:
@@ -760,66 +760,7 @@ class LeadsController extends Controller
 
         $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
 
-        $city = Auth::user()->city;
 
-        $days = $this->getManagerDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
-
-        $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $manager->id);
-
-//        dd($monthLeads);
-
-        $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $manager->id);
-        $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $manager->id);
-
-        $leads_temp=[];
-
-        foreach ($monthLeads as $lead){
-            if($lead->repair){
-                if($lead->marge()>=35&&$lead->repair->status!='declined'){
-                    array_push($leads_temp,$lead);
-                }
-            }
-            else{
-                array_push($leads_temp,$lead);
-            }
-        }
-        $monthLeads=$leads_temp;
-
-
-        $totalMeetings = 0;
-        $totalDeclined = 0;
-        $totalSuccessful = 0;
-        $totalNull = 0;
-        $totalEnter = 0;
-
-
-
-        foreach ($monthLeads as $lead) {
-            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
-            $days[$day - 1]['meetings'] += 1;
-            $days[$day - 1]['products_selled'] += $lead['check'];
-            $days[$day - 1]['products_issued'] += $lead['issued'];
-            $days[$day - 1]['products_confirmed'] += $lead->repair&&$lead->marge()>=35 ? $lead->repair->check : 0;
-            $totalMeetings++;
-            if ($lead->entered) {
-                $totalEnter++;
-            }
-            if($lead->check!=null){
-                $days[$day - 1]['successful'] += 1;
-                $totalSuccessful++;
-            }
-        }
-
-
-
-        foreach ($declined_leads as $lead) {
-            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
-            $days[$day - 1]['declined'] += 1;
-            $totalDeclined++;
-            if ($lead->issued == 0) {
-                $totalNull++;
-            }
-        }
 
 
 
@@ -844,6 +785,91 @@ class LeadsController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
+
+        $city = Auth::user()->city;
+
+        $days = $this->getManagerDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+        $monthLeads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $manager->id);
+
+//        dd($monthLeads);
+
+//        dd($monthLeads);
+
+        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+
+        $successful_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $manager->id);
+
+//        dd($successful_leads);
+
+        $completedLeads=Lead::whereBetween('created_at', [$startDate, $endDate])->where(["status" => 'completed', "manager_id" => $manager->id])->get();
+
+
+
+        $declined_leads = $this->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $manager->id);
+
+//        dd($declined_leads);
+
+        $leads_temp=[];
+
+
+
+//        dd($monthLeads);
+
+
+        $totalMeetings = 0;
+        $totalDeclined = 0;
+        $totalSuccessful = 0;
+        $totalNull = 0;
+        $totalEnter = 0;
+
+
+
+        foreach ($monthLeads as $lead) {
+            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
+            $days[$day - 1]['meetings'] += 1;
+            $days[$day - 1]['products_selled'] += $lead['check'];
+            $days[$day - 1]['products_issued'] += $lead['issued'];
+            $days[$day - 1]['products_confirmed'] += $lead->repair&&$lead->repair->status=='completed' ? $lead->repair->check : 0;
+            $totalMeetings++;
+            if ($lead->entered) {
+                $totalEnter++;
+            }
+            if($lead->check!=null){
+                $days[$day - 1]['successful'] += 1;
+                $totalSuccessful++;
+            }
+        }
+
+        foreach ($declined_leads as $lead) {
+            $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
+            $days[$day - 1]['declined'] += 1;
+            $totalDeclined++;
+            if ($lead->issued == 0) {
+                $totalNull++;
+            }
+        }
+
+//        dd($totalDeclined);
+
+//        dd($totalEnter);
+
+//        foreach ($monthLeads as $lead){
+//            if($lead->repair){
+//                if($lead->marge()>=35&&$lead->repair->status!='declined'){
+//                    array_push($leads_temp,$lead);
+//                }
+//            }
+//            else{
+//                array_push($leads_temp,$lead);
+//            }
+//        }
+        $monthLeads=$leads_temp;
+
+//        dd($totalEnter);
+
+
 
         $totalWorkDays = 0;
         $totalSelled = 0;
@@ -946,6 +972,7 @@ class LeadsController extends Controller
             $conversion = 0;
         }
 //        dd($conversion);
+//        dd($totalConfirmed);
 
 //        dd($conversion,$totalEnter ,$totalNull + $totalEnter );
 
@@ -961,11 +988,21 @@ class LeadsController extends Controller
 
         $totalProductsSalary = $totalConfirmed * $totalProductsPercent;
 
-        $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction;
+        $lowMargeChecksDeduction=0;
+
+        $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["manager_id","=",$manager->id],['salary_debuff','!=',false]])->get();
+
+        foreach ($lowMargeChecks as $check){
+            $lowMargeChecksDeduction+=$check->repair->check;
+        }
+
+        $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
+
+        $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
 //        dd($okladSallary);
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary','lowMargeChecksDeduction','lowMargeChecks'));
         }
 
 

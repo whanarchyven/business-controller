@@ -52,7 +52,7 @@
                     <th scope="row text-center">Ремонты</th>
                     @foreach($days as $day)
                         @if($day['repairs']!=0)
-                            <th class="fw-normal text-center {{$day['repairs']==$day['completed']?'bg-completed':''}}"
+                            <th class="fw-normal text-center {{$day['repairs']==$day['completed']+$day['refund']?'bg-completed':''}}"
                                 scope="col">{{$day['repairs']}}</th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>

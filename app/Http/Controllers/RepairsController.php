@@ -42,6 +42,7 @@ class RepairsController extends Controller
                 'repairs' => 0,
                 'declined' => 0,
                 'completed' => 0,
+                'refund' => 0,
                 'link' => $year . '-' . $month . '-' . ($day < 10 ? ('0' . $day) : ($day)),
             );
         }
@@ -66,6 +67,9 @@ class RepairsController extends Controller
                     $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
                     break;
                 case 'completed':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
+                    break;
+                case 'refund':
                     $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
                     break;
                 default:
@@ -194,10 +198,13 @@ class RepairsController extends Controller
         $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
         $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
 
+        $refundRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'refund');
+
 
         $totalRepairs = 0;
         $totalDeclined = 0;
         $totalCompleted = 0;
+        $totalRefund = 0;
 
         foreach ($monthRepairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
@@ -210,6 +217,13 @@ class RepairsController extends Controller
             $days[$day - 1]['declined'] += 1;
             $totalDeclined++;
         }
+
+        foreach ($refundRepairs as $refund) {
+            $day = intval(preg_split("/[^1234567890]/", $refund['repair_date'])[2]);
+            $days[$day - 1]['refund'] += 1;
+            $totalRefund++;
+        }
+
 
         foreach ($completedRepairs as $completed) {
             $day = intval(preg_split("/[^1234567890]/", $completed['repair_date'])[2]);
@@ -240,19 +254,19 @@ class RepairsController extends Controller
         }
 
         $totalCheck = 0;
-        $totalAvance=0;
+        $totalAvance = 0;
         foreach ($repairs as $repair) {
-            if($repair->status=='completed'){
+            if ($repair->status == 'completed') {
                 $totalCheck += $repair->check;
             }
         }
         foreach ($repairs as $repair) {
-            if($repair->status!='refund'){
+            if ($repair->status != 'refund') {
                 $totalAvance += $repair->lead->avance;
             }
         }
 
-        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck','totalAvance'));
+        return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'totalAvance', 'totalRefund'));
     }
 
 
@@ -267,46 +281,40 @@ class RepairsController extends Controller
         $city = City::where(["id" => $user->city])->first();
 
 
-        if($request->query('client_fullname')){
-            $client_fullname=$request->query('client_fullname');
-        }
-        else{
-            $client_fullname='';
-        }
-
-        if($request->query('address')){
-            $address=$request->query('address');
-        }
-        else{
-            $address='';
+        if ($request->query('client_fullname')) {
+            $client_fullname = $request->query('client_fullname');
+        } else {
+            $client_fullname = '';
         }
 
-        if($request->query('phone')){
-            $phone=$request->query('phone');
-        }
-        else{
-            $phone='';
-        }
-
-        if($request->query('manager_id')){
-            $manager_id=$request->query('manager_id');
-        }
-        else{
-            $manager_id=0;
+        if ($request->query('address')) {
+            $address = $request->query('address');
+        } else {
+            $address = '';
         }
 
-        if($request->query('status')){
-            $status=$request->query('status');
-        }
-        else{
-            $status='';
+        if ($request->query('phone')) {
+            $phone = $request->query('phone');
+        } else {
+            $phone = '';
         }
 
-        if($request->query('master_id')){
-            $master_id=$request->query('master_id');
+        if ($request->query('manager_id')) {
+            $manager_id = $request->query('manager_id');
+        } else {
+            $manager_id = 0;
         }
-        else{
-            $master_id=0;
+
+        if ($request->query('status')) {
+            $status = $request->query('status');
+        } else {
+            $status = '';
+        }
+
+        if ($request->query('master_id')) {
+            $master_id = $request->query('master_id');
+        } else {
+            $master_id = 0;
         }
 
 
@@ -439,14 +447,14 @@ class RepairsController extends Controller
         }
 
         $totalCheck = 0;
-        $totalAvance=0;
+        $totalAvance = 0;
         foreach ($repairs as $repair) {
-            if($repair->status=='completed'){
+            if ($repair->status == 'completed') {
                 $totalCheck += $repair->check;
             }
         }
         foreach ($repairs as $repair) {
-            if($repair->status!='refund'){
+            if ($repair->status != 'refund') {
                 $totalAvance += $repair->lead->avance;
             }
         }
@@ -464,8 +472,7 @@ class RepairsController extends Controller
         }
 
 
-
-        return view('repair.search', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'managers', 'masters','client_fullname','address','phone','manager_id','master_id','status','totalAvance'));
+        return view('repair.search', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'managers', 'masters', 'client_fullname', 'address', 'phone', 'manager_id', 'master_id', 'status', 'totalAvance'));
     }
 
     public function doSearch(Request $request)
@@ -479,32 +486,29 @@ class RepairsController extends Controller
             "status" => '',
         ]);
 
-        $temp=[];
-        foreach ($data as $key=>$item){
-            if($item!=null){
-                $temp[$key]=$item;
+        $temp = [];
+        foreach ($data as $key => $item) {
+            if ($item != null) {
+                $temp[$key] = $item;
             }
         }
 
-        $query='?';
-        $index=1;
-        foreach ($temp as $key=>$item){
-            if($index==count($temp)){
-                $query=$query.$key.'='.$item;
-            }
-            else{
-                $query=$query.$key.'='.$item.'&&';
+        $query = '?';
+        $index = 1;
+        foreach ($temp as $key => $item) {
+            if ($index == count($temp)) {
+                $query = $query . $key . '=' . $item;
+            } else {
+                $query = $query . $key . '=' . $item . '&&';
                 $index++;
             }
         }
-        return redirect('/repairs/search/'.$query);
+        return redirect('/repairs/search/' . $query);
     }
 
     public function update(Repair $repair, Request $request)
     {
         $data = $request->all();
-
-
 
 
         if ($data['status'] == 'completed' && ($repair->status == 'declined' || $repair->status == 'in-work')) {
@@ -635,16 +639,24 @@ class RepairsController extends Controller
 
         ]);
 
-        if(array_key_exists('master_boost',$data)){
-            $repair->master_boost=true;
+        if (array_key_exists('master_boost', $data)) {
+            $repair->master_boost = true;
+        } else {
+            $repair->master_boost = false;
         }
-        else{
-            $repair->master_boost=false;
+
+        if (array_key_exists('salary_debuff', $data)) {
+            $lead->salary_debuff = true;
+            $lead->save();
+        } else {
+            $lead->salary_debuff = false;
+            $lead->save();
         }
+
 
         $repair->save();
 
-        return (redirect(route('repairs.index')));
+        return (redirect()->back());
     }
 
 
@@ -851,7 +863,6 @@ class RepairsController extends Controller
     }
 
 
-
     public function expenseMaterialShow(Request $request)
     {
         if ($request->query('date')) {
@@ -942,10 +953,13 @@ class RepairsController extends Controller
         $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
         $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
 
+        $refundRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'refund');
 
         $totalRepairs = 0;
         $totalDeclined = 0;
         $totalCompleted = 0;
+
+        $totalRefund = 0;
 
         foreach ($monthRepairs as $repair) {
             $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
@@ -964,6 +978,13 @@ class RepairsController extends Controller
             $days[$day - 1]['completed'] += 1;
             $totalCompleted++;
         }
+
+        foreach ($refundRepairs as $refund) {
+            $day = intval(preg_split("/[^1234567890]/", $refund['repair_date'])[2]);
+            $days[$day - 1]['refund'] += 1;
+            $totalRefund++;
+        }
+
 
         $lexems = preg_split("/[^1234567890]/", $date);
 
@@ -994,7 +1015,6 @@ class RepairsController extends Controller
 
         return view('repair.expense', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck'));
     }
-
 
 
 }

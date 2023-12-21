@@ -1638,18 +1638,16 @@ class DirectorController extends Controller
         }
         $employers = $temp;
 
+        $totalProductsPercent=0.09;
+
         if ($totalConfirmed < 1000000) {
             $totalSalary = round((50000.0 / (count($days) - $weekends)) * $totalWorkDays);
         } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 2000000) {
             $totalSalary = round($totalConfirmed * 0.09);
+            $totalProductsPercent=0.09;
         } elseif ($totalConfirmed >= 2000000 && $totalConfirmed < 3000000) {
             $totalSalary = round($totalConfirmed * 0.10);
-        } elseif ($totalConfirmed >= 3000000) {
-            if (count($employers) >= 11) {
-                $totalSalary = round($totalConfirmed * 0.11);
-            } else {
-                $totalSalary = round($totalConfirmed * 0.10);
-            }
+            $totalProductsPercent=0.1;
         }
 
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $director->id, "type" => 'minus'])->get();
@@ -1657,9 +1655,23 @@ class DirectorController extends Controller
         foreach ($deductions as $deduction) {
             $totalDeduction += $deduction->amount;
         }
+
+        $lowMargeChecksDeduction=0;
+
+        $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city","=",$director->city()->name],['salary_debuff','!=',false]])->get();
+
+
+        foreach ($lowMargeChecks as $check){
+            $lowMargeChecksDeduction+=$check->repair->check;
+        }
+
+        $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
+
+        
+
 //        dd($totalSalary);
 
-        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalSalary'));
+        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalSalary','lowMargeChecks','lowMargeChecksDeduction'));
     }
 
     public function addWorkDay(User $director, Request $request)
