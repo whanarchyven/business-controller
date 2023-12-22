@@ -171,10 +171,16 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/salary/{user}', [App\Http\Controllers\SalaryController::class, 'getMasterSalary'])->name('director.salary');
 
     Route::get('/avance/week/', [App\Http\Controllers\DirectorController::class, 'avanceView'])->name('director.avance.week');
+
+    Route::get('/avance/week/operator', [App\Http\Controllers\DirectorController::class, 'avanceOperatorView'])->name('director.avance.operator');
+
     Route::get('/avance/month/', [App\Http\Controllers\DirectorController::class, 'avanceMonthView'])->name('director.avance.month');
     Route::post('/avance/week/pay', [App\Http\Controllers\DirectorController::class, 'payAvance'])->name('director.avance.pay');
 
     Route::get('/salary/avance/pay', [App\Http\Controllers\DirectorController::class, 'salaryView'])->name('director.salary.pay');
+
+    Route::get('/salary/avance/operator/pay', [App\Http\Controllers\DirectorController::class, 'operatorSalaryView'])->name('director.salary.pay.operator');
+
     Route::patch('/salary/avance/pay/{user}/', [App\Http\Controllers\DirectorController::class, 'paySalary'])->name('director.salary.payall');
 
 

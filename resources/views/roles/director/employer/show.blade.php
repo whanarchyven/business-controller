@@ -23,7 +23,7 @@
         {{--                @endif--}}
         {{--            @endforeach--}}
         {{--        @endif--}}
-        <p class="fw-bold my-3 fs-3">{{$title}} - {{$city->name}}</p>
+        <p class="fw-bold my-3 fs-3">{{$title}} {{$title=='Операторы'?'':' - '.$city->name}}</p>
         <table class="table  table-bordered table-sm table-secondary">
             <thead class="table-light">
             <tr class="bg-light">

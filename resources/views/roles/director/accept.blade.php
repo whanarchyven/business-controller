@@ -46,7 +46,7 @@
                                            placeholder="Документы" multiple>
                                     <div class="d-flex gap-3 align-items-center">
                                         <input class="form-control btn btn-success w-50" type="submit"/>
-                                        <div onclick="window.location.href='{{route('director.daily')}}'"
+                                        <div onclick="window.location.href='{{route('director.daily').'?date='.$lead->meeting_date}}'"
                                              class="btn w-50 btn-secondary">Назад
                                         </div>
                                     </div>
@@ -76,7 +76,7 @@
                                     <div class="d-flex gap-3 align-items-center">
                                         <input class="form-control btn btn-success w-50" value="Закрыть нулевую"
                                                type="submit"/>
-                                        <div onclick="window.location.href='{{route('director.daily')}}'"
+                                        <div onclick="window.location.href='{{route('director.daily').'?date='.$lead->meeting_date}}'"
                                              class="btn w-50 btn-secondary">Назад
                                         </div>
                                     </div>

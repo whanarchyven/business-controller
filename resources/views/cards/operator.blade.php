@@ -317,7 +317,7 @@
                             {{$user->deductions($date)}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->salary($date)}}
+                            {{$user->salary($date)-$user->payedSalary($date)}}
                         </th>
 
                     </tr>

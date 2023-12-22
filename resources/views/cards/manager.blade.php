@@ -385,7 +385,7 @@
                     <th scope="col" class="fw-normal text-center">ТО Зачёт</th>
                     @foreach($days as $day)
                         @if($day['meetings']!=0)
-                            <th class="fw-normal text-center" scope="col">{{$day['products_confirmed']}}</th>
+                            <th class="fw-normal text-center" scope="col"><a href="/repairs/search?date={{$day['date']}}&&manager_id={{$manager->id}}">{{$day['products_confirmed']}}</a></th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>
                         @endif
@@ -425,7 +425,7 @@
                     <th class="fw-normal text-center" scope="col">{{$lowMargeChecksDeduction}} ({{count($lowMargeChecks)}} шт.)</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round($manager->salary($date))}}</th>
+                        scope="col">{{round($manager->salary($date)-$manager->payedSalary($date))}}</th>
                 </tr>
                 </tbody>
 

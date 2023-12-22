@@ -130,7 +130,7 @@ class DirectorController extends Controller
     {
         $data = \request()->all();
         $user = Auth::user()->id;
-        $data['status'] = 'not-managed';
+//        $data['status'] = 'not-managed';
 
         if (isset($data['measuring'])) {
             $data['measuring'] == 'on' ? $data['measuring'] = true : $data['measuring'] = false;
@@ -140,7 +140,7 @@ class DirectorController extends Controller
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
 
-        if (array_key_exists('check',$data)){
+        if (array_key_exists('check',$data)&&$data['check']!=$lead->check){
             $data['status']='in-work';
         }
 
@@ -510,33 +510,33 @@ class DirectorController extends Controller
         }
 
 
-        if ($data['issued'] != 0 && DirectorWorkday::whereDate('created_at', Carbon::today()->toDateString())->where(["director_id" => Auth::user()->id])->first() == null) {
+        if ($data['issued'] != 0 && DirectorWorkday::whereDate('created_at', $lead->created_at)->where(["director_id" => Auth::user()->id])->first() == null) {
             $director_workday = new DirectorWorkday(["director_id" => Auth::user()->id]);
             $director_workday->save();
         }
 
-        if (EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $lead->getManagerId->id])->first() == null) {
+        if (EmployeerWorkDay::whereDate('created_at', $lead->created_at)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
             $workDay = new EmployeerWorkDay(["user_id" => $lead->getManagerId->id]);
             $workDay->save();
         }
 
-        $managerTodayLeads = Lead::where(["manager_id" => $lead->getManagerId->id])->whereDate('created_at', Carbon::today()->toDateString())->get();
+        $managerTodayLeads = Lead::where(["manager_id" => $lead->getManagerId->id])->whereDate('created_at', $lead->meeting_date)->get();
         $totalCheckToday = 0;
 
         foreach ($managerTodayLeads as $managerTodayLead) {
             $totalCheckToday += $managerTodayLead->issued;
         }
 
-        if ($totalCheckToday >= 15000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . Carbon::today()->toDateString()])->first() == null) {
-            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+        if ($totalCheckToday >= 15000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . $lead->meeting_date])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
-        if ($totalCheckToday >= 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . Carbon::today()->toDateString()])->first() == null) {
-            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 50000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+        if ($totalCheckToday >= 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . $lead->meeting_date])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 50000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
-        if ($totalCheckToday >= 100000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 100000 ' . Carbon::today()->toDateString()])->first() == null) {
-            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 100000 " . Carbon::today()->toDateString(), "city_id" => $lead->getManagerId->city]);
+        if ($totalCheckToday >= 100000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 100000 ' . $lead->meeting_date])->first() == null) {
+            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 100000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
 
@@ -551,7 +551,7 @@ class DirectorController extends Controller
         $lead->issued = 0;
         $lead->save();
 
-        return redirect(route('director.daily'));
+        return redirect(route('director.daily').'?date='.Carbon::createFromDate($lead->created_at)->toDateString());
     }
 
     public function nomenclature()
@@ -1667,7 +1667,7 @@ class DirectorController extends Controller
 
         $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
 
-        
+
 
 //        dd($totalSalary);
 
@@ -1808,6 +1808,115 @@ class DirectorController extends Controller
 
         return view('roles.director.avance', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
     }
+
+
+    public function avanceOperatorView(Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+
+        $director = Auth::user();
+
+        if ($director->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = $director->city();
+        }
+
+//        dd($director->city());
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+
+
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+        $employers = User::where(["city" => $city->id])->get();
+        $managers = array();
+        $directors = array();
+        $operators = array();
+        $masters = array();
+        $coordinators = array();
+        foreach ($employers as $employer) {
+            if ($employer->hasRole('manager')) {
+                array_push($managers, $employer);
+            } elseif ($employer->hasRole('director')) {
+                array_push($directors, $employer);
+            } elseif ($employer->hasRole('operator')) {
+                array_push($operators, $employer);
+            } elseif ($employer->hasRole('master')) {
+                array_push($masters, $employer);
+            } elseif ($employer->hasRole('coordinator')) {
+                array_push($coordinators, $employer);
+            }
+        }
+
+        return view('roles.director.avance_operator', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
+    }
+
 
 
     public function avanceMonthView(Request $request)
@@ -2051,6 +2160,115 @@ class DirectorController extends Controller
 
         return view('roles.director.salary', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
     }
+
+
+
+    public function operatorSalaryView(Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+
+        $director = Auth::user();
+
+        if ($director->isAdmin) {
+            $city = Session::get('city');
+        } else {
+            $city = $director->city();
+        }
+
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+
+
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+        $employers = User::where(["city" => $city->id])->get();
+        $managers = array();
+        $directors = array();
+        $operators = array();
+        $masters = array();
+        $coordinators = array();
+        foreach ($employers as $employer) {
+            if ($employer->hasRole('manager')) {
+                array_push($managers, $employer);
+            } elseif ($employer->hasRole('director')) {
+                array_push($directors, $employer);
+            } elseif ($employer->hasRole('operator')) {
+                array_push($operators, $employer);
+            } elseif ($employer->hasRole('master')) {
+                array_push($masters, $employer);
+            } elseif ($employer->hasRole('coordinator')) {
+                array_push($coordinators, $employer);
+            }
+        }
+
+        return view('roles.director.salary_operator', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
+    }
+
 
     public function paySalary(User $user, Request $request)
     {

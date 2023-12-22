@@ -24,6 +24,7 @@ class SalaryController extends Controller
         $yearTemp = preg_split("/[^1234567890]/", $date)[0];
         $monthTemp = preg_split("/[^1234567890]/", $date)[1];
         $salary = Salary::where(["month" => $monthTemp, "year" => $yearTemp, "user_id" => $user->id])->first();
+        $city_id = $user->city;
         if ($salary) {
             $salary->salary += $money;
             $salary->save();
@@ -40,11 +41,11 @@ class SalaryController extends Controller
             $state = TransactionState::getByCode('2.01.2.2.');
         } elseif ($user->hasRole('operator')) {
             $state = TransactionState::getByCode('2.01.2.10.');
+            $city_id=999;
         }
-        $desc = 'Выплата аванса ' . $user->name . ' ' . Carbon::today()->toDateString();
+        $desc = 'Выплата  ' . $user->name . ' ' . Carbon::today()->toDateString();
         $value = $money;
         $responsible = Auth::user()->id;
-        $city_id = $user->city;
         $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, '');
     }
 
@@ -160,7 +161,7 @@ class SalaryController extends Controller
         $lowMargeChecksDeduction=0;
 
         $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city","=",$user->city()->name],['salary_debuff','!=',false]])->get();
-        
+
 
         foreach ($lowMargeChecks as $check){
             $lowMargeChecksDeduction+=$check->repair->check;
@@ -195,7 +196,7 @@ class SalaryController extends Controller
 
         $completedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where(["status" => 'completed', "manager_id" => $user->id])->get();
 
-        $declinedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where(["status" => 'declined', "manager_id" => $user->id])->get();
+        $declinedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["status","=",'declined'],['manager_id','=',$user->id],['entered','!=',null]])->get();
 
 //        dd($declinedLeads);
 
@@ -218,6 +219,8 @@ class SalaryController extends Controller
                 $totalEnter++;
             }
         }
+
+//        dd($totalEnter);
 //        dd($totalEnter);
 
         foreach ($declinedLeads as $lead) {

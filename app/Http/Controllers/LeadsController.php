@@ -537,7 +537,7 @@ class LeadsController extends Controller
 
         $user = Auth::user()->id;
         $data['operator_id'] = $user;
-        $data['status'] = 'not-managed';
+//        $data['status'] = 'not-managed';
 
 
         if (isset($data['measuring'])) {
@@ -548,7 +548,7 @@ class LeadsController extends Controller
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
 
-        if (array_key_exists('check',$data)){
+        if (array_key_exists('check',$data)&&$data['check']!=$lead->check){
             $data['status']='in-work';
         }
 
@@ -680,11 +680,11 @@ class LeadsController extends Controller
         $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         switch ($type) {
             case 'all':
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['manager_id', '=', $manager_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['manager_id', '=', $manager_id],["entered","!=",null]])->get();
             case 'successful':
                 return Lead::where([['issued', '>', 0], ['manager_id', '=', $manager_id]])->whereBetween('created_at', [$startDate, $endDate])->get();
             case 'declined':
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['manager_id', '=', $manager_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['manager_id', '=', $manager_id],['entered',"!=",null]])->get();
             default:
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->get();
         }
@@ -837,6 +837,7 @@ class LeadsController extends Controller
                 $totalEnter++;
             }
             if($lead->check!=null){
+//                dd($lead,$day);
                 $days[$day - 1]['successful'] += 1;
                 $totalSuccessful++;
             }
@@ -1025,7 +1026,7 @@ class LeadsController extends Controller
         [$manager, $manager_statuses] = app('App\Http\Controllers\CoordinatorController')->getManagerCard($manager->id);
 
 
-        $leads = Lead::where([['manager_id', '=', $manager->id], ['issued', '=', null]])->get();
+        $leads = Lead::where([['manager_id', '=', $manager->id], ['issued', '=', null],['status',"!=","declined"]])->get();
 
 
         if ($manager->hasRole('manager')) {

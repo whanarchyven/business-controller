@@ -110,50 +110,8 @@
 {{--                </table>--}}
 {{--            </div>--}}
 
-{{--            <div class="mt-4">--}}
-{{--                <p class="fw-bold fs-2">Операторы</p>--}}
-{{--                <table class="table table-bordered table-sm table-secondary ">--}}
-{{--                    <thead>--}}
-{{--                    <tr>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>--}}
-{{--                        <th class="p-2 fw-bold text-left" scope="col"></th>--}}
-{{--                    </tr>--}}
-{{--                    </thead>--}}
-{{--                    <tbody>--}}
-{{--                    @foreach($operators as $operator)--}}
-{{--                        <tr class="table-light">--}}
-{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->name}}</th>--}}
-{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>--}}
-{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->payedSalary($date)}}</th>--}}
-{{--                            <th class="p-2 fw-bold text-left summ {{$operator->salary($date)-$operator->payedSalary($date)<0?'text-danger':'text-black'}}"--}}
-{{--                                scope="col">{{$operator->salary($date)-$operator->payedSalary($date)}}</th>--}}
-{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
-{{--                                <input class="form-control" required--}}
-{{--                                       value="5000" onchange="checkPay()"--}}
-{{--                                       --}}{{--                                       max="{{$operator->salary($date)}}"--}}
-{{--                                       type="number"--}}
-{{--                                       name="operator{{$loop->index}}"/>--}}
-{{--                                <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">--}}
-{{--                            </th>--}}
-{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
-{{--                                <div onclick="window.location.href='{{route('director.operatorcard',$operator)}}'"--}}
-{{--                                     class="btn w-100 btn-warning">--}}
-{{--                                    Карточка--}}
-{{--                                </div>--}}
-{{--                            </th>--}}
-{{--                        </tr>--}}
-{{--                    @endforeach--}}
-{{--                    </tbody>--}}
-
-{{--                </table>--}}
-{{--            </div>--}}
-
             <div class="mt-4">
-                <p class="fw-bold fs-2">Мастера</p>
+                <p class="fw-bold fs-2">Операторы</p>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>
@@ -166,22 +124,23 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($masters as $master)
+                    @foreach($operators as $operator)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->name}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left summ {{$master->salary($date)-$master->payedSalary($date)<0?'text-danger':'text-black'}}"
-                                scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->name}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->payedSalary($date)}}</th>
+                            <th class="p-2 fw-bold text-left summ {{$operator->salary($date)-$operator->payedSalary($date)<0?'text-danger':'text-black'}}"
+                                scope="col">{{$operator->salary($date)-$operator->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <input onchange="checkPay()" required class="form-control"
-                                       value="5000"
-                                       {{--                                       max="{{$master->salary($date)}}" type="number"--}}
-                                       name="master{{$loop->index}}"/>
-                                <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">
+                                <input class="form-control" required
+                                       value="5000" onchange="checkPay()"
+                                                                              max="{{$operator->salary($date)}}"
+                                       type="number"
+                                       name="operator{{$loop->index}}"/>
+                                <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <div onclick="window.location.href='{{route('director.mastercard',$master)}}'"
+                                <div onclick="window.location.href='{{route('director.operatorcard',$operator)}}'"
                                      class="btn w-100 btn-warning">
                                     Карточка
                                 </div>
@@ -192,6 +151,47 @@
 
                 </table>
             </div>
+
+{{--            <div class="mt-4">--}}
+{{--                <p class="fw-bold fs-2">Мастера</p>--}}
+{{--                <table class="table table-bordered table-sm table-secondary ">--}}
+{{--                    <thead>--}}
+{{--                    <tr>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Аванс</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col"></th>--}}
+{{--                    </tr>--}}
+{{--                    </thead>--}}
+{{--                    <tbody>--}}
+{{--                    @foreach($masters as $master)--}}
+{{--                        <tr class="table-light">--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->name}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left summ {{$master->salary($date)-$master->payedSalary($date)<0?'text-danger':'text-black'}}"--}}
+{{--                                scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                <input onchange="checkPay()" required class="form-control"--}}
+{{--                                       value="5000"--}}
+{{--                                       --}}{{--                                       max="{{$master->salary($date)}}" type="number"--}}
+{{--                                       name="master{{$loop->index}}"/>--}}
+{{--                                <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">--}}
+{{--                            </th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                <div onclick="window.location.href='{{route('director.mastercard',$master)}}'"--}}
+{{--                                     class="btn w-100 btn-warning">--}}
+{{--                                    Карточка--}}
+{{--                                </div>--}}
+{{--                            </th>--}}
+{{--                        </tr>--}}
+{{--                    @endforeach--}}
+{{--                    </tbody>--}}
+
+{{--                </table>--}}
+{{--            </div>--}}
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
                 @if(explode('-',$date)[1]==explode('-',\Illuminate\Support\Carbon::today()->toDateString())[1])

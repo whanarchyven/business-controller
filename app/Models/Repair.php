@@ -48,7 +48,7 @@ class Repair extends Model
         return $summ;
     }
 
-    public function getResult(string $clientName='',string $address='',string $phone='',int $manager_id=0,int $master_id=0,string $status)
+    public function getResult(string $clientName='',string $address='',string $phone='',int $manager_id=0,int $master_id=0,string $status,string $date)
     {
         $query = [];
         if ($clientName) {
@@ -62,6 +62,9 @@ class Repair extends Model
         }
         if($manager_id!=0){
             array_push($query,['manager_id','=',$manager_id]);
+        }
+        if($date!=''){
+            array_push($query,['created_at','=',$date]);
         }
 
 //        if ($date) {
