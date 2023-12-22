@@ -64,7 +64,7 @@ class Repair extends Model
             array_push($query,['manager_id','=',$manager_id]);
         }
         if($date!=''){
-            array_push($query,['created_at','=',$date]);
+            array_push($query,['meeting_date','=',$date]);
         }
 
 //        if ($date) {
@@ -80,6 +80,8 @@ class Repair extends Model
         else{
             $leads=Lead::where($query)->get();
         }
+
+//        dd($leads,$date,$manager_id,Lead::where(["created_at"=>]));
 
         $result=[];
 
