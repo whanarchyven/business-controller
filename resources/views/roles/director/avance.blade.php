@@ -168,7 +168,7 @@
                     <tbody>
                     @foreach($masters as $master)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->name}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$master->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$master->salary($date)-$master->payedSalary($date)<0?'text-danger':'text-black'}}"

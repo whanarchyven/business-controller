@@ -40,12 +40,19 @@
                     @foreach($managersCalendar as $manager)
                         <tr>
                             <th class="fw-normal p-2 table-light text-center" scope="col">{{$loop->iteration}}</th>
-                            <th class="fw-normal p-2 table-light text-left" scope="col">{{$manager[0]->name}}</th>
+                            <th class="fw-normal p-2 table-light text-left" scope="col">{{$manager[0]->shortname()}}</th>
                             <th class="fw-normal p-2 table-light text-left" scope="col">{{\App\Models\City::where(['id'=>$manager[0]->city])->first()->name}}</th>
                             <th class="fw-bold p-2 table-light text-left" scope="col">{{$manager['productsSelled']}}</th>
                             <th class="fw-bold p-2 table-light text-left" scope="col">{{$manager['productsConfirmed']}}</th>
                         </tr>
                     @endforeach
+                    <tr>
+                        <th class="fw-normal p-2 text-center" scope="col"></th>
+                        <th class="fw-bold p-2 text-left" scope="col">Итого</th>
+                        <th class="fw-normal p-2 text-center" scope="col"></th>
+                        <th class="fw-bold p-2 text-left" scope="col">{{$totalSelled}}</th>
+                        <th class="fw-bold p-2 text-left" scope="col">{{$totalConfirmed}}</th>
+                    </tr>
                     </tbody>
 
                 </table>

@@ -60,7 +60,7 @@
                                         <p>Вышел <br/> {{$lead->exited}}</p>
                                     </div>
                                     @if($lead->manager_id)
-                                        <p class="fw-bold">{{$lead->getManagerId->name}}</p>
+                                        <p class="fw-bold">{{$lead->getManagerId->shortname()}}</p>
                                     @else
                                         <p class="fw-bold">Не назначено</p>
                                     @endif

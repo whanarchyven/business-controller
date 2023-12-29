@@ -404,6 +404,9 @@
                 <tr>
                     <th class="fw-bold text-center" scope="col">% ТО</th>
                     <th class="fw-bold text-center" scope="col">% отказ</th>
+                    <th class="fw-bold text-center" scope="col">% стажёр</th>
+                    <th class="fw-bold text-center" scope="col">% конверсия</th>
+                    <th class="fw-bold text-center" scope="col">{{'% >400 000'}}</th>
                     <th class="fw-bold text-center" scope="col">Оклад</th>
                     <th class="fw-bold text-center" scope="col">Рабочих дней</th>
                     <th class="fw-bold text-center" scope="col">Факт. оклад</th>
@@ -415,8 +418,11 @@
                 <tbody>
                 <tr>
                     <th class="fw-normal text-center"
-                        scope="col">{{$totalConfirmed*$totalProductsPercent-($totalDeclined<3?$totalConfirmed*0.01:0)}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$totalDeclined<3?$totalConfirmed*0.01:0}}</th>
+                        scope="col">{{$totalConfirmed*0.1}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalDeclinedRepairs<   3?$totalConfirmed*0.01:0}}</th>
+                    <th class="fw-normal text-center" scope="col">{{count($manager->stagers($date))?$totalConfirmed*0.01:0}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$conversion>=0.5?$totalConfirmed*0.01:0}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{$oklad}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>

@@ -64,12 +64,21 @@
                                         <label for="role">Должность</label>
                                         <select onchange="updateSubForm()" id="role" class="form-control" name="role">
                                             <option value="manager">Менеджер</option>
-                                            <option value="coordinator">Координатор</option>
                                             <option value="master">Мастер</option>
                                             @if($director->isAdmin)
+                                                <option value="coordinator">Координатор</option>
                                                 <option value="operator">Оператор</option>
                                                 <option value="director">Руководитель</option>
                                             @endif
+                                        </select>
+                                    </div>
+
+                                    <div id="mentor-form" class="form-group my-2 d-none">
+                                        <label for="role">Ментор (наставник)</label>
+                                        <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">
+                                            @foreach($managers as $manager)
+                                                <option value={{$manager->id}}>{{$manager->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -137,16 +146,24 @@
                                 console.log(select.value);
                                 if (select.value == 'coordinator') {
                                     document.getElementById('city-form').className = 'd-none';
+                                    document.getElementById('mentor-form').className = 'd-none'
                                     document.getElementById('city-form-coordinator').className = 'form-group my-2';
+                                }
+                                else if(select.value=='manager'){
+                                    document.getElementById('city-form').className = 'form-group my-2';
+                                    document.getElementById('city-form-coordinator').className = 'd-none';
+                                    document.getElementById('mentor-form').className = 'form-group my-2'
                                 }
                                 else {
                                     document.getElementById('city-form').className = 'form-group my-2';
                                     document.getElementById('city-form-coordinator').className = 'd-none';
+                                    document.getElementById('mentor-form').className = 'd-none'
                                 }
                             }
-
                             document.querySelector("#role").addEventListener('select', updateSubForm)
+                            updateSubForm();
                         </script>
+
                     </div>
                 </div>
             </div>

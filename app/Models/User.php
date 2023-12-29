@@ -69,6 +69,19 @@ class User extends Authenticatable
         return $this->belongsTo(City::class, 'city')->first();
     }
 
+    public function stagers($date){
+        return User::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->where(["mentor_id"=>$this->id])->get();
+    }
+
+    public function shortname(){
+        if(count(explode(' ',$this->name))>=3){
+            return explode(' ',$this->name)[0].' '.explode(' ',$this->name)[1];
+        }
+        else{
+            return $this->name;
+        }
+    }
+
 
     public function coordinatorCity()
     {

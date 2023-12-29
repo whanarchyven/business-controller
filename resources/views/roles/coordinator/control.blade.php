@@ -35,7 +35,6 @@
                             <thead class="table-light">
                             <tr class="bg-light">
                                 <th class="fw-bold text-left" scope="col">Встречи</th>
-                                <th class="fw-bold text-left" scope="col">ДОРы</th>
                                 <th class="fw-bold text-left" scope="col">Отказы</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Продано</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Зачёт</th>
@@ -44,7 +43,6 @@
                             <tbody>
                             <tr>
                                 <th class="fw-bold text-left" scope="col">{{$meetings}}</th>
-                                <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($declined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_selled}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_issued}}</th>
@@ -60,7 +58,6 @@
                             <thead class="table-light">
                             <tr class="bg-light">
                                 <th class="fw-bold text-left" scope="col">Встречи</th>
-                                <th class="fw-bold text-left" scope="col">ДОРы</th>
                                 <th class="fw-bold text-left" scope="col">Отказы</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Продано</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Зачёт</th>
@@ -69,7 +66,6 @@
                             <tbody>
                             <tr>
                                 <th class="fw-bold text-left" scope="col">{{$todayMeetings}}</th>
-                                <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($todayDeclined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsSelled}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsIssued}}</th>
@@ -239,7 +235,6 @@
                             <thead class="table-light">
                             <tr class="bg-light">
                                 <th class="fw-bold text-left" scope="col">Встречи</th>
-                                <th class="fw-bold text-left" scope="col">ДОРы</th>
                                 <th class="fw-bold text-left" scope="col">Отказы</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Продано</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Зачёт</th>
@@ -248,7 +243,6 @@
                             <tbody>
                             <tr>
                                 <th class="fw-bold text-left" scope="col">{{$meetings}}</th>
-                                <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($declined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_selled}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_issued}}</th>
@@ -264,7 +258,6 @@
                             <thead class="table-light">
                             <tr class="bg-light">
                                 <th class="fw-bold text-left" scope="col">Встречи</th>
-                                <th class="fw-bold text-left" scope="col">ДОРы</th>
                                 <th class="fw-bold text-left" scope="col">Отказы</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Продано</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Зачёт</th>
@@ -273,7 +266,6 @@
                             <tbody>
                             <tr>
                                 <th class="fw-bold text-left" scope="col">{{$todayMeetings}}</th>
-                                <th class="fw-bold text-left" scope="col">-</th>
                                 <th class="fw-bold text-left" scope="col">{{count($todayDeclined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsSelled}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$todayProductsIssued}}</th>

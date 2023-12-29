@@ -52,7 +52,7 @@
                 <tbody>
                 @foreach($managers_gsm as $mg)
                     <tr class="gsm_row{{$loop->index}} border-2 border-black my-3">
-                        <th class="fw-normal p-3 text-center" scope="col">{{$mg[0]->name}}</th>
+                        <th class="fw-normal p-3 text-center" scope="col">{{$mg[0]->shortname()}}</th>
                         @foreach($mg[1] as $mg_day)
                             @if($mg_day['gsm']==0)
                                 <th class="fw-normal p-3 text-center" scope="col">

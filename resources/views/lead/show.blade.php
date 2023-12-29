@@ -109,7 +109,7 @@
                             <th class="fw-normal text-left" scope="col">{{$lead->jobType->name}}</th>
                             <th class="fw-bold text-left" scope="col">
                                 @if($lead->manager_id)
-                                    <p class="fw-normal">{{$lead->getManagerId->name}}</p>
+                                    <p class="fw-normal">{{$lead->getManagerId->shortname()}}</p>
                                 @else
                                     <p class="fw-normal">Не назначено</p>
                                 @endif
@@ -129,9 +129,22 @@
                             <th class="fw-bold text-left" scope="col">
                                 <button onclick="window.location='{{route('leads.edit',$lead->id)}}'"
                                         class="bg-primary text-white rounded-2 w-100 p-2">
-                                    Редатировать
+                                    Редактировать
                                 </button>
-                                <p class="fw-normal">{{$lead->getOperatorId->name}}</p>
+                                @if($lead->status=='not-managed'&&\Illuminate\Support\Facades\Auth::user()->hasRole('director'))
+                                    <form id="delete-lead" class="flex d-flex my-2 flex-column"
+                                          enctype="multipart/form-data"
+                                          action="{{route('director.lead.delete',$lead->id)}}"
+                                          method="post">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="form-group d-flex flex-column">
+                                            <input type="submit" class="btn btn-danger w-auto"
+                                                   value="Удалить">
+                                        </div>
+                                    </form>
+                                @endif
+                                <p class="fw-normal">{{$lead->getOperatorId->shortname()}}</p>
                             </th>
                         </tr>
                     @endforeach

@@ -109,7 +109,7 @@
                                 {{$transaction->balance_stamp}}
                             </th>
                             <th class="fw-bold text-left" scope="col">
-                                {{$transaction->user->name}}
+                                {{$transaction->user->shortname()}}
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <button

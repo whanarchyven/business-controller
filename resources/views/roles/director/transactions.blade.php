@@ -73,7 +73,7 @@
                                 {{$transaction->balance_stamp}}
                             </th>
                             <th class="fw-bold text-left" scope="col">
-                                {{$transaction->user->name}}
+                                {{$transaction->user->shortname()}}
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <button
@@ -129,6 +129,10 @@
                             <div class="form-group col my-2">
                                 <label for="value">Сумма транзакции</label>
                                 <input required type="number" class="form-control" id='value' name="value">
+                            </div>
+                            <div class="form-group col my-2">
+                                <label for="value">Комментарий</label>
+                                <input type="text" class="form-control" id='description' name="description">
 
                             </div>
                             <div class="d-flex flex-column col">
@@ -141,7 +145,7 @@
                             </div>
                             <div class="form-group my-2">
                                 <input type="submit" class="form-control bg-primary text-white fw-bold"
-                                       value="Отправить">
+                                       value="Создать транзакцию">
                             </div>
                         </div>
                     </form>

@@ -253,10 +253,11 @@
                                 <a class="dropdown-item" href="{{route('director.employers.operators')}}">
                                     Оператор
                                 </a>
+                                <a class="dropdown-item" href="{{route('director.employers.coordinators')}}">
+                                    Координатор
+                                </a>
                             @endif
-                            <a class="dropdown-item" href="{{route('director.employers.coordinators')}}">
-                                Координатор
-                            </a>
+
                             <a class="dropdown-item" href="{{route('director.employers.managers')}}">
                                 Менеджер
                             </a>

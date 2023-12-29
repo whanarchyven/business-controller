@@ -44,6 +44,12 @@
                             <th class="fw-bold p-2 table-light text-left" scope="col">{{$city['productsConfirmed']}}</th>
                         </tr>
                     @endforeach
+                    <tr>
+                        <th class="fw-normal p-2 text-center" scope="col"></th>
+                        <th class="fw-bold p-2 text-left" scope="col">Итого</th>
+                        <th class="fw-bold p-2 text-left" scope="col">{{$totalSelled}}</th>
+                        <th class="fw-bold p-2 text-left" scope="col">{{$totalConfirmed}}</th>
+                    </tr>
                     </tbody>
 
                 </table>

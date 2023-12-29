@@ -7,7 +7,7 @@
         <div class="d-flex align-items-center justify-content-center gap-3 my-3">
             <div class="d-flex flex-column align-items-center gap-3">
 
-                <p class="fw-bold mb-0 fs-3">{{$manager->name}}</p>
+                <p class="fw-bold mb-0 fs-3">{{$manager->shortname()}}</p>
                 @role('coordinator')
                 <button id="status"
                         class="btn h-25 manager-{{$manager->status}}">{{$manager_statuses[$manager->status]}}
@@ -303,8 +303,50 @@
                                                value="Закрыть встречу">
                                     </div>
                                 </form>
+
+                                <div class="form-group d-flex flex-column">
+                                    <label for="check">Сумма</label>
+                                    <input required class="form-control w-100 my-2" name="check" type="number"/>
+                                    {{--                                                <label for="note">Примечание</label>--}}
+                                    {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
+                                    {{--                                                          type="text"></textarea>--}}
+                                    {{--                                                <label for="documents">Документы</label>--}}
+                                    {{--                                                <input enctype="multipart/form-data" type="file"--}}
+                                    {{--                                                       class="my-2 form-control"--}}
+                                    {{--                                                       name="documents[]"--}}
+                                    {{--                                                       placeholder="Документы" multiple>--}}
+                                    <input type="submit" class="btn btn-success w-auto"
+                                           value="Закрыть встречу">
+                                </div>
+
+                            @elseif($lead->check)
+                                <div onclick="changeCheck()" class="change-check-btn btn-success btn" id="change-check-btn">
+                                    Изменить сумму
+                                </div>
+                                <form id="change-check-form" id="change-check-form" class="d-none"
+                                      enctype="multipart/form-data"
+                                      action="{{route('director.manager.leads.close',$lead->id)}}"
+                                      method="post">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="form-group d-flex flex-column">
+                                        <label for="check">Сумма</label>
+                                        <input required class="form-control w-100 my-2" name="check" type="number"/>
+                                        {{--                                                <label for="note">Примечание</label>--}}
+                                        {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
+                                        {{--                                                          type="text"></textarea>--}}
+                                        {{--                                                <label for="documents">Документы</label>--}}
+                                        {{--                                                <input enctype="multipart/form-data" type="file"--}}
+                                        {{--                                                       class="my-2 form-control"--}}
+                                        {{--                                                       name="documents[]"--}}
+                                        {{--                                                       placeholder="Документы" multiple>--}}
+                                        <input type="submit" class="btn btn-success w-auto"
+                                               value="Изменить сумму">
+                                    </div>
+                                </form>
                             @endif
-                        @endif
+
+                            @endif
                     </th>
                 </tr>
             @endforeach
@@ -549,7 +591,33 @@
                                                value="Закрыть встречу">
                                     </div>
                                 </form>
+                            @elseif($lead->check)
+                                <div onclick="changeCheck()" class="change-check-btn btn-success btn" id="change-check-btn">
+                                    Изменить сумму
+                                </div>
+                                <form id="change-check-form" id="change-check-form" class="d-none"
+                                      enctype="multipart/form-data"
+                                      action="{{route('director.manager.leads.close',$lead->id)}}"
+                                      method="post">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="form-group d-flex flex-column">
+                                        <label for="check">Сумма</label>
+                                        <input required class="form-control w-100 my-2" name="check" type="number"/>
+                                        {{--                                                <label for="note">Примечание</label>--}}
+                                        {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
+                                        {{--                                                          type="text"></textarea>--}}
+                                        {{--                                                <label for="documents">Документы</label>--}}
+                                        {{--                                                <input enctype="multipart/form-data" type="file"--}}
+                                        {{--                                                       class="my-2 form-control"--}}
+                                        {{--                                                       name="documents[]"--}}
+                                        {{--                                                       placeholder="Документы" multiple>--}}
+                                        <input type="submit" class="btn btn-success w-auto"
+                                               value="Изменить сумму">
+                                    </div>
+                                </form>
                             @endif
+
                         @endif
                     </th>
                 </tr>
@@ -559,6 +627,14 @@
         </table>
 
         @endrole
+
+        <script>
+            function changeCheck(){
+                document.getElementById('change-check-btn').className="d-none";
+                document.getElementById('change-check-form').className="flex d-flex flex-column";
+
+            }
+        </script>
 
 
         {{--            <div class="bd-cyan-500">--}}

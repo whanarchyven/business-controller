@@ -56,6 +56,8 @@ class TransactionController extends Controller
         if(array_key_exists('ismainoffice',$data)){
             $city=City::where(["id"=>999])->first();
         }
+
+
         else{
             if ($user->isAdmin) {
                 $city = \Illuminate\Support\Facades\Session::get('city');
@@ -63,6 +65,16 @@ class TransactionController extends Controller
                 $city = City::where(["id" => $user->city])->first();
             }
         }
+
+        if(array_key_exists('description',$data)&&$data['description']!=''){
+            $description=$data['description'];
+        }
+        else{
+            $description=null;
+        }
+
+//        dd($data);
+
         $state = TransactionState::where(["code" => $data['state']])->first();
 
         $documents = array();
@@ -78,7 +90,7 @@ class TransactionController extends Controller
         }
         $documents = implode('|', $documents);
         if ($data['type']=='receipt') {
-            $receipt = $this->newReceipt($state->id, 'Ручная транзакция: Приход', $data['value'], $user->id, $city->id, $documents);
+            $receipt = $this->newReceipt($state->id, 'Ручная транзакция: Приход.| '.($description?$description:''), $data['value'], $user->id, $city->id, $documents);
         } else {
             if ($state->code=='3.0.'){
                 $expense = $this->newExpense($state->id, 'Перевод в главный офис', $data['value'], $user->id, $city->id, $documents);
@@ -103,7 +115,7 @@ class TransactionController extends Controller
                 $perevod =$this->newReceipt($newState->id, 'Приход от главного офиса', $data['value'], $user->id, $newCity->id, $documents);
             }
             else{
-                $expense = $this->newExpense($state->id, 'Ручная транзакция: Расход', $data['value'], $user->id, $city->id, $documents);
+                $expense = $this->newExpense($state->id, 'Ручная транзакция: Расход.| '.($description?$description:''), $data['value'], $user->id, $city->id, $documents);
             }
         }
 

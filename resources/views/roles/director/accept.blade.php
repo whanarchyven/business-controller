@@ -45,7 +45,7 @@
                                            name="documents[]"
                                            placeholder="Документы" multiple>
                                     <div class="d-flex gap-3 align-items-center">
-                                        <input class="form-control btn btn-success w-50" type="submit"/>
+                                        <input class="form-control btn btn-success w-50" value="Принять" type="submit"/>
                                         <div onclick="window.location.href='{{route('director.daily').'?date='.$lead->meeting_date}}'"
                                              class="btn w-50 btn-secondary">Назад
                                         </div>
@@ -74,7 +74,7 @@
                                         @endforeach
                                     </select>
                                     <div class="d-flex gap-3 align-items-center">
-                                        <input class="form-control btn btn-success w-50" value="Закрыть нулевую"
+                                        <input class="form-control btn btn-success w-50" value="Принять нулевую"
                                                type="submit"/>
                                         <div onclick="window.location.href='{{route('director.daily').'?date='.$lead->meeting_date}}'"
                                              class="btn w-50 btn-secondary">Назад

@@ -282,7 +282,7 @@
                             </div>
                             <div class="form-group my-2">
                                 <input type="submit" class="form-control bg-primary text-white fw-bold"
-                                       value="Отправить">
+                                       value="Обновить">
                             </div>
                             <div class="form-group my-2">
                                 <div onclick="window.location.href='/repairs'" class="form-control bg-secondary d-flex justify-content-center cursor-pointer text-white fw-bold">
@@ -295,17 +295,43 @@
 
 
                         <script>
+
+                            let docs_show=false;
+                            let status_show=false;
+
                             document.getElementById('status').addEventListener('click', () => {
-                                document.getElementById('status-panel').className = 'd-flex gap-2 w-100 justify-content-start flex-row align-items-center'
-                                if (document.getElementById('documents-panel')) {
-                                    document.getElementById('documents-panel').className = 'd-none'
+                                if(!status_show){
+                                    document.getElementById('status-panel').className = 'd-flex gap-2 w-100 justify-content-start flex-row align-items-center'
+                                    if (document.getElementById('documents-panel')) {
+                                        document.getElementById('documents-panel').className = 'd-none'
+                                    }
+                                    docs_show=false;
+                                    status_show=true;
+                                }
+                                else{
+                                    document.getElementById('status-panel').className = 'd-none'
+                                    if (document.getElementById('documents-panel')) {
+                                        document.getElementById('documents-panel').className = 'd-none'
+                                    }
+                                    status_show=false;
                                 }
                             })
                             document.getElementById('docs').addEventListener('click', () => {
-                                document.getElementById('documents-panel').className = 'd-flex flex-column gap-3 mt-4'
-                                if (document.getElementById('status-panel')) {
-                                    document.getElementById('status-panel').className = 'd-none'
-                                }
+                               if(!docs_show){
+                                   document.getElementById('documents-panel').className = 'd-flex flex-column gap-3 mt-4'
+                                   if (document.getElementById('status-panel')) {
+                                       document.getElementById('status-panel').className = 'd-none'
+                                   }
+                                   docs_show=true;
+                                   status_show=false;
+                               }
+                               else{
+                                   document.getElementById('documents-panel').className = 'd-none'
+                                   if (document.getElementById('status-panel')) {
+                                       document.getElementById('status-panel').className = 'd-none'
+                                   }
+                                   docs_show=false;
+                               }
                             })
 
                             function openForm() {

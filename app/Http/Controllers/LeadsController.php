@@ -823,7 +823,7 @@ class LeadsController extends Controller
         $totalSuccessful = 0;
         $totalNull = 0;
         $totalEnter = 0;
-
+        $totalDeclinedRepairs=0;
 
 
         foreach ($monthLeads as $lead) {
@@ -841,7 +841,13 @@ class LeadsController extends Controller
                 $days[$day - 1]['successful'] += 1;
                 $totalSuccessful++;
             }
+            if($lead->repair&&($lead->repair->status=='refund'||$lead->repair->status=='declined')){
+                $totalDeclinedRepairs++;
+            }
         }
+
+//        dd($totalDeclinedRepairs);
+
 
         foreach ($declined_leads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
@@ -851,6 +857,8 @@ class LeadsController extends Controller
                 $totalNull++;
             }
         }
+
+
 
 //        dd($totalDeclined);
 
@@ -968,7 +976,7 @@ class LeadsController extends Controller
 
         $totalProductsPercent = 0.1;
         if ($totalEnter != 0) {
-            $conversion = $totalEnter / ($totalNull + $totalEnter);
+            $conversion =( $totalEnter-$totalNull) / ($totalEnter);
         } else {
             $conversion = 0;
         }
@@ -980,12 +988,17 @@ class LeadsController extends Controller
         if ($conversion >= 0.5) {
             $totalProductsPercent += 0.01;
         }
-        if ($totalDeclined < 3) {
+        if ($totalDeclinedRepairs < 3) {
             $totalProductsPercent += 0.01;
+        }
+        if(count($manager->stagers($date))>=1){
+            $totalProductsPercent+=0.01;
         }
         if ($totalConfirmed >= 400000) {
             $totalProductsPercent += 0.01;
         }
+
+//        dd($totalProductsPercent);
 
         $totalProductsSalary = $totalConfirmed * $totalProductsPercent;
 
@@ -999,11 +1012,15 @@ class LeadsController extends Controller
 
         $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
 
+
         $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
+
 //        dd($okladSallary);
 
+//        dd($totalProductsPercent,$totalConfirmed);
+
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary','lowMargeChecksDeduction','lowMargeChecks'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary','lowMargeChecksDeduction','lowMargeChecks','totalDeclinedRepairs','conversion'));
         }
 
 
@@ -1037,7 +1054,9 @@ class LeadsController extends Controller
     }
 
     public function deleteLead(Lead $lead){
-        $lead->repair->delete();
+        if($lead->repair){
+            $lead->repair->delete();
+        }
         $lead->delete();
         return redirect()->back();
     }

@@ -170,6 +170,7 @@ class DirectorController extends Controller
         $leads = $this->getMonthLeads(false, $city);
         $declined = $this->getMonthLeads(true, $city);
         $month = $this->getMonth();
+//        dd($leads);
 
         $products_selled = 0;
         $products_issued = 0;
@@ -527,10 +528,15 @@ class DirectorController extends Controller
             $totalCheckToday += $managerTodayLead->issued;
         }
 
-        if ($totalCheckToday >= 15000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . $lead->meeting_date])->first() == null) {
+        if($lead->check>=15000&&$lead->avance>=$lead->check/2){
             $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
+
+//        if ($totalCheckToday >= 15000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 15000 ' . $lead->meeting_date])->first() == null) {
+//            $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
+//            $newBonus->save();
+//        }
         if ($totalCheckToday >= 50000 && BonusManager::where(["user_id" => $lead->getManagerId->id, "reason" => 'Бонус за 50000 ' . $lead->meeting_date])->first() == null) {
             $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 50000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
@@ -926,18 +932,27 @@ class DirectorController extends Controller
 
         $director = Auth::user();
 
-        $users = User::where(["city" => Auth::user()->city])->get();
+        if(Auth::user()->isAdmin){
+            $users = User::where(["city" => Session::get('city')->id])->get();
+        }
+        else{
+            $users = User::where(["city" => Auth::user()->city])->get();
+        }
 
         $coordinators = array();
+        $managers=array();
 
         foreach ($users as $user) {
             if ($user->hasRole('coordinator')) {
                 array_push($coordinators, $user);
             }
+            if($user->hasRole('manager')){
+                array_push($managers,$user);
+            }
         }
 
 
-        return view('roles.director.employer.new', compact('cities', 'coordinators', 'director'));
+        return view('roles.director.employer.new', compact('cities', 'coordinators', 'managers', 'director'));
     }
 
     public function storeNewUser(Request $request)
@@ -986,6 +1001,7 @@ class DirectorController extends Controller
         $newUser->birth_date = $data['birth_date'];
         $newUser->password = bcrypt($result);
         $newUser->city = array_key_exists('city', $data) ? $data['city'] : Auth::user()->city;
+        $newUser->mentor_id=array_key_exists('mentor_id',$data)?$data['mentor_id']:null;
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
@@ -1645,7 +1661,7 @@ class DirectorController extends Controller
         } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 2000000) {
             $totalSalary = round($totalConfirmed * 0.09);
             $totalProductsPercent=0.09;
-        } elseif ($totalConfirmed >= 2000000 && $totalConfirmed < 3000000) {
+        } else  {
             $totalSalary = round($totalConfirmed * 0.10);
             $totalProductsPercent=0.1;
         }
@@ -2556,6 +2572,8 @@ class DirectorController extends Controller
         $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city", '=', $city->name], ["manager_id", "!=", null]])->get();
 
         $logs = array();
+        $totalSelled=0;
+        $totalConfirmed=0;
         foreach ($leads as $lead) {
             $manager = $lead->getManagerId->id;
             $neededObject = array_filter(
@@ -2566,16 +2584,20 @@ class DirectorController extends Controller
             );
             $neededObject = array_key_first($neededObject);
             $managersCalendar[$neededObject]['productsSelled'] += intval($lead->check);
+            $totalSelled+= intval($lead->check);
 
-            $managersCalendar[$neededObject]['productsConfirmed'] += $lead->repair ? intval($lead->repair->check) : 0;
+            $managersCalendar[$neededObject]['productsConfirmed'] += $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
+            $totalConfirmed+= $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
         }
         $managersCalendar = collect($managersCalendar);
 
         $managersCalendar = $managersCalendar->sortByDesc('productsConfirmed');
 
+
+
 //        dd($managersCalendar);
 
-        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'managersCalendar'));
+        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'managersCalendar','totalSelled','totalConfirmed'));
     }
 
 
@@ -2660,12 +2682,17 @@ class DirectorController extends Controller
             array_push($citiesCalendar, [$city, 'productsConfirmed' => 0, 'productsSelled' => 0]);
         }
 
-        $startDate = Carbon::createFromDate(intval($dateTemp[0]), intval($dateTemp[1]), 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
+        $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
 
-        $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->get();
+//        dd($startDate,$endDate);
 
+        $leads = Lead::whereBetween("meeting_date", [$startDate, $endDate])->where([["status","!=","declined"]])->get();
+//        dd($leads);
         $logs = array();
+        $totalSelled=0;
+        $totalConfirmed=0;
+
         foreach ($leads as $lead) {
             $cityTemp = City::where(["name"=>$lead->city])->first();
             $neededObject = array_filter(
@@ -2676,7 +2703,9 @@ class DirectorController extends Controller
             );
             $neededObject = array_key_first($neededObject);
             $citiesCalendar[$neededObject]['productsSelled'] += intval($lead->check);
-            $citiesCalendar[$neededObject]['productsConfirmed'] += $lead->repair ? intval($lead->repair->check) : 0;
+            $totalSelled+= intval($lead->check);
+            $citiesCalendar[$neededObject]['productsConfirmed'] += $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
+            $totalConfirmed+= $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
         }
         $citiesCalendar = collect($citiesCalendar);
 
@@ -2684,7 +2713,7 @@ class DirectorController extends Controller
 
 //        dd($managersCalendar);
 
-        return view('roles.director.statistic.posygramm_cities', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'cities', 'date', 'citiesCalendar'));
+        return view('roles.director.statistic.posygramm_cities', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'cities', 'date', 'citiesCalendar','totalConfirmed','totalSelled'));
     }
 
 

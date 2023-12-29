@@ -38,7 +38,7 @@
                 @foreach($deductions as $deduction)
                     <tr>
                         <th class="fw-normal p-2 text-left" scope="col">
-                            {{$deduction->user->name}}
+                            {{$deduction->user->shortname()}}
                         </th>
                         <th class="fw-normal p-2 text-left" scope="col">
                             {{$deduction->amount}}

@@ -94,6 +94,9 @@ class RepairsController extends Controller
                 case 'completed':
                     $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'completed']])->get();
                     break;
+                case 'refund':
+                    $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', $status]])->get();
+                    break;
                 default:
                     $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
                     break;
@@ -256,15 +259,13 @@ class RepairsController extends Controller
         $totalCheck = 0;
         $totalAvance = 0;
         foreach ($repairs as $repair) {
-            if ($repair->status == 'completed') {
-                $totalCheck += $repair->check;
-            }
+            $totalCheck += $repair->lead->issued;
         }
         foreach ($repairs as $repair) {
-            if ($repair->status != 'refund') {
-                $totalAvance += $repair->lead->avance;
-            }
+            $totalAvance += $repair->lead->avance;
         }
+
+//        dd($repairs);
 
         return view('repair.show', compact('repairs', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalRepairs', 'nextMonthLink', 'prevMonthLink', 'declinedRepairs', 'totalDeclined', 'totalCompleted', 'totalCheck', 'totalAvance', 'totalRefund'));
     }
@@ -360,9 +361,13 @@ class RepairsController extends Controller
         $totalAvance=0;
 
         foreach ($repairs as $repair){
-            $totalCheck+=$repair->check;
+            if($repair->status=='completed'){
+                $totalCheck+=$repair->check;
+            }
             $totalAvance+=$repair->lead->avance;
         }
+
+//        dd($totalCheck);
 
         foreach ($users as $user) {
             if ($user->hasRole('manager') && $user->city == $city->id) {

@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.salary.pay').'?date='.$prevMonthLink}}">Предыдущий
+                       href="{{route('director.salary.pay.operator').'?date='.$prevMonthLink}}">Предыдущий
                         месяц</a>
                 </div>
                 <div id="date-head">
@@ -18,7 +18,7 @@
                 </div>
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.salary.pay').'?date='.$nextMonthLink}}">Следующий
+                       href="{{route('director.salary.pay.operator').'?date='.$nextMonthLink}}">Следующий
                         месяц</a>
                 </div>
             </div>
@@ -119,7 +119,7 @@
                     <tbody>
                     @foreach($operators as $operator)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->name}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$operator->salary($date)-$operator->payedSalary($date)<0?'text-danger':'text-black'}}"

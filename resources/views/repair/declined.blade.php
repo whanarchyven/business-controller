@@ -97,7 +97,7 @@
                             <th class="fw-normal text-left" scope="col">{{$lead->note}}</th>
                             <th class="fw-bold text-left" scope="col">
                                 @if($lead->manager_id)
-                                    <p class="fw-normal">{{$lead->getManagerId->name}}</p>
+                                    <p class="fw-normal">{{$lead->getManagerId->shortname()}}</p>
                                 @else
                                     <p class="fw-normal">Не назначено</p>
                                 @endif
@@ -107,7 +107,7 @@
                                         class="bg-warning text-black rounded-2 w-100 p-2">
                                     Вернуть в работу
                                 </button>
-                                <p class="fw-normal">{{$lead->getOperatorId->name}}</p>
+                                <p class="fw-normal">{{$lead->getOperatorId->shortname()}}</p>
                             </th>
                         </tr>
                     @endforeach

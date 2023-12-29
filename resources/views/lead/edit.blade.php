@@ -410,7 +410,7 @@
                                 @endif
                                 <div class="form-group my-2">
                                     <input type="submit" class="form-control bg-primary text-white fw-bold"
-                                           value="Отправить">
+                                           value="Обновить заявку">
                                 </div>
                             </div>
                         </form>

@@ -39,7 +39,7 @@
                         @foreach($bonuses15k as $bonus)
                             <tr>
                                 <th class="fw-normal p-2 text-left" scope="col">
-                                    {{$bonus->user->name}}
+                                    {{$bonus->user->shortname()}}
                                 </th>
                                 <th class="fw-normal p-2 text-left" scope="col">
                                     {{$bonus->amount}}

@@ -50,7 +50,7 @@
                     <tbody>
                     @foreach($managersCalendar as $manager)
                         <tr>
-                            <th class="fw-normal table-light text-center" scope="col">{{$manager[0]->name}}</th>
+                            <th class="fw-normal table-light text-center" scope="col">{{$manager[0]->shortname()}}</th>
                             @foreach($manager[1] as $day)
                                 <th class="fw-normal table-light text-center" scope="col">{{round($day['productsSelled']/1000,2)}}<br/>{{round($day['productsConfirmed']/1000,2)}}</th>
                             @endforeach

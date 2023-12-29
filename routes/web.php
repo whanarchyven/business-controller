@@ -106,7 +106,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/leads/{lead}/accept', [App\Http\Controllers\DirectorController::class, 'acceptLeadView'])->name('director.leads.accept');
     Route::patch('/director/leads/{lead}/close', [App\Http\Controllers\DirectorController::class, 'closeLead'])->name('director.close.lead');
     Route::patch('/director/leads/{lead}/close/null', [App\Http\Controllers\DirectorController::class, 'closeLeadNull'])->name('director.leads.close.null');
-    Route::patch('/director/leads/{lead}/delete', [App\Http\Controllers\LeadsController::class, 'deleteLead'])->name('director.lead.delete');
+    Route::delete('/director/leads/{lead}/delete', [App\Http\Controllers\LeadsController::class, 'deleteLead'])->name('director.lead.delete');
 
 
     Route::get('/director/nomenclature', [App\Http\Controllers\DirectorController::class, 'nomenclature'])->name('director.nomenclature');

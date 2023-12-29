@@ -184,13 +184,13 @@ class SalaryController extends Controller
 
         $city = $user->city();
 //        $date = Carbon::today()->toDateString();
-        $date = explode('-', $date);
+        $dateTemp = explode('-', $date);
 
-        $startDate = Carbon::createFromDate($date[0], $date[1], 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($date[0], $date[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
 
 
-        $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($date[0],$date[1],'all',$user->id);
+        $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0],$dateTemp[1],'all',$user->id);
 //        dd($leads);
 
 
@@ -202,7 +202,7 @@ class SalaryController extends Controller
 
 
 
-        $days = $this->getDaysInMonthWithWeekdays($date[1], $date[0]);
+        $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
         $monthWorkDays = 0;
         foreach ($days as $day) {
             if ($day['weekDay'] != 'вс') {
@@ -214,6 +214,9 @@ class SalaryController extends Controller
         $totalEnter = 0;
         $totalNullLeads = 0;
         $totalDeclined = 0;
+        $totalDeclinedRepairs=0;
+
+
         foreach ($leads as $lead) {
             if ($lead->entered) {
                 $totalEnter++;
@@ -233,10 +236,12 @@ class SalaryController extends Controller
 //        dd($totalDeclined);
 
         if ($totalEnter != 0) {
-            $conversion = $totalEnter / ($totalNullLeads + $totalEnter);
+            $conversion = ($totalEnter-$totalNullLeads) / ($totalEnter);
         } else {
             $conversion = 0;
         }
+//        dd($totalNullLeads);
+//        dd($conversion);
 
 //        dd($conversion);
 
@@ -257,6 +262,9 @@ class SalaryController extends Controller
         foreach ($leads as $lead){
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $totalConfirmed += $lead->repair->check;
+            }
+            if($lead->repair&&($lead->repair->status=='refund'||$lead->repair->status=='declined')){
+                $totalDeclinedRepairs++;
             }
         }
 
@@ -319,16 +327,21 @@ class SalaryController extends Controller
         if ($conversion >= 0.5) {
             $totalProductsPercent += 0.01;
         }
-        if ($totalDeclined < 3) {
+        if ($totalDeclinedRepairs < 3) {
             $totalProductsPercent += 0.01;
-
+        }
+        if(count($user->stagers($date))>=1){
+            $totalProductsPercent+=0.01;
         }
         if ($totalConfirmed >= 400000) {
             $totalProductsPercent += 0.01;
         }
 
 //        dd($totalProductsPercent);
+
+//        dd($totalProductsPercent);
         $totalProductsSalary = $totalConfirmed * $totalProductsPercent;
+
 
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;
@@ -350,6 +363,7 @@ class SalaryController extends Controller
         $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
 
         $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
+
 //        dd($oklad);
 
         return round($totalSalary);

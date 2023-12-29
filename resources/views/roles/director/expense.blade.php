@@ -40,7 +40,7 @@
                             <th class="p-2 fw-normal text-left" scope="col">{{$repair->lead->note}}</th>
 
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <p>{{$repair->master?$repair->master->name:'Не назначено'}}</p>
+                                <p>{{$repair->master?$repair->master->shortname() :'Не назначено'}}</p>
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <button onclick="window.location.href='{{route('director.expense.new',$repair)}}'"
