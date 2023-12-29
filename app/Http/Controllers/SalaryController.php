@@ -152,6 +152,10 @@ class SalaryController extends Controller
             $totalSalary = round($totalConfirmed * 0.10);
             $totalProductsPercent=0.1;
         }
+        else{
+            $totalSalary = round($totalConfirmed * 0.10);
+            $totalProductsPercent=0.1;
+        }
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;
         foreach ($deductions as $deduction) {

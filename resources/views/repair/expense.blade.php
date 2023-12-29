@@ -86,6 +86,7 @@
                         <th class="fw-bold text-left" scope="col">Статус</th>
                         <th class="fw-bold text-left" scope="col">Инфо о клиенте</th>
                         <th class="fw-bold text-left" scope="col">Список работ</th>
+                        <th class="fw-bold text-left" scope="col">Тип работ</th>
                         <th class="fw-bold text-left" scope="col">Примечание</th>
                         <th class="fw-bold text-left" scope="col">Сумма</th>
                         <th class="fw-bold text-left" scope="col">Специалисты</th>
@@ -115,6 +116,7 @@
 
                             <th class="fw-normal text-left" scope="col">{{$repair->works}}</th>
                             <th class="fw-normal text-left" scope="col">{{$repair->lead->jobType->name}}</th>
+                            <th class="fw-normal text-left" scope="col">{{$repair->lead->note}}</th>
                             <th class="fw-normal text-left" scope="col">{{$repair->lead->issued}}
                                 /{{$repair->lead->avance}}
                             </th>
