@@ -412,6 +412,7 @@
                     <th class="fw-bold text-center" scope="col">Факт. оклад</th>
                     <th class="fw-bold text-center" scope="col">НЕЗАЧЕТ чеки</th>
                     <th class="fw-bold text-center" scope="col">Общ.сумма удержаний</th>
+                    <th class="fw-bold text-center" scope="col">Выдано</th>
                     <th class="fw-bold text-center" scope="col">Сумма к выдаче</th>
                 </tr>
                 </thead>
@@ -430,8 +431,9 @@
                         scope="col">{{round($okladSallary)}}</th>
                     <th class="fw-normal text-center" scope="col">{{$lowMargeChecksDeduction}} ({{count($lowMargeChecks)}} шт.)</th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$manager->payedSalary($date)}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round($manager->salary($date)-$manager->payedSalary($date))}}</th>
+                        scope="col">{{round($manager->salary($date))}}</th>
                 </tr>
                 </tbody>
 

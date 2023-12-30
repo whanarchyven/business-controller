@@ -189,6 +189,8 @@ class DirectorController extends Controller
             }
         }
 
+//        dd($repairs);
+
         $todayLeads = $this->getTodayLeads(false, $city);
         $todayDeclined = $this->getTodayLeads(true, $city);
 
@@ -1543,8 +1545,7 @@ class DirectorController extends Controller
         $days = $this->getDirectorDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
 
-        $monthLeads = $this->getDirectorMonthLeads($dateTemp[0], $dateTemp[1], $city->name);
-
+        $monthLeads = Repair::whereBetween('repair_date',[Carbon::createFromDate($date)->startOfMonth()->toDateString(),Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
 
 
         $suka=[];
@@ -1555,13 +1556,13 @@ class DirectorController extends Controller
             }
         }
 
+
         $monthLeads=$suka;
 
-//        dd($monthLeads);
 
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['repair_date'])[2]);
-            if($lead->lead->marge()>=35&&$lead->status=='completed'){
+            if($lead->status=='completed'){
                 $days[$day - 1]['repairs_confirmed'] += $lead->check;
             }
 //            echo $lead->check;

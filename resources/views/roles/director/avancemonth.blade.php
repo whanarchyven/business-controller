@@ -50,7 +50,7 @@
                                     scope="col">{{$director->salary($date)-$director->payedSalary($date)}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">
                                     <input class="form-control"
-                                           required value="5000"
+                                           required value="{{$director->salary($date)-$director->payedSalary($date)<5000?$director->salary($date)-$director->payedSalary($date):5000}}" max="{{$director->salary($date)-$director->payedSalary($date)}}"
                                            type="number"
                                            name="director{{$loop->index}}"
                                     />
@@ -93,7 +93,7 @@
                                 scope="col">{{$manager->salary($date)-$manager->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <input class="form-control"
-                                       required value="5000" type="number"
+                                       required value="{{$manager->salary($date)-$manager->payedSalary($date)<5000?$manager->salary($date)-$manager->payedSalary($date):5000}}" max="{{$manager->salary($date)-$manager->payedSalary($date)}}" type="number"
                                        name="manager{{$loop->index}}"/>
                                 <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">
                             </th>

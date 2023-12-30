@@ -175,8 +175,7 @@
                                 scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <input onchange="checkPay()" required class="form-control"
-                                       value="5000"
-                                       {{--                                       max="{{$master->salary($date)}}" type="number"--}}
+                                       value="{{$master->salary($date)-$master->payedSalary($date)<5000?$master->salary($date)-$master->payedSalary($date):5000}}" max="{{$master->salary($date)-$master->payedSalary($date)}}" type="number"
                                        name="master{{$loop->index}}"/>
                                 <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">
                             </th>

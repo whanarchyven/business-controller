@@ -294,6 +294,7 @@
                     <th class="fw-bold text-center" scope="col">% ТО</th>
                     <th class="fw-bold text-center" scope="col">Рабочих дней</th>
                     <th class="fw-bold text-center" scope="col">Общ.сумма удержаний</th>
+                    <th class="fw-bold text-center" scope="col">Выдано</th>
                     <th class="fw-bold text-center" scope="col">Сумма к выдаче</th>
                 </tr>
                 </thead>
@@ -302,8 +303,9 @@
                     <th class="fw-normal text-center" scope="col">{{$master->salary($date)}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center" scope="col">{{$master->deductions($date)}}</th>
+                    <th class="fw-normal text-center" scope="col">{{$master->payedSalary($date)}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>
+                        scope="col">{{$master->salary($date)}}</th>
                 </tr>
                 </tbody>
 

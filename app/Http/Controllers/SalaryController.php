@@ -85,11 +85,12 @@ class SalaryController extends Controller
     {
         $city = $user->city();
 //        $date = Carbon::today()->toDateString();
-        $date = explode('-', $date);
 
-        $startDate = Carbon::createFromDate($date[0], $date[1], 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($date[0], $date[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
+        $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
         $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'completed']])->get();
+
+        $date = explode('-', $date);
 
         $temp=[];
 
@@ -99,7 +100,9 @@ class SalaryController extends Controller
             }
         }
 
+
         $repairs=$temp;
+//        dd($repairs);
 
 //        dd($repairs);
 
@@ -114,12 +117,9 @@ class SalaryController extends Controller
         $totalConfirmed = 0;
         $confirmed = array();
         foreach ($repairs as $repair) {
-            if($repair->lead->marge()>=35){
+            if(!$repair->lead->salary_debuff){
                 array_push($confirmed, $repair);
                 $totalConfirmed += $repair->check;
-            }
-            elseif (!$repair->lead->salary_debuff){
-                array_push($confirmed,$repair);
             }
         }
 //        dd($repairs);
@@ -190,8 +190,8 @@ class SalaryController extends Controller
 //        $date = Carbon::today()->toDateString();
         $dateTemp = explode('-', $date);
 
-        $startDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($dateTemp[0], $dateTemp[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
+        $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
 
 
         $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0],$dateTemp[1],'all',$user->id);
@@ -274,7 +274,20 @@ class SalaryController extends Controller
 
 //        dd($totalConfirmed);
 
-        $totalWorkDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get());
+
+        $totalWorkDays = EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get();
+
+        $tempWorkdays=[];
+        $tempDates=[];
+
+        foreach ($totalWorkDays as $workDay){
+            if(!array_search(Carbon::createFromDate($workDay->created_at)->toDateString(),$tempDates)){
+                array_push($tempDates,Carbon::createFromDate($workDay->created_at)->toDateString());
+                array_push($tempWorkdays,$workDay);
+            }
+        }
+
+        $totalWorkDays=count($tempWorkdays);
 
         $oklad = 0;
         $okladSallary = 0;
@@ -322,6 +335,7 @@ class SalaryController extends Controller
         }
 
 
+//        dd($totalWorkDays);
 //        dd($conversion);
 
         $totalProductsPercent = 0.1;
@@ -341,7 +355,6 @@ class SalaryController extends Controller
             $totalProductsPercent += 0.01;
         }
 
-//        dd($totalProductsPercent);
 
 //        dd($totalProductsPercent);
         $totalProductsSalary = $totalConfirmed * $totalProductsPercent;
@@ -354,8 +367,6 @@ class SalaryController extends Controller
         }
 
 
-//        dd($totalProductsSalary);
-
         $lowMargeChecksDeduction=0;
 
         $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["manager_id","=",$user->id],['salary_debuff','!=',false]])->get();
@@ -367,6 +378,7 @@ class SalaryController extends Controller
         $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
 
         $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
+
 
 //        dd($oklad);
 

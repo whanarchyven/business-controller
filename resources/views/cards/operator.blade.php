@@ -295,6 +295,7 @@
                         <th class="fw-bold text-left" scope="col">За выходы</th>
                         <th class="fw-bold text-left" scope="col">Рабочих дней</th>
                         <th class="fw-bold text-left" scope="col">Общая сумма удержаний</th>
+                        <th class="fw-bold text-left" scope="col">Выдано</th>
                         <th class="fw-bold text-left" scope="col">Сумма к выдаче</th>
 
                     </tr>
@@ -317,7 +318,10 @@
                             {{$user->deductions($date)}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->salary($date)-$user->payedSalary($date)}}
+                            {{$user->payedSalary($date)}}
+                        </th>
+                        <th class="fw-normal text-left" scope="col">
+                            {{$user->salary($date)}}
                         </th>
 
                     </tr>
