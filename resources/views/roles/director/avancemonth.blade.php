@@ -192,9 +192,7 @@
 {{--            </div>--}}
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
-                @if(explode('-',$date)[1]==explode('-',\Illuminate\Support\Carbon::today()->toDateString())[1])
-                    <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
-                @endif
+                <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
