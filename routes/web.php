@@ -152,6 +152,9 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::post('/director/transactions/search', [App\Http\Controllers\DirectorController::class, 'doSearchTransaction'])->name('director.transactions.do.search');
 
     Route::get('/director/transactions/new', [App\Http\Controllers\TransactionController::class, 'newTransactionView'])->name('director.transactions.new');
+
+    Route::get('/director/transactions/error', [App\Http\Controllers\TransactionController::class, 'errorView'])->name('director.transactions.error');
+
     Route::post('/director/transactions/store', [App\Http\Controllers\TransactionController::class, 'storeNewTransaction'])->name('director.transactions.store');
     Route::get('/director/transactions/{transaction}', [App\Http\Controllers\DirectorController::class, 'showTransactionDocs'])->name('director.transactions.docs');
 

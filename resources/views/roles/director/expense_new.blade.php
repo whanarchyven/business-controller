@@ -29,7 +29,7 @@
                         </div>
                         <div class="w-25">
                             <label for="quantity1">Количество</label>
-                            <input required type="number" name="quantity1" class="form-control">
+                            <input step="0.01" required type="number" name="quantity1" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
             </div>
             <div class="w-25">
                 <label for="quantity${id}">Количество</label>
-                <input type="number" name="quantity${id}" class="form-control">
+                <input step="0.01" type="number" name="quantity${id}" class="form-control">
             </div>
         </div>`);
                 id++

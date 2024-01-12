@@ -15,6 +15,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class SalaryController extends Controller
 {
@@ -25,6 +26,11 @@ class SalaryController extends Controller
         $monthTemp = preg_split("/[^1234567890]/", $date)[1];
         $salary = Salary::where(["month" => $monthTemp, "year" => $yearTemp, "user_id" => $user->id])->first();
         $city_id = $user->city;
+
+        if($user->city()->budget()->money<$money){
+            return Redirect::to(route('director.transactions.error'))->send();
+        }
+
         if ($salary) {
             $salary->salary += $money;
             $salary->save();

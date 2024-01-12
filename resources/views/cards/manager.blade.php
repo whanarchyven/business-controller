@@ -403,10 +403,20 @@
                 <thead>
                 <tr>
                     <th class="fw-bold text-center" scope="col">% ТО</th>
-                    <th class="fw-bold text-center" scope="col">% отказ</th>
-                    <th class="fw-bold text-center" scope="col">% стажёр</th>
-                    <th class="fw-bold text-center" scope="col">% конверсия</th>
-                    <th class="fw-bold text-center" scope="col">{{'% >400 000'}}</th>
+                    @if($totalDeclinedRepairs<3)
+                        <th class="fw-bold text-center" scope="col">% отказ</th>
+                    @endif
+                    @if(count($manager->stagers($date)))
+                        <th class="fw-bold text-center" scope="col">% стажёр</th>
+                    @endif
+
+                    @if($conversion>=0.5)
+                        <th class="fw-bold text-center" scope="col">% конверсия</th>
+                    @endif
+
+                    @if($totalConfirmed>400000)
+                        <th class="fw-bold text-center" scope="col">{{'% >400 000'}}</th>
+                    @endif
                     <th class="fw-bold text-center" scope="col">Оклад</th>
                     <th class="fw-bold text-center" scope="col">Рабочих дней</th>
                     <th class="fw-bold text-center" scope="col">Факт. оклад</th>
@@ -420,10 +430,21 @@
                 <tr>
                     <th class="fw-normal text-center"
                         scope="col">{{$totalConfirmed*0.1}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$totalDeclinedRepairs<   3?$totalConfirmed*0.01:0}}</th>
-                    <th class="fw-normal text-center" scope="col">{{count($manager->stagers($date))?$totalConfirmed*0.01:0}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$conversion>=0.5?$totalConfirmed*0.01:0}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
+                    @if($totalDeclinedRepairs<3)
+                        <th class="fw-normal text-center" scope="col">{{$totalDeclinedRepairs<3?$totalConfirmed*0.01:0}}</th>
+                    @endif
+                    @if(count($manager->stagers($date)))
+                        <th class="fw-normal text-center" scope="col">{{count($manager->stagers($date))?$totalConfirmed*0.01:0}}</th>
+                    @endif
+
+                    @if($conversion>=0.5)
+                        <th class="fw-normal text-center" scope="col">{{$conversion>=0.5?$totalConfirmed*0.01:0}}</th>
+                    @endif
+
+                    @if($totalConfirmed>400000)
+                        <th class="fw-normal text-center" scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
+                    @endif
+
                     <th class="fw-normal text-center"
                         scope="col">{{$oklad}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>

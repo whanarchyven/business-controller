@@ -518,8 +518,10 @@ class DirectorController extends Controller
             $director_workday->save();
         }
 
-        if (EmployeerWorkDay::whereDate('created_at', $lead->created_at)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
+        if (EmployeerWorkDay::whereDate('created_at', $lead->meeting_date)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
             $workDay = new EmployeerWorkDay(["user_id" => $lead->getManagerId->id]);
+            $workDay->created_at=$lead->meeting_date. ' 08:00:00';
+            $workDay->updated_at=$lead->meeting_date. ' 08:00:00';
             $workDay->save();
         }
 
@@ -566,9 +568,9 @@ class DirectorController extends Controller
     {
         $user = Auth::user();
         if ($user->isAdmin) {
-            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->orderBy('name')->get();
         } else {
-            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->orderBy('name')->get();
         }
         return (view('nomenclature.show', compact('nomenclature', 'user')));
     }
@@ -617,9 +619,9 @@ class DirectorController extends Controller
     {
         $user = Auth::user();
         if ($user->isAdmin) {
-            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->orderBy('name')->get();
         } else {
-            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->orderBy('name')->get();
         }
         return view('roles.director.receipt', compact('nomenclature', 'user'));
     }
@@ -692,9 +694,9 @@ class DirectorController extends Controller
     {
         $user = Auth::user();
         if ($user->isAdmin) {
-            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->get();
+            $nomenclature = Nomenclature::where(["city_id" => Session::get('city')->id])->orderBy('name')->get();
         } else {
-            $nomenclature = Nomenclature::where(["city_id" => $user->city])->get();
+            $nomenclature = Nomenclature::where(["city_id" => $user->city])->orderBy('name')->get();
         }
         return view('roles.director.expense_new', compact('nomenclature', 'repair'));
     }

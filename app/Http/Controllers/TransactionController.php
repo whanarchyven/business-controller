@@ -8,6 +8,7 @@ use App\Models\TransactionState;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use MongoDB\Driver\Session;
 
 class TransactionController extends Controller
@@ -32,6 +33,9 @@ class TransactionController extends Controller
         $city = City::where(['id' => $city_id])->first();
         $budget = $city->budget();
 //        dd($budget);
+        if($budget->money<$value){
+            return [Redirect::to(route('director.transactions.error'))->send(),exit()];
+        }
         $budget->money -= $value;
         $budget->save();
 
@@ -46,6 +50,11 @@ class TransactionController extends Controller
     {
         $states = TransactionState::all();
         return view('roles.director.transaction_create', compact('states'));
+    }
+
+    public function errorView()
+    {
+        return view('roles.director.transaction_error');
     }
 
     public function storeNewTransaction(Request $request)
@@ -92,30 +101,37 @@ class TransactionController extends Controller
         if ($data['type']=='receipt') {
             $receipt = $this->newReceipt($state->id, 'Ручная транзакция: Приход.| '.($description?$description:''), $data['value'], $user->id, $city->id, $documents);
         } else {
-            if ($state->code=='3.0.'){
-                $expense = $this->newExpense($state->id, 'Перевод в главный офис', $data['value'], $user->id, $city->id, $documents);
-                if($city->name=='Нижний Новгород'){
-                    $newState=TransactionState::where(["code"=>'3.01.27.'])->first();
-                }
-                else if($city->name=='Симферополь'){
-                    $newState=TransactionState::where(["code"=>'3.01.28.'])->first();
-                }
-                $perevod =$this->newReceipt($newState->id, 'Приход от филиала', $data['value'], $user->id, 999, $documents);
-            }
-            else if($state->code=='3.02.27.'){
-                $expense = $this->newExpense($state->id, 'Перевод в филиал', $data['value'], $user->id, 999, $documents);
-                $newCity=City::where(["name"=>"Нижний Новгород"])->first();
-                $newState=TransactionState::where(["code"=>'3.01.'])->first();
-                $perevod =$this->newReceipt($newState->id, 'Приход от главного офиса', $data['value'], $user->id, $newCity->id, $documents);
-            }
-            else if($state->code=='3.02.28.'){
-                $expense = $this->newExpense($state->id, 'Перевод в филиал', $data['value'], $user->id, 999, $documents);
-                $newCity=City::where(["name"=>"Симферополь"])->first();
-                $newState=TransactionState::where(["code"=>'3.01.'])->first();
-                $perevod =$this->newReceipt($newState->id, 'Приход от главного офиса', $data['value'], $user->id, $newCity->id, $documents);
+//            dd($city->budget());
+            if($city->budget()->money<$data['value']){
+                return redirect(route('director.transactions.error'));
             }
             else{
-                $expense = $this->newExpense($state->id, 'Ручная транзакция: Расход.| '.($description?$description:''), $data['value'], $user->id, $city->id, $documents);
+                if ($state->code=='3.0.'){
+                    $expense = $this->newExpense($state->id, 'Перевод в главный офис', $data['value'], $user->id, $city->id, $documents);
+                    if($city->name=='Нижний Новгород'){
+                        $newState=TransactionState::where(["code"=>'3.01.27.'])->first();
+                    }
+                    else if($city->name=='Симферополь'){
+                        $newState=TransactionState::where(["code"=>'3.01.28.'])->first();
+                    }
+
+                    $perevod =$this->newReceipt($newState->id, 'Приход от филиала', $data['value'], $user->id, 999, $documents);
+                }
+                else if($state->code=='3.02.27.'){
+                    $expense = $this->newExpense($state->id, 'Перевод в филиал', $data['value'], $user->id, 999, $documents);
+                    $newCity=City::where(["name"=>"Нижний Новгород"])->first();
+                    $newState=TransactionState::where(["code"=>'3.01.'])->first();
+                    $perevod =$this->newReceipt($newState->id, 'Приход от главного офиса', $data['value'], $user->id, $newCity->id, $documents);
+                }
+                else if($state->code=='3.02.28.'){
+                    $expense = $this->newExpense($state->id, 'Перевод в филиал', $data['value'], $user->id, 999, $documents);
+                    $newCity=City::where(["name"=>"Симферополь"])->first();
+                    $newState=TransactionState::where(["code"=>'3.01.'])->first();
+                    $perevod =$this->newReceipt($newState->id, 'Приход от главного офиса', $data['value'], $user->id, $newCity->id, $documents);
+                }
+                else{
+                    $expense = $this->newExpense($state->id, 'Ручная транзакция: Расход.| '.($description?$description:''), $data['value'], $user->id, $city->id, $documents);
+                }
             }
         }
 
