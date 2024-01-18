@@ -193,6 +193,7 @@
             </div>
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
+                <input type="hidden" name="date" value="{{$date}}"/>
                 <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>
             </div>

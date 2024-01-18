@@ -101,7 +101,7 @@
                         <div class="row">
                             <div class="d-flex col gap-2">
                                 <label for="state">Статья транзакции</label>
-                                <select name="state" class="form-select">
+                                <select name="state" class="js-select2">
                                     @foreach($states as $state)
                                         <option value="{{$state->code}}">{{$state->code}} {{$state->name}}</option>
                                     @endforeach
@@ -151,7 +151,19 @@
                     </form>
                 </div>
             </div>
-
+            <link rel="stylesheet" href="https://snipp.ru/cdn/select2/4.0.13/dist/css/select2.min.css">
+            <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
+            <script src="https://snipp.ru/cdn/select2/4.0.13/dist/js/select2.min.js"></script>
+            <script src="https://snipp.ru/cdn/select2/4.0.13/dist/js/i18n/ru.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('.js-select2').select2({
+                        placeholder: "Выберите город",
+                        maximumSelectionLength: 2,
+                        language: "ru"
+                    });
+                });
+            </script>
         </div>
 
     </div>

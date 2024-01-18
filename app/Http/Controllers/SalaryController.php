@@ -19,9 +19,8 @@ use Illuminate\Support\Facades\Redirect;
 
 class SalaryController extends Controller
 {
-    public function addSalary(User $user, $money)
+    public function addSalary(User $user, $money,$date)
     {
-        $date = Carbon::now()->toDateString();
         $yearTemp = preg_split("/[^1234567890]/", $date)[0];
         $monthTemp = preg_split("/[^1234567890]/", $date)[1];
         $salary = Salary::where(["month" => $monthTemp, "year" => $yearTemp, "user_id" => $user->id])->first();
@@ -430,6 +429,7 @@ class SalaryController extends Controller
 
         $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
+
         $leads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
 
         $okna=0;
@@ -452,6 +452,7 @@ class SalaryController extends Controller
         $daysSalary = $workDays * 200;
 
         $totalSalary = $daysSalary + $leadsSalary - $deductions;
+
 
         return round($totalSalary);
     }

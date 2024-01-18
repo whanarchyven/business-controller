@@ -96,9 +96,9 @@ class User extends Authenticatable
     }
 
 
-    public function addSalary($salary)
+    public function addSalary($salary,$date)
     {
-        app(\App\Http\Controllers\SalaryController::class)->addSalary($this, $salary);
+        app(\App\Http\Controllers\SalaryController::class)->addSalary($this, $salary,$date);
     }
 
     public function salary($date)

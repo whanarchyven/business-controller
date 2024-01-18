@@ -454,7 +454,7 @@
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center" scope="col">{{$manager->payedSalary($date)}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{round($manager->salary($date))}}</th>
+                        scope="col">{{round($manager->salary($date)-$manager->payedSalary($date))}}</th>
                 </tr>
                 </tbody>
 

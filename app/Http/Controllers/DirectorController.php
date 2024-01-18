@@ -2048,6 +2048,7 @@ class DirectorController extends Controller
     public function payAvance(Request $request)
     {
         $data = $request->all();
+//        dd($data);
         $data = array_slice($data, 2, count($data));
         $values = array();
         $users = array();
@@ -2065,7 +2066,7 @@ class DirectorController extends Controller
 
         foreach ($users as $user) {
             $recepient = User::where(["id" => $user])->first();
-            $recepient->addSalary($values[$counter]);
+            $recepient->addSalary($values[$counter],$data['date']);
             $counter++;
         }
 
@@ -2291,6 +2292,7 @@ class DirectorController extends Controller
 
     public function paySalary(User $user, Request $request)
     {
+//        dd($request->all());
         $date = $request->all();
         $date = $date['data'];
 
@@ -2298,8 +2300,9 @@ class DirectorController extends Controller
         $payedSalary = $user->payedSalary($date);
 
         $salary = $user->salary($date) - $payedSalary;
+//        dd($user->salary($date));
 
-        $user->addSalary($salary);
+        $user->addSalary($salary,$date);
 
         return redirect()->back();
     }
