@@ -90,7 +90,7 @@ class TransactionController extends Controller
         if ($files = $request->file('documents')) {
             $i = 1;
             foreach ($files as $file) {
-                $name = Carbon::now()->toDateString() . '- Ручная транзакция- ' . $user->name . $i . '.' . $file->extension();
+                $name = rand(0,10000) . '- Руч. транзакция- ' . $user->name . $i . '.' . $file->extension();
 //                $name = Carbon::now()->toDateString() . '-' . preg_split("/[\s,]+/", $repair->lead['client_fullname'])[0] . '-' . $i . '.' . $file->extension()
                 $file->move('documents', $name);
                 $documents[] = $name;

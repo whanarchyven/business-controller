@@ -615,6 +615,11 @@ class DirectorController extends Controller
         return (redirect(route('director.nomenclature')));
     }
 
+    public function deleteNomenclature(Nomenclature $nomenclature){
+        $nomenclature->delete();
+        return redirect()->back();
+    }
+
     public function receipt()
     {
         $user = Auth::user();

@@ -113,6 +113,7 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::get('/director/nomenclature/add', [App\Http\Controllers\DirectorController::class, 'addNomenclature'])->name('director.add.nomenclature');
     Route::get('/director/nomenclature/{nomenclature}/edit', [App\Http\Controllers\DirectorController::class, 'editNomenclature'])->name('director.edit.nomenclature');
     Route::patch('/director/nomenclature/{nomenclature}/update', [App\Http\Controllers\DirectorController::class, 'updateNomenclature'])->name('director.update.nomenclature');
+    Route::delete('/director/nomenclature/{nomenclature}/delete', [App\Http\Controllers\DirectorController::class, 'deleteNomenclature'])->name('director.delete.nomenclature');
     Route::post('/director/nomenclature/store', [App\Http\Controllers\DirectorController::class, 'storeNomenclature'])->name('director.store.nomenclature');
 
 

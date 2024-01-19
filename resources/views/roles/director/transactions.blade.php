@@ -128,7 +128,7 @@
                         <div class="row">
                             <div class="form-group col my-2">
                                 <label for="value">Сумма транзакции</label>
-                                <input required type="number" class="form-control" id='value' name="value">
+                                <input step="0.01" required type="number" class="form-control" id='value' name="value">
                             </div>
                             <div class="form-group col my-2">
                                 <label for="value">Комментарий</label>

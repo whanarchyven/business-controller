@@ -306,7 +306,10 @@ class BonusController extends Controller
     public function createBonus(User $user, Request $request)
     {
         $data = $request->all();
+//        dd($data);
         $bonus = new BonusManager(["user_id" => $user->id, "type" => $data['type'], "amount" => $data['amount'], "reason" => $data['reason'], "city_id" => $user->city]);
+        $bonus->created_at=$data['date'];
+        $bonus->updated_at=$data['date'];
         $bonus->save();
         return redirect()->back();
     }

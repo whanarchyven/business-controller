@@ -38,12 +38,16 @@
                             <th class="fw-bold text-left" scope="col">{{$user->isAdmin?$item->remain:'?'}}</th>
                             <th class="fw-bold text-left" scope="col">{{$item->price}}</th>
                             @if($user->isAdmin)
-                                <th class="fw-bold d-flex justify-content-center w-auto text-left" scope="col">
+                                <th class="fw-bold d-flex gap-4 justify-content-center w-auto text-left" scope="col">
                                     <div onclick="window.location.href='{{route('director.edit.nomenclature',$item)}}'"
                                          class="btn btn-primary">
                                         Редактировать
                                     </div>
-
+                                    <form method="post" action="{{route('director.delete.nomenclature',$item->id)}}">
+                                        @csrf
+                                        @method('delete')
+                                        <input type="submit" value="Удалить" class="btn btn-danger">
+                                    </form>
                                 </th>
                             @endif
 

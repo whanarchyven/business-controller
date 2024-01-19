@@ -202,6 +202,7 @@
                             @csrf
                             @method('post')
                             <input type="hidden" name="type" value="minus"/>
+                            <input type="hidden" name="date" value="{{$date}}"/>
                             <th class="fw-normal p-2 text-left" scope="col">
                                 {{\Carbon\Carbon::today()->toDateString()}}
                             </th>
