@@ -50,7 +50,6 @@
                                     @csrf
                                     @method('patch')
                                     <input type="hidden" name="status" value="declined"/>
-                                    <input type="hidden" name="refund" value="true"/>
                                     <input type="submit" class="btn w-100 btn-danger" value="Отказ"/>
                                 </form>
                             </div>

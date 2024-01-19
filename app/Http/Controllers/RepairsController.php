@@ -460,7 +460,7 @@ class RepairsController extends Controller
             $transaction = app(\App\Http\Controllers\TransactionController::class)->newReceipt($state->id, $desc, $value, $responsible, $city_id, $documents);
             $transaction->save();
         }
-        if ($data['status'] == 'declined' && array_key_exists('refund', $data)) {
+        if ($data['status'] == 'refund' && array_key_exists('refund', $data)) {
             $state = TransactionState::getByCode('1.5.');
             $desc = 'Возврат по договору ' . $repair->lead->city . ' ' . $repair->lead->address . ' ';
             $value = $repair->lead->avance;
