@@ -55,6 +55,8 @@
                                                id='phone'
                                                name="phone" list="phone">
                                     </div>
+
+
                                     {{--                                    <div class="form-group my-2">--}}
                                     {{--                                        <label for="role">Должность</label>--}}
                                     {{--                                        <select onchange="updateSubForm()" id="role" class="form-control" name="role">--}}
@@ -130,6 +132,15 @@
                                     {{--                                           name="documents[]"--}}
                                     {{--                                           placeholder="Документы" multiple>--}}
                                     @if($user->hasRole('manager'))
+                                        <div id="mentor-form" class="form-group my-2 ">
+                                            <label for="role">Ментор (наставник)</label>
+                                            <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">
+                                                <option value={{null}}>{{'БЕЗ НАСТАВНИКА'}}</option>
+                                                @foreach($managers as $manager)
+                                                    <option {{$user->mentor_id==$manager->id?'selected':''}} value={{$manager->id}}>{{$manager->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <div class="form-group my-2">
                                             <label for="chat_bot_id">Код привязки к боту</label>
                                             <input value="{{$user->chat_bot_id?$user->chat_bot_id:''}}" type="tel"

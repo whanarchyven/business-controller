@@ -118,9 +118,9 @@ class DirectorController extends Controller
         $data = $request->all();
         $lead->update(['status' => 'declined', 'note' => $data['note']]);
         $manager = $lead->getManagerId;
-        if ($manager){
+        if ($manager) {
             $manager->status = 'free';
-            $this->changeBotPhoto($manager,'free');
+            $this->changeBotPhoto($manager, 'free');
             $manager->save();
         }
         return redirect()->back();
@@ -140,8 +140,8 @@ class DirectorController extends Controller
             $data['range'] == 'on' ? $data['range'] = true : $data['range'] = false;
         }
 
-        if (array_key_exists('check',$data)&&$data['check']!=$lead->check){
-            $data['status']='in-work';
+        if (array_key_exists('check', $data) && $data['check'] != $lead->check) {
+            $data['status'] = 'in-work';
         }
 
 //        dd($data);
@@ -174,13 +174,13 @@ class DirectorController extends Controller
 
         $products_selled = 0;
         $products_issued = 0;
-        $meetings=0;
+        $meetings = 0;
 
         $repairs = array();
 
         foreach ($leads as $lead) {
             $products_selled += $lead->check;
-            if($lead->entered){
+            if ($lead->entered) {
                 $meetings++;
             }
             if ($lead->repair && $lead->repair->status == 'completed') {
@@ -201,7 +201,7 @@ class DirectorController extends Controller
 
         foreach ($todayLeads as $lead) {
             $todayProductsSelled += $lead->check;
-            if($lead->entered){
+            if ($lead->entered) {
                 $todayMeetings++;
             }
             if ($lead->repair && $lead->repair->status == 'completed') {
@@ -211,12 +211,12 @@ class DirectorController extends Controller
 
         $cities = $this->getCities();
         $managers = $this->getManagers($city_id);
-        $managers_leads=[];
-        foreach ($managers as $manager){
-            $managers_leads[$manager->name]=0;
-            foreach ($todayLeads as $todayLead){
-                if ($todayLead->manager_id==$manager->id&&$todayLead->entered){
-                    $managers_leads[$manager->name]+=$todayLead->issued;
+        $managers_leads = [];
+        foreach ($managers as $manager) {
+            $managers_leads[$manager->name] = 0;
+            foreach ($todayLeads as $todayLead) {
+                if ($todayLead->manager_id == $manager->id && $todayLead->entered) {
+                    $managers_leads[$manager->name] += $todayLead->check;
                 }
             }
         }
@@ -228,7 +228,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings','meetings','managers_leads'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings', 'meetings', 'managers_leads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -237,7 +237,7 @@ class DirectorController extends Controller
         $manager = User::where([['id', '=', $data['manager']]])->first();
 
         $lead->update(["manager_id" => $manager->id, "status" => 'managed']);
-        $this->changeBotPhoto($manager,'meeting-managed');
+        $this->changeBotPhoto($manager, 'meeting-managed');
         $manager->status = 'meeting-managed';
         $manager->save();
 
@@ -265,7 +265,8 @@ class DirectorController extends Controller
         return $links = ["meeting-accepted" => 'https://i.ibb.co/pzq1fBs/accepted.png', "free" => 'https://i.ibb.co/CWHv2SM/free.png', "weekend" => 'https://i.ibb.co/HYqZfnV/weekend.png', "meeting-managed" => "https://i.ibb.co/8zsXb74/managed.png", "dinner" => "https://i.ibb.co/0mNJQLz/dinner.png", "on-meeting" => "https://i.ibb.co/chyhmjN/on-meeting.png", "delaying" => 'https://i.ibb.co/xfgpKH5/delaying.png'];
     }
 
-    public function changeBotPhoto(User $user,$status){
+    public function changeBotPhoto(User $user, $status)
+    {
         if ($user->chat_bot_id) {
             $client = new GuzzleHttp\Client();
             $response = $client->request('POST', 'https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/setChatPhoto?chat_id=' . $user->chat_bot_id, [
@@ -284,7 +285,7 @@ class DirectorController extends Controller
         $data = $request->all();
         $manager = User::where([['id', '=', $data['manager']]])->first();
         $lead->update(["manager_id" => null, "accepted" => null, "entered" => null,]);
-        $this->changeBotPhoto($manager,'free');
+        $this->changeBotPhoto($manager, 'free');
         $manager->status = 'free';
         $manager->save();
         $lead->save();
@@ -297,7 +298,7 @@ class DirectorController extends Controller
         $manager = User::where([['id', '=', $data['manager']]])->first();
         if ($manager->chat_bot_id) {
             $client = new GuzzleHttp\Client();
-            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' .'<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Телефон: </b>' . $lead->phone .'%0A');
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Телефон: </b>' . $lead->phone . '%0A');
         }
         return redirect()->back();
     }
@@ -308,7 +309,7 @@ class DirectorController extends Controller
         $manager = User::where([['id', '=', $data['manager']]])->first();
         if ($manager->chat_bot_id) {
             $client = new GuzzleHttp\Client();
-            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' .'<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address .'%0A');
+            $res = $client->get('https://api.telegram.org/bot6384276235:AAEGyfBmhCSgizgLa3_vRbZ1VSFcPtYZAHk/sendMessage?chat_id=' . $manager->chat_bot_id . '&parse_mode=html&text=' . '<b>ФИО клиента: </b>' . $lead->client_fullname . '%0A' . '<b>Адрес: </b>' . $lead->address . '%0A');
         }
         return redirect()->back();
     }
@@ -469,7 +470,6 @@ class DirectorController extends Controller
         }
 
 
-
         return view('roles.director.accept', compact('lead', 'managers'));
     }
 
@@ -490,8 +490,6 @@ class DirectorController extends Controller
 
 
         //здесь будем бонусы выписывать
-
-
 
 
         $repair = new Repair();
@@ -520,8 +518,8 @@ class DirectorController extends Controller
 
         if (EmployeerWorkDay::whereDate('created_at', $lead->meeting_date)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
             $workDay = new EmployeerWorkDay(["user_id" => $lead->getManagerId->id]);
-            $workDay->created_at=$lead->meeting_date. ' 08:00:00';
-            $workDay->updated_at=$lead->meeting_date. ' 08:00:00';
+            $workDay->created_at = $lead->meeting_date . ' 08:00:00';
+            $workDay->updated_at = $lead->meeting_date . ' 08:00:00';
             $workDay->save();
         }
 
@@ -532,7 +530,7 @@ class DirectorController extends Controller
             $totalCheckToday += $managerTodayLead->issued;
         }
 
-        if($lead->check>=15000&&$lead->avance>=$lead->check/2){
+        if ($lead->check >= 15000 && $lead->avance >= $lead->check / 2) {
             $newBonus = new BonusManager(["user_id" => $lead->getManagerId->id, "type" => "plus", "amount" => 500, "reason" => "Бонус за 15000 " . $lead->meeting_date, "city_id" => $lead->getManagerId->city]);
             $newBonus->save();
         }
@@ -550,7 +548,7 @@ class DirectorController extends Controller
             $newBonus->save();
         }
 
-        return redirect(route('director.daily').'?date='.Carbon::createFromDate($lead->created_at)->toDateString());
+        return redirect(route('director.daily') . '?date=' . Carbon::createFromDate($lead->created_at)->toDateString());
     }
 
 
@@ -561,7 +559,7 @@ class DirectorController extends Controller
         $lead->issued = 0;
         $lead->save();
 
-        return redirect(route('director.daily').'?date='.Carbon::createFromDate($lead->created_at)->toDateString());
+        return redirect(route('director.daily') . '?date=' . Carbon::createFromDate($lead->created_at)->toDateString());
     }
 
     public function nomenclature()
@@ -615,7 +613,8 @@ class DirectorController extends Controller
         return (redirect(route('director.nomenclature')));
     }
 
-    public function deleteNomenclature(Nomenclature $nomenclature){
+    public function deleteNomenclature(Nomenclature $nomenclature)
+    {
         $nomenclature->delete();
         return redirect()->back();
     }
@@ -640,8 +639,8 @@ class DirectorController extends Controller
 
         $date = array_slice($date, 2, count($date));
 
-        $totalPrice=0;
-        $totalCart='';
+        $totalPrice = 0;
+        $totalCart = '';
 
         for ($i = 1; $i <= count($date) / 2; $i++) {
             $nomenclature_receipt = new NomenclatureReceipt();
@@ -653,14 +652,14 @@ class DirectorController extends Controller
 
             $plus = Nomenclature::where(["id" => $date['nomenclature' . $i]])->first();
             $plus->remain += $date['quantity' . $i];
-            $totalPrice+=($plus->price*$date['quantity'.$i]);
-            $totalCart.=$plus->name.' '.$date['quantity'.$i].' '.$plus->unit.', ';
-            $city=City::where(["id"=>$plus->city_id])->first();
+            $totalPrice += ($plus->price * $date['quantity' . $i]);
+            $totalCart .= $plus->name . ' ' . $date['quantity' . $i] . ' ' . $plus->unit . ', ';
+            $city = City::where(["id" => $plus->city_id])->first();
             $plus->save();
         }
 
         $state = TransactionState::getByCode('2.02.2.');
-        $desc = 'Закупка материала ' . $city->name.': '.$totalCart;
+        $desc = 'Закупка материала ' . $city->name . ': ' . $totalCart;
         $value = $totalPrice;
         $responsible = Auth::user()->id;
         $documents = '';
@@ -673,7 +672,7 @@ class DirectorController extends Controller
     {
         $user = Auth::user();
         if ($user->isAdmin) {
-            $repairs = Repair::where([['status','!=','completed'],['status','!=','declined']])->get();
+            $repairs = Repair::where([['status', '!=', 'completed'], ['status', '!=', 'declined']])->get();
             $temp = array();
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == Session::get('city')->name) {
@@ -683,7 +682,7 @@ class DirectorController extends Controller
             $repairs = $temp;
         } else {
             $city = City::where(["id" => $user->city])->first();
-            $repairs = Repair::where([['status','!=','completed'],['status','!=','declined']])->get();
+            $repairs = Repair::where([['status', '!=', 'completed'], ['status', '!=', 'declined']])->get();
             $temp = array();
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == $city->name) {
@@ -734,8 +733,8 @@ class DirectorController extends Controller
 
     public function declineExpense(Repair $repair, Request $request)
     {
-        $id=$repair->materials[0]->expense_id;
-        foreach ($repair->materials as $material){
+        $id = $repair->materials[0]->expense_id;
+        foreach ($repair->materials as $material) {
 //            dd($material);
             $minus = Nomenclature::where(["id" => $material->nomenclature_id])->first();
             $minus->remain = $minus->remain + $material->quantity;
@@ -743,7 +742,7 @@ class DirectorController extends Controller
             $material->delete();
 //            dd('deleted');
         }
-        $expense=Expense::where(['id'=>$id])->delete(); //Удаляем expense
+        $expense = Expense::where(['id' => $id])->delete(); //Удаляем expense
         return redirect()->back();
     }
 
@@ -941,22 +940,21 @@ class DirectorController extends Controller
 
         $director = Auth::user();
 
-        if(Auth::user()->isAdmin){
+        if (Auth::user()->isAdmin) {
             $users = User::where(["city" => Session::get('city')->id])->get();
-        }
-        else{
+        } else {
             $users = User::where(["city" => Auth::user()->city])->get();
         }
 
         $coordinators = array();
-        $managers=array();
+        $managers = array();
 
         foreach ($users as $user) {
             if ($user->hasRole('coordinator')) {
                 array_push($coordinators, $user);
             }
-            if($user->hasRole('manager')){
-                array_push($managers,$user);
+            if ($user->hasRole('manager')) {
+                array_push($managers, $user);
             }
         }
 
@@ -1010,7 +1008,7 @@ class DirectorController extends Controller
         $newUser->birth_date = $data['birth_date'];
         $newUser->password = bcrypt($result);
         $newUser->city = array_key_exists('city', $data) ? $data['city'] : Auth::user()->city;
-        $newUser->mentor_id=array_key_exists('mentor_id',$data)?$data['mentor_id']:null;
+        $newUser->mentor_id = array_key_exists('mentor_id', $data) ? $data['mentor_id'] : null;
         $newUser->status = 'free';
         $newUser->salary = 0;
         $newUser->documents = implode('|', $documents);
@@ -1054,12 +1052,33 @@ class DirectorController extends Controller
         } else {
             $cities = City::where(["id" => Auth::user()->city])->first();
         }
-        return view('roles.director.employer.edit', compact('user', 'cities', 'director'));
+
+        if (Auth::user()->isAdmin) {
+            $users = User::where(["city" => Session::get('city')->id])->get();
+        } else {
+            $users = User::where(["city" => Auth::user()->city])->get();
+        }
+
+        $coordinators = array();
+        $managers = array();
+
+        foreach ($users as $user) {
+            if ($user->hasRole('coordinator')) {
+                array_push($coordinators, $user);
+            }
+            if ($user->hasRole('manager')) {
+                array_push($managers, $user);
+            }
+        }
+
+
+        return view('roles.director.employer.edit', compact('user', 'cities', 'director', 'managers'));
     }
 
     public function updateUser(User $user, Request $request)
     {
         $data = $request->all();
+//        dd($data);
 
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $count = mb_strlen($chars);
@@ -1074,12 +1093,13 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
-        if($user->hasRole('manager')){
+        $user->mentor_id = $data['mentor_id'];
+        if ($user->hasRole('manager')) {
             $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
         }
         $user->password = bcrypt($result);
-        if(Auth::user()->isAdmin&&$user->hasRole('coordinator')){
-            CoordinatorCity::where(["user_id"=>$user->id])->delete();
+        if (Auth::user()->isAdmin && $user->hasRole('coordinator')) {
+            CoordinatorCity::where(["user_id" => $user->id])->delete();
             $cities = City::all();
             foreach ($cities as $city) {
                 if (array_key_exists(str_replace(' ', '_', $city->name), $data)) {
@@ -1231,7 +1251,6 @@ class DirectorController extends Controller
     }
 
 
-
     public function getMainOffice(Request $request)
     {
         $user = Auth::user();
@@ -1337,7 +1356,6 @@ class DirectorController extends Controller
     }
 
 
-
     public function searchTransactions(Request $request)
     {
         $user = Auth::user();
@@ -1347,32 +1365,28 @@ class DirectorController extends Controller
             $city = City::where(['id' => Auth::user()->city])->first();
         }
 
-        if($request->query('state')){
-            $state=$request->query('state');
-        }
-        else{
-            $state=0;
-        }
-
-        if($request->query('description')){
-            $description=$request->query('description');
-        }
-        else{
-            $description='';
+        if ($request->query('state')) {
+            $state = $request->query('state');
+        } else {
+            $state = 0;
         }
 
-        if($request->query('type')){
-            $type=$request->query('type');
-        }
-        else{
-            $type='';
+        if ($request->query('description')) {
+            $description = $request->query('description');
+        } else {
+            $description = '';
         }
 
-        if($request->query('responsible')){
-            $responsible=$request->query('responsible');
+        if ($request->query('type')) {
+            $type = $request->query('type');
+        } else {
+            $type = '';
         }
-        else{
-            $responsible=0;
+
+        if ($request->query('responsible')) {
+            $responsible = $request->query('responsible');
+        } else {
+            $responsible = 0;
         }
 
         if ($request->query('date')) {
@@ -1383,12 +1397,12 @@ class DirectorController extends Controller
 
 //        dd($transactions);
 
-        $transactions=$city->getTransactionQuery($date,$description,$state,$type,$responsible);
+        $transactions = $city->getTransactionQuery($date, $description, $state, $type, $responsible);
 
-        $allUsers=User::all();
+        $allUsers = User::all();
 
         $states = TransactionState::all();
-        return view('roles.director.transactions_search', compact('transactions', 'city', 'date', 'states','date','description','state','type','responsible','allUsers'));
+        return view('roles.director.transactions_search', compact('transactions', 'city', 'date', 'states', 'date', 'description', 'state', 'type', 'responsible', 'allUsers'));
     }
 
     public function doSearchTransaction(Request $request)
@@ -1401,27 +1415,25 @@ class DirectorController extends Controller
             "responsible" => '',
         ]);
 
-        $temp=[];
-        foreach ($data as $key=>$item){
-            if($item!=null){
-                $temp[$key]=$item;
+        $temp = [];
+        foreach ($data as $key => $item) {
+            if ($item != null) {
+                $temp[$key] = $item;
             }
         }
 
-        $query='?';
-        $index=1;
-        foreach ($temp as $key=>$item){
-            if($index==count($temp)){
-                $query=$query.$key.'='.$item;
-            }
-            else{
-                $query=$query.$key.'='.$item.'&&';
+        $query = '?';
+        $index = 1;
+        foreach ($temp as $key => $item) {
+            if ($index == count($temp)) {
+                $query = $query . $key . '=' . $item;
+            } else {
+                $query = $query . $key . '=' . $item . '&&';
                 $index++;
             }
         }
-        return redirect('/director/transactions/search/'.$query);
+        return redirect('/director/transactions/search/' . $query);
     }
-
 
 
     public function showTransactionDocs(Transaction $transaction)
@@ -1552,24 +1564,24 @@ class DirectorController extends Controller
         $days = $this->getDirectorDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
 
-        $monthLeads = Repair::whereBetween('repair_date',[Carbon::createFromDate($date)->startOfMonth()->toDateString(),Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
+        $monthLeads = Repair::whereBetween('repair_date', [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
 
 
-        $suka=[];
+        $suka = [];
 
-        foreach ($monthLeads as $monthLead){
-            if($city->name==$monthLead->lead->city){
-                array_push($suka,$monthLead);
+        foreach ($monthLeads as $monthLead) {
+            if ($city->name == $monthLead->lead->city) {
+                array_push($suka, $monthLead);
             }
         }
 
 
-        $monthLeads=$suka;
+        $monthLeads = $suka;
 
 
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['repair_date'])[2]);
-            if($lead->status=='completed'){
+            if ($lead->status == 'completed') {
                 $days[$day - 1]['repairs_confirmed'] += $lead->check;
             }
 //            echo $lead->check;
@@ -1662,16 +1674,16 @@ class DirectorController extends Controller
         }
         $employers = $temp;
 
-        $totalProductsPercent=0.09;
+        $totalProductsPercent = 0.09;
 
         if ($totalConfirmed < 1000000) {
             $totalSalary = round((50000.0 / (count($days) - $weekends)) * $totalWorkDays);
         } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 2000000) {
             $totalSalary = round($totalConfirmed * 0.09);
-            $totalProductsPercent=0.09;
-        } else  {
+            $totalProductsPercent = 0.09;
+        } else {
             $totalSalary = round($totalConfirmed * 0.10);
-            $totalProductsPercent=0.1;
+            $totalProductsPercent = 0.1;
         }
 
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $director->id, "type" => 'minus'])->get();
@@ -1680,22 +1692,21 @@ class DirectorController extends Controller
             $totalDeduction += $deduction->amount;
         }
 
-        $lowMargeChecksDeduction=0;
+        $lowMargeChecksDeduction = 0;
 
-        $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city","=",$director->city()->name],['salary_debuff','!=',false]])->get();
+        $lowMargeChecks = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city", "=", $director->city()->name], ['salary_debuff', '!=', false]])->get();
 
 
-        foreach ($lowMargeChecks as $check){
-            $lowMargeChecksDeduction+=$check->repair->check;
+        foreach ($lowMargeChecks as $check) {
+            $lowMargeChecksDeduction += $check->repair->check;
         }
 
-        $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
-
+        $lowMargeChecksDeduction = $lowMargeChecksDeduction * $totalProductsPercent;
 
 
 //        dd($totalSalary);
 
-        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalSalary','lowMargeChecks','lowMargeChecksDeduction'));
+        return view('cards.director', compact('date', 'dateTitle', 'formattedDate', 'city', 'director', 'days', 'nextMonthLink', 'prevMonthLink', 'totalWorkDays', 'totalConfirmed', 'documents', 'documents', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalSalary', 'lowMargeChecks', 'lowMargeChecksDeduction'));
     }
 
     public function addWorkDay(User $director, Request $request)
@@ -1784,6 +1795,17 @@ class DirectorController extends Controller
                 break;
         }
 
+        if ($request->query('day')) {
+            $day_start = $request->query('day');
+        } else {
+            $day_start = Carbon::createFromDate(date('Y-m-d', strtotime('saturday this week')))->toDateString();
+        }
+
+        $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
+        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
+
+//        dd($day_start,$nextSaturday,$prevSaturday);
+
 
         $dateTitle = $dateTitle . $dateTemp[0];
 
@@ -1811,26 +1833,14 @@ class DirectorController extends Controller
             }
         }
         $employers = User::where(["city" => $city->id])->get();
-        $managers = array();
-        $directors = array();
-        $operators = array();
         $masters = array();
-        $coordinators = array();
         foreach ($employers as $employer) {
-            if ($employer->hasRole('manager')) {
-                array_push($managers, $employer);
-            } elseif ($employer->hasRole('director')) {
-                array_push($directors, $employer);
-            } elseif ($employer->hasRole('operator')) {
-                array_push($operators, $employer);
-            } elseif ($employer->hasRole('master')) {
+            if ($employer->hasRole('master')) {
                 array_push($masters, $employer);
-            } elseif ($employer->hasRole('coordinator')) {
-                array_push($coordinators, $employer);
             }
         }
 
-        return view('roles.director.avance', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
+        return view('roles.director.avance', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'masters', 'date','nextSaturday','prevSaturday'));
     }
 
 
@@ -1940,7 +1950,6 @@ class DirectorController extends Controller
 
         return view('roles.director.avance_operator', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
     }
-
 
 
     public function avanceMonthView(Request $request)
@@ -2053,7 +2062,6 @@ class DirectorController extends Controller
     public function payAvance(Request $request)
     {
         $data = $request->all();
-//        dd($data);
         $data = array_slice($data, 2, count($data));
         $values = array();
         $users = array();
@@ -2071,7 +2079,7 @@ class DirectorController extends Controller
 
         foreach ($users as $user) {
             $recepient = User::where(["id" => $user])->first();
-            $recepient->addSalary($values[$counter],$data['date']);
+            $recepient->addSalary($values[$counter], $data['date']);
             $counter++;
         }
 
@@ -2185,7 +2193,6 @@ class DirectorController extends Controller
 
         return view('roles.director.salary', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
     }
-
 
 
     public function operatorSalaryView(Request $request)
@@ -2307,7 +2314,7 @@ class DirectorController extends Controller
         $salary = $user->salary($date) - $payedSalary;
 //        dd($user->salary($date));
 
-        $user->addSalary($salary,$date);
+        $user->addSalary($salary, $date);
 
         return redirect()->back();
     }
@@ -2583,8 +2590,8 @@ class DirectorController extends Controller
         $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city", '=', $city->name], ["manager_id", "!=", null]])->get();
 
         $logs = array();
-        $totalSelled=0;
-        $totalConfirmed=0;
+        $totalSelled = 0;
+        $totalConfirmed = 0;
         foreach ($leads as $lead) {
             $manager = $lead->getManagerId->id;
             $neededObject = array_filter(
@@ -2595,20 +2602,19 @@ class DirectorController extends Controller
             );
             $neededObject = array_key_first($neededObject);
             $managersCalendar[$neededObject]['productsSelled'] += intval($lead->check);
-            $totalSelled+= intval($lead->check);
+            $totalSelled += intval($lead->check);
 
-            $managersCalendar[$neededObject]['productsConfirmed'] += $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
-            $totalConfirmed+= $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
+            $managersCalendar[$neededObject]['productsConfirmed'] += $lead->repair && $lead->repair->status == 'completed' ? intval($lead->repair->check) : 0;
+            $totalConfirmed += $lead->repair && $lead->repair->status == 'completed' ? intval($lead->repair->check) : 0;
         }
         $managersCalendar = collect($managersCalendar);
 
         $managersCalendar = $managersCalendar->sortByDesc('productsConfirmed');
 
 
-
 //        dd($managersCalendar);
 
-        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'managersCalendar','totalSelled','totalConfirmed'));
+        return view('roles.director.statistic.posygramm', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'managersCalendar', 'totalSelled', 'totalConfirmed'));
     }
 
 
@@ -2685,7 +2691,7 @@ class DirectorController extends Controller
         }
 
 
-        $cities=City::where([["id","!=",999]])->get();
+        $cities = City::where([["id", "!=", 999]])->get();
 
         $citiesCalendar = array();
 
@@ -2698,14 +2704,14 @@ class DirectorController extends Controller
 
 //        dd($startDate,$endDate);
 
-        $leads = Lead::whereBetween("meeting_date", [$startDate, $endDate])->where([["status","!=","declined"]])->get();
+        $leads = Lead::whereBetween("meeting_date", [$startDate, $endDate])->where([["status", "!=", "declined"]])->get();
 //        dd($leads);
         $logs = array();
-        $totalSelled=0;
-        $totalConfirmed=0;
+        $totalSelled = 0;
+        $totalConfirmed = 0;
 
         foreach ($leads as $lead) {
-            $cityTemp = City::where(["name"=>$lead->city])->first();
+            $cityTemp = City::where(["name" => $lead->city])->first();
             $neededObject = array_filter(
                 $citiesCalendar,
                 function ($e) use (&$cityTemp) {
@@ -2714,9 +2720,9 @@ class DirectorController extends Controller
             );
             $neededObject = array_key_first($neededObject);
             $citiesCalendar[$neededObject]['productsSelled'] += intval($lead->check);
-            $totalSelled+= intval($lead->check);
-            $citiesCalendar[$neededObject]['productsConfirmed'] += $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
-            $totalConfirmed+= $lead->repair&&$lead->repair->status=='completed' ? intval($lead->repair->check) : 0;
+            $totalSelled += intval($lead->check);
+            $citiesCalendar[$neededObject]['productsConfirmed'] += $lead->repair && $lead->repair->status == 'completed' ? intval($lead->repair->check) : 0;
+            $totalConfirmed += $lead->repair && $lead->repair->status == 'completed' ? intval($lead->repair->check) : 0;
         }
         $citiesCalendar = collect($citiesCalendar);
 
@@ -2724,9 +2730,8 @@ class DirectorController extends Controller
 
 //        dd($managersCalendar);
 
-        return view('roles.director.statistic.posygramm_cities', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'cities', 'date', 'citiesCalendar','totalConfirmed','totalSelled'));
+        return view('roles.director.statistic.posygramm_cities', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'cities', 'date', 'citiesCalendar', 'totalConfirmed', 'totalSelled'));
     }
-
 
 
 }

@@ -36,7 +36,6 @@
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <p class="mb-0 fw-normal"><strong>ФИО: </strong>{{$lead->client_fullname}}</p>
                                 <p class="mb-0 fw-normal"><strong>Адрес: </strong>{{$lead->address}}</p>
-                                <p class="mb-0 fw-normal"><strong>Телефон: </strong> {{$lead->phone}}</p>
                                 <p class="mb-0 fw-normal"><strong>Доп: </strong>{{$lead->comment}}</p>
                                 <p class="mb-0 fw-normal"><strong>Тип работ:</strong> {{$lead->jobType->name}}</p>
                             </th>

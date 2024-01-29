@@ -567,7 +567,7 @@ class LeadsController extends Controller
     public function getManagerLeads()
     {
         $manager = Auth::user();
-        $leads = Lead::where([['manager_id', '=', $manager->id],['issued','=',null]])->get();
+        $leads = Lead::where([['manager_id', '=', $manager->id],['issued','=',null],['status','!=','declined']])->get();
 
         return view('roles.manager.leads', compact('leads', 'manager'));
     }
@@ -912,7 +912,13 @@ class LeadsController extends Controller
             $totalConfirmed += $day['products_confirmed'];
         }
 
-        if ($totalConfirmed < 200000) {
+        if ($totalConfirmed < 100000) {
+            $oklad = 0;
+            $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
+
+        }
+
+        else if ($totalConfirmed >= 100000 &&$totalConfirmed < 200000) {
             $oklad = 5000;
             $okladSallary = $oklad * $totalWorkDays / (count($days) - $weekends);
 
@@ -1012,15 +1018,40 @@ class LeadsController extends Controller
 
         $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
 
+        $studentsSalary=0;
+        $norm_students=array();
 
-        $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
+        if ($manager->students && count($manager->students) > 0 && $totalConfirmed >= 400000) {
+            $students = $manager->students;
+            $students_percent = 0.01;
+            if ($totalConfirmed >= 600000) {
+                $students_percent = 0.02;
+            }
+//            dd($students);
+            foreach ($students as $student) {
+                $student_leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $student->id);
+                $student_totalConfirmed = 0;
+                foreach ($student_leads as $lead) {
+                    if ($lead->repair && $lead->repair->status == 'completed') {
+                        $student_totalConfirmed += $lead->repair->check;
+                    }
+                }
+                array_push($norm_students,["student"=>$student,"confirmed"=>$student_totalConfirmed]);
+                if($student_totalConfirmed>=400000){
+                    $studentsSalary+=($student_totalConfirmed*$students_percent);
+                }
+            }
+        }
+
+
+        $totalSalary = $totalProductsSalary + $okladSallary +$studentsSalary - $totalDeduction-$lowMargeChecksDeduction;
 
 //        dd($okladSallary);
 
 //        dd($totalProductsPercent,$totalConfirmed);
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary','lowMargeChecksDeduction','lowMargeChecks','totalDeclinedRepairs','conversion'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary','lowMargeChecksDeduction','lowMargeChecks','totalDeclinedRepairs','conversion','studentsSalary','norm_students'));
         }
 
 

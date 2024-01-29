@@ -22,8 +22,8 @@
                    href="/director/gsm{{$role=='manager'?'/managers':'/masters'}}?date={{\Carbon\Carbon::createFromDate($date)->subWeek()->toDateString()}}&day={{$prevMonday}}">Предыдущая
                     неделя</a>
             </div>
-            <div id="date-head">
-                <p class="fs-3">{{$dateTitle}}</p>
+            <div id="date-head" {{\Carbon\Carbon::setLocale('ru')}}>
+                <p class="fs-3">{{\Illuminate\Support\Carbon::createFromDate($date)->startOfWeek()->translatedFormat('j F Y')}} - {{\Illuminate\Support\Carbon::createFromDate($date)->endOfWeek()->subDays(1)->translatedFormat('j F Y')}}</p>
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"

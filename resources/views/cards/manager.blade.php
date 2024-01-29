@@ -5,7 +5,7 @@
 @section('content')
     <div class="container">
         <div class="d-flex align-items-center gap-3 my-3">
-            <p class="fw-bold mb-0 fs-3">{{$manager->name}}</p>
+            <p class="fw-bold mb-0 fs-3">{{$manager->name}} </p>
             @role('coordinator')
             <button id="status"
                     class="btn h-25 manager-{{$manager->status}}">{{$manager_statuses[$manager->status]}}
@@ -69,6 +69,10 @@
                     class="btn btn-secondary text-white rounded-2  p-2">Бонусы и удержания
             </button>
 
+            <button onclick="showStudents()"
+                    class="btn btn-primary text-white rounded-2  p-2">Стажёры
+            </button>
+
             <script>
                 document.getElementById('change-status').addEventListener('click', () => {
                     document.getElementById('change-status').className = 'd-none';
@@ -105,6 +109,34 @@
                         src="{{ URL::to('/documents') }}/{{$document}}"/></a>
             @endforeach
         </div>
+
+        <div id="students-pop" class="d-none">
+            <table class="table table-bordered table-sm table-light ">
+                <thead class="">
+                <tr>
+                    <th class="fw-bold p-2 text-left" scope="col">Подчинённый</th>
+                    <th class="fw-bold p-2 text-left" scope="col">ТО Зачет</th>
+                    <th class="fw-bold p-2 text-left" scope="col">Процент тимлида {{$totalConfirmed>400000?($totalConfirmed>600000?'2%':'1%'):'0%'}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($norm_students as $student)
+                    <tr>
+                        <th class="fw-normal p-2 text-left" scope="col">
+                            {{$student['student']->name}}
+                        </th>
+                        <th class="fw-normal p-2 text-left" scope="col">
+                            {{$student['confirmed']}}
+                        </th>
+                        <th class="fw-normal p-2 text-left" scope="col">
+                            {{$student['confirmed']>=400000?$student['confirmed']*($totalConfirmed>400000?($totalConfirmed>600000?0.02:0.01):0):0}}
+                        </th>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+
         <div class="d-none" id="bonuses">
             <div class="d-flex flex-column">
                 <p class="w-100 text-center fw-bold fs-4">Бонусы</p>
@@ -264,6 +296,19 @@
                 }
             }
 
+            isStudentsOpen = false;
+
+            function showStudents() {
+                if (!isStudentsOpen) {
+                    document.getElementById('students-pop').className = 'w-100 row bg-secondary-subtle m-0 p-4 row-cols-2 my-4'
+                    isStudentsOpen = true;
+                } else {
+                    document.getElementById('students-pop').className = 'd-none'
+                    isStudentsOpen = false;
+                }
+            }
+
+
         </script>
         @endrole
 
@@ -387,7 +432,9 @@
                     <th scope="col" class="fw-normal text-center">ТО Зачёт</th>
                     @foreach($days as $day)
                         @if($day['meetings']!=0)
-                            <th class="fw-normal text-center" scope="col"><a href="/repairs/search?date={{$day['date']}}&&manager_id={{$manager->id}}">{{$day['products_confirmed']}}</a></th>
+                            <th class="fw-normal text-center" scope="col"><a
+                                    href="/repairs/search?date={{$day['date']}}&&manager_id={{$manager->id}}">{{$day['products_confirmed']}}</a>
+                            </th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>
                         @endif
@@ -408,8 +455,8 @@
                     @if($totalDeclinedRepairs<3)
                         <th class="fw-bold text-center" scope="col">% отказ</th>
                     @endif
-                    @if(count($manager->stagers($date)))
-                        <th class="fw-bold text-center" scope="col">% стажёр</th>
+                    @if($studentsSalary)
+                        <th class="fw-bold text-center" scope="col">% стажёры</th>
                     @endif
 
                     @if($conversion>=0.5)
@@ -433,10 +480,11 @@
                     <th class="fw-normal text-center"
                         scope="col">{{$totalConfirmed*0.1}}</th>
                     @if($totalDeclinedRepairs<3)
-                        <th class="fw-normal text-center" scope="col">{{$totalDeclinedRepairs<3?$totalConfirmed*0.01:0}}</th>
+                        <th class="fw-normal text-center"
+                            scope="col">{{$totalDeclinedRepairs<3?$totalConfirmed*0.01:0}}</th>
                     @endif
-                    @if(count($manager->stagers($date)))
-                        <th class="fw-normal text-center" scope="col">{{count($manager->stagers($date))?$totalConfirmed*0.01:0}}</th>
+                    @if($studentsSalary)
+                        <th class="fw-normal text-center" scope="col">{{$studentsSalary}}</th>
                     @endif
 
                     @if($conversion>=0.5)
@@ -444,7 +492,8 @@
                     @endif
 
                     @if($totalConfirmed>400000)
-                        <th class="fw-normal text-center" scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
+                        <th class="fw-normal text-center"
+                            scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
                     @endif
 
                     <th class="fw-normal text-center"
@@ -452,7 +501,9 @@
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center"
                         scope="col">{{round($okladSallary)}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$lowMargeChecksDeduction}} ({{count($lowMargeChecks)}} шт.)</th>
+                    <th class="fw-normal text-center" scope="col">{{$lowMargeChecksDeduction}}
+                        ({{count($lowMargeChecks)}} шт.)
+                    </th>
                     <th class="fw-normal text-center" scope="col">{{$totalDeduction}}</th>
                     <th class="fw-normal text-center" scope="col">{{$manager->payedSalary($date)}}</th>
                     <th class="fw-normal text-center"

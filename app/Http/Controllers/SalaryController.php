@@ -10,6 +10,7 @@ use App\Models\Lead;
 use App\Models\Plan;
 use App\Models\Repair;
 use App\Models\Salary;
+use App\Models\Transaction;
 use App\Models\TransactionState;
 use App\Models\User;
 use Carbon\Carbon;
@@ -19,14 +20,14 @@ use Illuminate\Support\Facades\Redirect;
 
 class SalaryController extends Controller
 {
-    public function addSalary(User $user, $money,$date)
+    public function addSalary(User $user, $money, $date)
     {
         $yearTemp = preg_split("/[^1234567890]/", $date)[0];
         $monthTemp = preg_split("/[^1234567890]/", $date)[1];
         $salary = Salary::where(["month" => $monthTemp, "year" => $yearTemp, "user_id" => $user->id])->first();
         $city_id = $user->city;
 
-        if($user->city()->budget()->money<$money){
+        if ($user->city()->budget()->money < $money) {
             return Redirect::to(route('director.transactions.error'))->send();
         }
 
@@ -46,12 +47,12 @@ class SalaryController extends Controller
             $state = TransactionState::getByCode('2.01.2.2.');
         } elseif ($user->hasRole('operator')) {
             $state = TransactionState::getByCode('2.01.2.10.');
-            $city_id=999;
+            $city_id = 999;
         }
         $desc = 'Выплата  ' . $user->name . ' ' . Carbon::today()->toDateString();
         $value = $money;
         $responsible = Auth::user()->id;
-        $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, '');
+        $transaction = app(\App\Http\Controllers\TransactionController::class)->newExpense($state->id, $desc, $value, $responsible, $city_id, '',$date);
     }
 
     public function getDaysInMonthWithWeekdays($month, $year)
@@ -97,16 +98,16 @@ class SalaryController extends Controller
 
         $date = explode('-', $date);
 
-        $temp=[];
+        $temp = [];
 
-        foreach ($repairs as $repair){
-            if($repair->lead->city==$city->name){
-                array_push($temp,$repair);
+        foreach ($repairs as $repair) {
+            if ($repair->lead->city == $city->name) {
+                array_push($temp, $repair);
             }
         }
 
 
-        $repairs=$temp;
+        $repairs = $temp;
 //        dd($repairs);
 
 //        dd($repairs);
@@ -122,7 +123,7 @@ class SalaryController extends Controller
         $totalConfirmed = 0;
         $confirmed = array();
         foreach ($repairs as $repair) {
-            if(!$repair->lead->salary_debuff){
+            if (!$repair->lead->salary_debuff) {
                 array_push($confirmed, $repair);
                 $totalConfirmed += $repair->check;
             }
@@ -146,20 +147,19 @@ class SalaryController extends Controller
 //            dd($confirmed);
 
 
-        $totalProductsPercent=0.09;
+        $totalProductsPercent = 0.09;
 
         if ($totalConfirmed < 1000000) {
             $totalSalary = round(50000 / $monthWorkDays * count($workDays));
         } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 2000000) {
             $totalSalary = round($totalConfirmed * 0.09);
-            $totalProductsPercent=0.09;
+            $totalProductsPercent = 0.09;
         } elseif ($totalConfirmed >= 2000000 && $totalConfirmed < 3000000) {
             $totalSalary = round($totalConfirmed * 0.10);
-            $totalProductsPercent=0.1;
-        }
-        else{
+            $totalProductsPercent = 0.1;
+        } else {
             $totalSalary = round($totalConfirmed * 0.10);
-            $totalProductsPercent=0.1;
+            $totalProductsPercent = 0.1;
         }
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;
@@ -167,19 +167,19 @@ class SalaryController extends Controller
             $totalDeduction += $deduction->amount;
         }
 
-        $lowMargeChecksDeduction=0;
+        $lowMargeChecksDeduction = 0;
 
-        $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city","=",$user->city()->name],['salary_debuff','!=',false]])->get();
+        $lowMargeChecks = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["city", "=", $user->city()->name], ['salary_debuff', '!=', false]])->get();
 
 
-        foreach ($lowMargeChecks as $check){
-            $lowMargeChecksDeduction+=$check->repair->check;
+        foreach ($lowMargeChecks as $check) {
+            $lowMargeChecksDeduction += $check->repair->check;
         }
 
-        $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
+        $lowMargeChecksDeduction = $lowMargeChecksDeduction * $totalProductsPercent;
 
 
-        $totalSalary -= ($totalDeduction+$lowMargeChecksDeduction);
+        $totalSalary -= ($totalDeduction + $lowMargeChecksDeduction);
 
 
         return round($totalSalary);
@@ -199,16 +199,15 @@ class SalaryController extends Controller
         $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
 
 
-        $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0],$dateTemp[1],'all',$user->id);
+        $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $user->id);
 //        dd($leads);
 
 
         $completedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where(["status" => 'completed', "manager_id" => $user->id])->get();
 
-        $declinedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["status","=",'declined'],['manager_id','=',$user->id],['entered','!=',null]])->get();
+        $declinedLeads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["status", "=", 'declined'], ['manager_id', '=', $user->id], ['entered', '!=', null]])->get();
 
 //        dd($declinedLeads);
-
 
 
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
@@ -223,7 +222,7 @@ class SalaryController extends Controller
         $totalEnter = 0;
         $totalNullLeads = 0;
         $totalDeclined = 0;
-        $totalDeclinedRepairs=0;
+        $totalDeclinedRepairs = 0;
 
 
         foreach ($leads as $lead) {
@@ -245,7 +244,7 @@ class SalaryController extends Controller
 //        dd($totalDeclined);
 
         if ($totalEnter != 0) {
-            $conversion = ($totalEnter-$totalNullLeads) / ($totalEnter);
+            $conversion = ($totalEnter - $totalNullLeads) / ($totalEnter);
         } else {
             $conversion = 0;
         }
@@ -268,11 +267,11 @@ class SalaryController extends Controller
 
 //        dd($leads);
 
-        foreach ($leads as $lead){
+        foreach ($leads as $lead) {
             if ($lead->repair && $lead->repair->status == 'completed') {
                 $totalConfirmed += $lead->repair->check;
             }
-            if($lead->repair&&($lead->repair->status=='refund'||$lead->repair->status=='declined')){
+            if ($lead->repair && ($lead->repair->status == 'refund' || $lead->repair->status == 'declined')) {
                 $totalDeclinedRepairs++;
             }
         }
@@ -282,22 +281,26 @@ class SalaryController extends Controller
 
         $totalWorkDays = EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get();
 
-        $tempWorkdays=[];
-        $tempDates=[];
+        $tempWorkdays = [];
+        $tempDates = [];
 
-        foreach ($totalWorkDays as $workDay){
-            if(!array_search(Carbon::createFromDate($workDay->created_at)->toDateString(),$tempDates)){
-                array_push($tempDates,Carbon::createFromDate($workDay->created_at)->toDateString());
-                array_push($tempWorkdays,$workDay);
+        foreach ($totalWorkDays as $workDay) {
+            if (!array_search(Carbon::createFromDate($workDay->created_at)->toDateString(), $tempDates)) {
+                array_push($tempDates, Carbon::createFromDate($workDay->created_at)->toDateString());
+                array_push($tempWorkdays, $workDay);
             }
         }
 
-        $totalWorkDays=count($tempWorkdays);
+        $totalWorkDays = count($tempWorkdays);
 
         $oklad = 0;
         $okladSallary = 0;
 
-        if ($totalConfirmed < 200000) {
+        if ($totalConfirmed < 100000) {
+            $oklad = 0;
+            $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
+
+        } else if ($totalConfirmed >= 100000 && $totalConfirmed < 200000) {
             $oklad = 5000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
@@ -353,8 +356,8 @@ class SalaryController extends Controller
         if ($totalDeclinedRepairs < 3) {
             $totalProductsPercent += 0.01;
         }
-        if(count($user->stagers($date))>=1){
-            $totalProductsPercent+=0.01;
+        if (count($user->stagers($date)) >= 1) {
+            $totalProductsPercent += 0.01;
         }
         if ($totalConfirmed >= 400000) {
             $totalProductsPercent += 0.01;
@@ -372,17 +375,45 @@ class SalaryController extends Controller
         }
 
 
-        $lowMargeChecksDeduction=0;
+        $lowMargeChecksDeduction = 0;
 
-        $lowMargeChecks=Lead::whereBetween('created_at', [$startDate, $endDate])->where([["manager_id","=",$user->id],['salary_debuff','!=',false]])->get();
+        $lowMargeChecks = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["manager_id", "=", $user->id], ['salary_debuff', '!=', false]])->get();
 
-        foreach ($lowMargeChecks as $check){
-            $lowMargeChecksDeduction+=$check->repair->check;
+        foreach ($lowMargeChecks as $check) {
+            $lowMargeChecksDeduction += $check->repair->check;
         }
 
-        $lowMargeChecksDeduction=$lowMargeChecksDeduction*$totalProductsPercent;
+        $lowMargeChecksDeduction = $lowMargeChecksDeduction * $totalProductsPercent;
 
-        $totalSalary = $totalProductsSalary + $okladSallary - $totalDeduction-$lowMargeChecksDeduction;
+        $studentsSalary = 0;
+
+//        dd($user->students);
+        if ($user->students && count($user->students) > 0 && $totalConfirmed >= 400000) {
+            $students = $user->students;
+            $students_percent = 0.01;
+            if ($totalConfirmed >= 600000) {
+                $students_percent = 0.02;
+            }
+            $norm_students=array();
+//            dd($students);
+            foreach ($students as $student) {
+                $student_leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $student->id);
+                $student_totalConfirmed = 0;
+                foreach ($student_leads as $lead) {
+                    if ($lead->repair && $lead->repair->status == 'completed') {
+                        $student_totalConfirmed += $lead->repair->check;
+                    }
+                }
+                if($student_totalConfirmed>=400000){
+
+                    $studentsSalary+=($student_totalConfirmed*$students_percent);
+                }
+            }
+        }
+
+//        dd($studentsSalary);
+
+        $totalSalary = $totalProductsSalary + $okladSallary + $studentsSalary - $totalDeduction - $lowMargeChecksDeduction;
 
 
 //        dd($oklad);
@@ -405,7 +436,7 @@ class SalaryController extends Controller
         $totalConfirmed = 0;
         foreach ($repairs as $repair) {
             if ($repair->lead->city == $city->name) {
-                $totalConfirmed += ($repair->check*($repair->master_boost?0.15:0.1));
+                $totalConfirmed += ($repair->check * ($repair->master_boost ? 0.15 : 0.1));
             }
         }
 
@@ -422,6 +453,46 @@ class SalaryController extends Controller
         return round($totalSalary);
     }
 
+    public function getMasterWeekSalary(User $user, $dateStart,$dateEnd)
+    {
+        $city = $user->city();
+//        $date = Carbon::today()->toDateString();
+
+        $repairs = Repair::whereBetween('repair_date', [$dateStart, $dateEnd])->where(["status" => 'completed', "master_id" => $user->id])->get();
+
+        $totalConfirmed = 0;
+        foreach ($repairs as $repair) {
+            if ($repair->lead->city == $city->name) {
+                $totalConfirmed += ($repair->check * ($repair->master_boost ? 0.15 : 0.1));
+            }
+        }
+
+        $totalSalary = $totalConfirmed;
+
+
+
+        $deductions = BonusManager::whereBetween('created_at', [$dateStart, $dateEnd])->where(["user_id" => $user->id, "type" => 'minus'])->get();
+        $totalDeduction = 0;
+        foreach ($deductions as $deduction) {
+            $totalDeduction += $deduction->amount;
+        }
+
+        $totalSalary -= $totalDeduction;
+
+        return round($totalSalary);
+    }
+
+    public function getMasterWeekPayedSalary(User $user,$dateStart,$dateEnd){
+        $rqst='Выплата  '.$user->name;
+        $transactions=Transaction::whereBetween('updated_at', [Carbon::createFromDate($dateStart)->addDay(1)->toDateString(), $dateEnd])->where([["description","LIKE","%{$rqst}%"]])->get();
+//        dd($dateStart,$dateEnd,$transactions);
+        $totalPayed=0;
+        foreach ($transactions as $transaction){
+            $totalPayed+=$transaction->value;
+        }
+        return $totalPayed;
+    }
+
     public function getOperatorSalary(User $user, $date)
     {
         $city = $user->city();
@@ -432,21 +503,20 @@ class SalaryController extends Controller
 
         $leads = Lead::whereBetween('created_at', [$startDate, $endDate])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
 
-        $okna=0;
-        $other=0;
+        $okna = 0;
+        $other = 0;
 
 //        dd($leads);
 
-        foreach ($leads as $lead){
-            if($lead->job_type==1){
+        foreach ($leads as $lead) {
+            if ($lead->job_type == 1) {
                 $okna++;
-            }
-            else{
+            } else {
                 $other++;
             }
         }
 
-        $leadsSalary=$okna*200 + $other*150;
+        $leadsSalary = $okna * 200 + $other * 200;
 
         $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get());
         $daysSalary = $workDays * 200;

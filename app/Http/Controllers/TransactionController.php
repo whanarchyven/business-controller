@@ -13,7 +13,7 @@ use MongoDB\Driver\Session;
 
 class TransactionController extends Controller
 {
-    public function newReceipt($state_id, $description, $value, $responsible, $city_id, $documents)
+    public function newReceipt($state_id, $description, $value, $responsible, $city_id, $documents,$date=null)
     {
         $city = City::where(['id' => $city_id])->first();
         $budget = $city->budget();
@@ -21,14 +21,16 @@ class TransactionController extends Controller
         $budget->money += $value;
         $budget->save();
 
+
         $transaction = new Transaction(["budget_id" => $budget->id, "state_id" => $state_id, "description" => $description, "type" => 'receipt', "responsible" => $responsible, "documents" => $documents, "balance_stamp" => $budget->money, "value" => $value]);
+
         $transaction->save();
 
         return $transaction;
     }
 
 
-    public function newExpense($state_id, $description, $value, $responsible, $city_id, $documents)
+    public function newExpense($state_id, $description, $value, $responsible, $city_id, $documents,$date=null)
     {
         $city = City::where(['id' => $city_id])->first();
         $budget = $city->budget();
@@ -40,6 +42,9 @@ class TransactionController extends Controller
         $budget->save();
 
         $transaction = new Transaction(["budget_id" => $budget->id, "state_id" => $state_id, "description" => $description, "type" => 'expense', "responsible" => $responsible, "documents" => $documents, "balance_stamp" => $budget->money, "value" => $value]);
+        if(!empty($date)){
+            $transaction->updated_at=$date;
+        }
         $transaction->save();
 
         return $transaction;

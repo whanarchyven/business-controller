@@ -47,7 +47,7 @@ Route::group(['middleware' => 'role:manager'], function () {
 });
 
 Route::group(['middleware' => 'role:coordinator'], function () {
-    Route::get('/coordinator/', [App\Http\Controllers\CoordinatorController::class, 'controlTable'])->name('coordinator.managers');
+    Route::get('/coordinator/', [App\Http\Controllers\DirectorController::class, 'controlTable'])->name('coordinator.managers');
     Route::get('/coordinator/leads/{lead}/edit', [App\Http\Controllers\LeadsController::class, 'edit'])->name('coordinator.leads.edit');
     Route::patch('/coordinator/leads/{lead}', [App\Http\Controllers\CoordinatorController::class, 'update'])->name('coordinator.leads.update');
     Route::patch('/coordinator/leads/decline/{lead}', [App\Http\Controllers\DirectorController::class, 'declineLead'])->name('coordinator.leads.decline');

@@ -144,45 +144,45 @@
 {{--                </table>--}}
 {{--            </div>--}}
 
-            <div class="mt-4">
-                <p class="fw-bold fs-2">Мастера</p>
-                <table class="table table-bordered table-sm table-secondary ">
-                    <thead>
-                    <tr>
-                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>
-                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>
-                        <th class="p-2 fw-bold text-left" scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($masters as $master)
-                        <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->name}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left summ {{$master->salary($date)-$master->payedSalary($date)<0?'text-danger':'text-black'}}"
-                                scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>
+{{--            <div class="mt-4">--}}
+{{--                <p class="fw-bold fs-2">Мастера</p>--}}
+{{--                <table class="table table-bordered table-sm table-secondary ">--}}
+{{--                    <thead>--}}
+{{--                    <tr>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">ФИО</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Удержано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">Выдано</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col">К выдаче</th>--}}
+{{--                        <th class="p-2 fw-bold text-left" scope="col"></th>--}}
+{{--                    </tr>--}}
+{{--                    </thead>--}}
+{{--                    <tbody>--}}
+{{--                    @foreach($masters as $master)--}}
+{{--                        <tr class="table-light">--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->name}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left" scope="col">{{$master->payedSalary($date)}}</th>--}}
+{{--                            <th class="p-2 fw-bold text-left summ {{$master->salary($date)-$master->payedSalary($date)<0?'text-danger':'text-black'}}"--}}
+{{--                                scope="col">{{$master->salary($date)-$master->payedSalary($date)}}</th>--}}
 
-                            <th class="p-2 fw-bold text-left" scope="col">
-                                @if($master->salary($date)-$master->payedSalary($date)>0)
-                                    <form action="{{route('director.salary.payall',$master)}}" method="post">
-                                        @csrf
-                                        @method('patch')
-                                        <input type="hidden" name="data" value="{{$date}}"/>
-                                        <input type="submit"
-                                               class="btn w-100 btn-success" value="Выплатить"/>
-                                    </form>
-                                @endif
+{{--                            <th class="p-2 fw-bold text-left" scope="col">--}}
+{{--                                @if($master->salary($date)-$master->payedSalary($date)>0)--}}
+{{--                                    <form action="{{route('director.salary.payall',$master)}}" method="post">--}}
+{{--                                        @csrf--}}
+{{--                                        @method('patch')--}}
+{{--                                        <input type="hidden" name="data" value="{{$date}}"/>--}}
+{{--                                        <input type="submit"--}}
+{{--                                               class="btn w-100 btn-success" value="Выплатить"/>--}}
+{{--                                    </form>--}}
+{{--                                @endif--}}
 
-                            </th>
-                        </tr>
-                    @endforeach
-                    </tbody>
+{{--                            </th>--}}
+{{--                        </tr>--}}
+{{--                    @endforeach--}}
+{{--                    </tbody>--}}
 
-                </table>
-            </div>
+{{--                </table>--}}
+{{--            </div>--}}
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>

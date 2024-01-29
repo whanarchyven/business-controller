@@ -122,16 +122,16 @@
                                     <input type="submit" class="my-2 btn btn-success w-100" value="Принял">
                                 </form>
                                 <div class="d-flex flex-column">
-                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                    <div id="{{'control-panel'.$loop->index}}" class="d-flex flex-row gap-2">
                                         <div class="d-flex flex-column gap-2 w-100">
-                                            <button id="decline-btn"
+                                            <button id="{{'decline-btn'.$loop->index}}"
                                                     class="btn btn-danger text-white w-100 rounded-2  p-2">
                                                 Отказ
                                             </button>
                                             <button
                                                 onclick="window.location='{{route('coordinator.leads.edit',$lead->id)}}'"
                                                 class="btn btn-warning text-white w-100 rounded-2  p-2">
-                                                Редатировать
+                                                Редактировать
                                             </button>
                                             <form method="post"
                                                   action="{{route('coordinator.leads.changemanager',$lead)}}">
@@ -164,7 +164,7 @@
 
                                     </div>
                                 </div>
-                                <div id="decline-form-second" class="d-none">
+                                <div id="{{'decline-form-second'.$loop->index}}" class="d-none">
                                     <form class="d-flex gap-2 w-100"
                                           action="{{route('coordinator.leads.decline',$lead->id)}}"
                                           method="post">
@@ -176,9 +176,9 @@
                                     </form>
                                 </div>
                                 <script>
-                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
-                                        document.getElementById('control-panel').className = 'd-none';
-                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    document.getElementById('decline-btn' + {{$loop->index}})?.addEventListener('click', () => {
+                                        document.getElementById('control-panel'+ {{$loop->index}}).className = 'd-none';
+                                        document.getElementById('decline-form-second'+ {{$loop->index}}).className = 'd-flex flex-row gap-2';
                                     })
                                 </script>
 
@@ -192,19 +192,19 @@
                                     <input type="submit" class="btn btn-success w-100" value="Вошёл">
                                 </form>
                                 <div class="d-flex mt-2 flex-column">
-                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                    <div id="{{'control-panel'.$loop->index}}" class="d-flex flex-row gap-2">
                                         <div class="d-flex flex-column gap-2 w-100">
-                                            <button id="decline-btn"
+                                            <button id="{{'decline-btn'.$loop->index}}"
                                                     class="btn btn-danger text-white w-100 rounded-2  p-2">
                                                 Отказ
                                             </button>
                                             <button
-                                                onclick="window.location='{{route('director.leads.edit',$lead->id)}}'"
+                                                onclick="window.location='{{route('coordinator.leads.edit',$lead->id)}}'"
                                                 class="btn btn-warning text-white w-100 rounded-2  p-2">
-                                                Редатировать
+                                                Редактировать
                                             </button>
                                             <form method="post"
-                                                  action="{{route('director.leads.changemanager',$lead)}}">
+                                                  action="{{route('coordinator.leads.changemanager',$lead)}}">
                                                 @csrf
                                                 @method('patch')
                                                 <input type="hidden" name="manager" value="{{$lead->manager_id}}">
@@ -234,7 +234,7 @@
 
                                     </div>
                                 </div>
-                                <div id="decline-form-second" class="d-none">
+                                <div id="{{'decline-form-second'.$loop->index}}" class="d-none">
                                     <form class="d-flex gap-2 w-100"
                                           action="{{route('director.leads.decline',$lead->id)}}"
                                           method="post">
@@ -246,9 +246,9 @@
                                     </form>
                                 </div>
                                 <script>
-                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
-                                        document.getElementById('control-panel').className = 'd-none';
-                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    document.getElementById('decline-btn' + {{$loop->index}})?.addEventListener('click', () => {
+                                        document.getElementById('control-panel' + {{$loop->index}}).className = 'd-none';
+                                        document.getElementById('decline-form-second' + {{$loop->index}}).className = 'd-flex flex-row gap-2';
                                     })
                                 </script>
                                 {{--                                        <form id="decline-form" class="d-none"--}}
@@ -270,7 +270,7 @@
                                            value="exited"/>
                                     <input type="submit" class="btn btn-success w-100" value="Вышел">
                                 </form>
-                            @elseif(!$lead->issued)
+                            @elseif(!isset($lead->check))
                                 {{--                                        <button id="success" class="my-2 btn btn-success w-100">Успешно</button>--}}
                                 {{--                                        <button id="otkaz" class="my-2 btn btn-danger w-100">Отказ</button>--}}
                                 {{--                                        <form id="decline-form-second" class="d-none"--}}
@@ -304,28 +304,29 @@
                                     </div>
                                 </form>
 
-                                <div class="form-group d-flex flex-column">
-                                    <label for="check">Сумма</label>
-                                    <input required class="form-control w-100 my-2" name="check" type="number"/>
-                                    {{--                                                <label for="note">Примечание</label>--}}
-                                    {{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
-                                    {{--                                                          type="text"></textarea>--}}
-                                    {{--                                                <label for="documents">Документы</label>--}}
-                                    {{--                                                <input enctype="multipart/form-data" type="file"--}}
-                                    {{--                                                       class="my-2 form-control"--}}
-                                    {{--                                                       name="documents[]"--}}
-                                    {{--                                                       placeholder="Документы" multiple>--}}
-                                    <input type="submit" class="btn btn-success w-auto"
-                                           value="Закрыть встречу">
-                                </div>
+                                {{--                                <div class="form-group d-flex flex-column">--}}
+                                {{--                                    <label for="check">Сумма</label>--}}
+                                {{--                                    <input required class="form-control w-100 my-2" name="check" type="number"/>--}}
+                                {{--                                    --}}{{--                                                <label for="note">Примечание</label>--}}
+                                {{--                                    --}}{{--                                                <textarea class="form-control w-100 my-2" name="note"--}}
+                                {{--                                    --}}{{--                                                          type="text"></textarea>--}}
+                                {{--                                    --}}{{--                                                <label for="documents">Документы</label>--}}
+                                {{--                                    --}}{{--                                                <input enctype="multipart/form-data" type="file"--}}
+                                {{--                                    --}}{{--                                                       class="my-2 form-control"--}}
+                                {{--                                    --}}{{--                                                       name="documents[]"--}}
+                                {{--                                    --}}{{--                                                       placeholder="Документы" multiple>--}}
+                                {{--                                    <input type="submit" class="btn btn-success w-auto"--}}
+                                {{--                                           value="Закрыть встречу">--}}
+                                {{--                                </div>--}}
 
-                            @elseif($lead->check)
-                                <div onclick="changeCheck()" class="change-check-btn btn-success btn" id="change-check-btn">
+                            @elseif(isset($lead->check))
+                                <div class="change-check-btn btn-success btn"
+                                     id="{{'change-check-btn'.$loop->index}}">
                                     Изменить сумму
                                 </div>
-                                <form id="change-check-form" id="change-check-form" class="d-none"
+                                <form  id="{{'change-check-form'.$loop->index}}" class="d-none"
                                       enctype="multipart/form-data"
-                                      action="{{route('director.manager.leads.close',$lead->id)}}"
+                                      action="{{route('coordinator.manager.leads.close',$lead->id)}}"
                                       method="post">
                                     @csrf
                                     @method('PATCH')
@@ -344,9 +345,15 @@
                                                value="Изменить сумму">
                                     </div>
                                 </form>
+                                <script>
+                                    document.getElementById('change-check-btn'+{{$loop->index}}).addEventListener('click',()=>{
+                                        document.getElementById('change-check-btn'+{{$loop->index}}).className = "d-none";
+                                        document.getElementById('change-check-form'+{{$loop->index}}).className = "flex d-flex flex-column";
+                                    })
+                                </script>
                             @endif
 
-                            @endif
+                        @endif
                     </th>
                 </tr>
             @endforeach
@@ -409,9 +416,9 @@
                                     <input type="submit" class="my-2 btn btn-success w-100" value="Принял">
                                 </form>
                                 <div class="d-flex flex-column">
-                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                    <div id="{{'control-panel'.$loop->index}}" class="d-flex flex-row gap-2">
                                         <div class="d-flex flex-column gap-2 w-100">
-                                            <button id="decline-btn"
+                                            <button id="{{'decline-btn'.$loop->index}}"
                                                     class="btn btn-danger text-white w-100 rounded-2  p-2">
                                                 Отказ
                                             </button>
@@ -451,7 +458,7 @@
 
                                     </div>
                                 </div>
-                                <div id="decline-form-second" class="d-none">
+                                <div id="{{'decline-form-second'.$loop->index}}" class="d-none">
                                     <form class="d-flex gap-2 w-100"
                                           action="{{route('director.leads.decline',$lead->id)}}"
                                           method="post">
@@ -463,9 +470,9 @@
                                     </form>
                                 </div>
                                 <script>
-                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
-                                        document.getElementById('control-panel').className = 'd-none';
-                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    document.getElementById('decline-btn'+{{$loop->index}})?.addEventListener('click', () => {
+                                        document.getElementById('control-panel'+{{$loop->index}}).className = 'd-none';
+                                        document.getElementById('decline-form-second'+{{$loop->index}}).className = 'd-flex flex-row gap-2';
                                     })
                                 </script>
 
@@ -479,9 +486,9 @@
                                     <input type="submit" class="btn btn-success w-100" value="Вошёл">
                                 </form>
                                 <div class="d-flex mt-2 flex-column">
-                                    <div id="control-panel" class="d-flex flex-row gap-2">
+                                    <div id="{{'control-panel'.$loop->index}}" class="d-flex flex-row gap-2">
                                         <div class="d-flex flex-column gap-2 w-100">
-                                            <button id="decline-btn"
+                                            <button id="{{'decline-btn'.$loop->index}}"
                                                     class="btn btn-danger text-white w-100 rounded-2  p-2">
                                                 Отказ
                                             </button>
@@ -522,7 +529,7 @@
 
                                     </div>
                                 </div>
-                                <div id="decline-form-second" class="d-none">
+                                <div id="{{'decline-form-second'.$loop->index}}" class="d-none">
                                     <form class="d-flex gap-2 w-100"
                                           action="{{route('director.leads.decline',$lead->id)}}"
                                           method="post">
@@ -534,9 +541,9 @@
                                     </form>
                                 </div>
                                 <script>
-                                    document.getElementById('decline-btn')?.addEventListener('click', () => {
-                                        document.getElementById('control-panel').className = 'd-none';
-                                        document.getElementById('decline-form-second').className = 'd-flex flex-row gap-2';
+                                    document.getElementById('decline-btn'+{{$loop->index}})?.addEventListener('click', () => {
+                                        document.getElementById('control-panel'+{{$loop->index}}).className = 'd-none';
+                                        document.getElementById('decline-form-second'+{{$loop->index}}).className = 'd-flex flex-row gap-2';
                                     })
                                 </script>
                                 {{--                                        <form id="decline-form" class="d-none"--}}
@@ -592,10 +599,11 @@
                                     </div>
                                 </form>
                             @elseif($lead->check)
-                                <div onclick="changeCheck()" class="change-check-btn btn-success btn" id="change-check-btn">
+                                <div class="change-check-btn btn-success btn"
+                                     id="{{'change-check-btn'.$loop->index}}">
                                     Изменить сумму
                                 </div>
-                                <form id="change-check-form" id="change-check-form" class="d-none"
+                                <form id="{{'change-check-form'.$loop->index}}" id="{{'change-check-form'.$loop->index}}" class="d-none"
                                       enctype="multipart/form-data"
                                       action="{{route('director.manager.leads.close',$lead->id)}}"
                                       method="post">
@@ -614,6 +622,12 @@
                                         {{--                                                       placeholder="Документы" multiple>--}}
                                         <input type="submit" class="btn btn-success w-auto"
                                                value="Изменить сумму">
+                                        <script>
+                                            document.getElementById('change-check-btn'+{{$loop->index}}).addEventListener('click',()=>{
+                                                document.getElementById('change-check-btn'+{{$loop->index}}).className = "d-none";
+                                                document.getElementById('change-check-form'+{{$loop->index}}).className = "flex d-flex flex-column";
+                                            })
+                                        </script>
                                     </div>
                                 </form>
                             @endif
@@ -627,14 +641,6 @@
         </table>
 
         @endrole
-
-        <script>
-            function changeCheck(){
-                document.getElementById('change-check-btn').className="d-none";
-                document.getElementById('change-check-form').className="flex d-flex flex-column";
-
-            }
-        </script>
 
 
         {{--            <div class="bd-cyan-500">--}}

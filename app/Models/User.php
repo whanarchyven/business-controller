@@ -115,6 +115,14 @@ class User extends Authenticatable
         return 'salary -';
     }
 
+    public function masterWeek($dateStart,$dateEnd){
+        return app(\App\Http\Controllers\SalaryController::class)->getMasterWeekSalary($this, $dateStart,$dateEnd);
+    }
+
+    public function masterWeekPayed($dateStart,$dateEnd){
+        return app(\App\Http\Controllers\SalaryController::class)->getMasterWeekPayedSalary($this, $dateStart,$dateEnd);
+    }
+
     public function deductions($date)
     {
 //        $date = Carbon::today()->toDateString();
@@ -129,7 +137,9 @@ class User extends Authenticatable
         return $totalDeduction;
     }
 
-
+    public function students(){
+        return $this->hasMany(User::class,"mentor_id","id");
+    }
 
 
 }

@@ -25,26 +25,15 @@
                             <div class="form-row row-gap-10">
                                 <div class="form-group my-2">
                                     <label for="city">Город:</label>
-                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'
-                                           name="city" list="city" onchange="updateSubcityOptions()">
-                                    <datalist id="city">
-                                        <option value="" disabled selected>Выберите город</option>
-                                        {{--                            <option value="Москва">Москва</option>--}}
-                                        {{--                            <option value="Санкт-Петербург">Санкт-Петербург</option>--}}
-                                        {{--                            <option value="Новосибирск">Новосибирск</option>--}}
-                                        {{--                            <option value="Екатеринбург">Екатеринбург</option>--}}
-                                        {{--                            <option value="Нижний Новгород">Нижний Новгород</option>--}}
-                                        {{--                            <option value="Казань">Казань</option>--}}
-                                        {{--                            <option value="Челябинск">Челябинск</option>--}}
-                                        {{--                            <option value="Омск">Омск</option>--}}
-                                        {{--                            <option value="Самара">Самара</option>--}}
-                                        {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
+{{--                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'--}}
+{{--                                           name="city" list="city" onchange="updateSubcityOptions()">--}}
+                                    <select class="form-control" value="{{$lead->city}}" name="city" id="city">
                                         @foreach($cities as $city)
                                             @if($city->id!=999)
-                                                <option class="" value="{{$city->name}}"></option>
+                                                <option class="text-black" {{$lead->city==$city->name?'selected':''}} value="{{$city->name}}">{{$city->name}}</option>
                                             @endif
                                         @endforeach
-                                    </datalist>
+                                    </select>
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="subcity">Подгород</label>
@@ -155,26 +144,15 @@
                             <div class="form-row row-gap-10">
                                 <div class="form-group my-2">
                                     <label for="city">Город:</label>
-                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'
-                                           name="city" list="city" onchange="updateSubcityOptions()">
-                                    <datalist id="city">
-                                        <option value="" disabled selected>Выберите город</option>
-                                        {{--                            <option value="Москва">Москва</option>--}}
-                                        {{--                            <option value="Санкт-Петербург">Санкт-Петербург</option>--}}
-                                        {{--                            <option value="Новосибирск">Новосибирск</option>--}}
-                                        {{--                            <option value="Екатеринбург">Екатеринбург</option>--}}
-                                        {{--                            <option value="Нижний Новгород">Нижний Новгород</option>--}}
-                                        {{--                            <option value="Казань">Казань</option>--}}
-                                        {{--                            <option value="Челябинск">Челябинск</option>--}}
-                                        {{--                            <option value="Омск">Омск</option>--}}
-                                        {{--                            <option value="Самара">Самара</option>--}}
-                                        {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
+{{--                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'--}}
+{{--                                           name="city" list="city" onchange="updateSubcityOptions()">--}}
+                                    <select class="form-control" value="{{$lead->city}}" name="city" id="city">
                                         @foreach($cities as $city)
                                             @if($city->id!=999)
-                                                <option class="" value="{{$city->name}}"></option>
+                                                <option class="text-black" {{$lead->city==$city->name?'selected':''}} value="{{$city->name}}">{{$city->name}}</option>
                                             @endif
                                         @endforeach
-                                    </datalist>
+                                    </select>
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="subcity">Подгород</label>
@@ -286,26 +264,15 @@
                             <div class="form-row row-gap-10">
                                 <div class="form-group my-2">
                                     <label for="city">Город:</label>
-                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'
-                                           name="city" list="city" onchange="updateSubcityOptions()">
-                                    <datalist id="city">
-                                        <option value="" disabled selected>Выберите город</option>
-                                        {{--                            <option value="Москва">Москва</option>--}}
-                                        {{--                            <option value="Санкт-Петербург">Санкт-Петербург</option>--}}
-                                        {{--                            <option value="Новосибирск">Новосибирск</option>--}}
-                                        {{--                            <option value="Екатеринбург">Екатеринбург</option>--}}
-                                        {{--                            <option value="Нижний Новгород">Нижний Новгород</option>--}}
-                                        {{--                            <option value="Казань">Казань</option>--}}
-                                        {{--                            <option value="Челябинск">Челябинск</option>--}}
-                                        {{--                            <option value="Омск">Омск</option>--}}
-                                        {{--                            <option value="Самара">Самара</option>--}}
-                                        {{--                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>--}}
+{{--                                    <input type="text" value="{{$lead->city}}" class="form-control" id='city-input'--}}
+{{--                                           name="city" list="city" onchange="updateSubcityOptions()">--}}
+                                    <select class="form-control" value="{{$lead->city}}" name="city" id="city">
                                         @foreach($cities as $city)
                                             @if($city->id!=999)
-                                                <option class="" value="{{$city->name}}"></option>
+                                                <option class="text-black" {{$lead->city==$city->name?'selected':''}} value="{{$city->name}}">{{$city->name}}</option>
                                             @endif
                                         @endforeach
-                                    </datalist>
+                                    </select>
                                 </div>
                                 <div class="form-group my-2">
                                     <label for="subcity">Подгород</label>
