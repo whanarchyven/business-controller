@@ -158,7 +158,7 @@ class DirectorController extends Controller
         if ($data && $data['city']) {
             $city_id = $data['city'];
         } else {
-            if ($user->isAdmin) {
+            if ($user->isAdmin||$user->hasRole('coordinator')) {
                 $city_id = Session::get('city')->id;
             } else {
                 $city_id = Auth::user()->city;
@@ -1015,6 +1015,15 @@ class DirectorController extends Controller
 //        $newUser->bet = $data['bet'] ? $data['bet'] : 0;
         $newUser->phone = $data['phone'];
         $newUser->isAdmin = 0;
+        if($data['mentor_id']){
+            if($data['mentor_id']==-1){
+                $newUser->mentor_id = null;
+            }
+            else{
+                $newUser->mentor_id = $data['mentor_id'];
+            }
+        }
+
         $newUser->save();
         switch ($data['role']) {
             case 'operator':
@@ -1062,12 +1071,12 @@ class DirectorController extends Controller
         $coordinators = array();
         $managers = array();
 
-        foreach ($users as $user) {
-            if ($user->hasRole('coordinator')) {
-                array_push($coordinators, $user);
+        foreach ($users as $suka) {
+            if ($suka->hasRole('coordinator')) {
+                array_push($coordinators, $suka);
             }
-            if ($user->hasRole('manager')) {
-                array_push($managers, $user);
+            if ($suka->hasRole('manager')) {
+                array_push($managers, $suka);
             }
         }
 
@@ -1093,7 +1102,14 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
-        $user->mentor_id = $data['mentor_id'];
+        if($data['mentor_id']){
+            if($data['mentor_id']==-1){
+                $user->mentor_id = null;
+            }
+            else{
+                $user->mentor_id = $data['mentor_id'];
+            }
+        }
         if ($user->hasRole('manager')) {
             $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
         }

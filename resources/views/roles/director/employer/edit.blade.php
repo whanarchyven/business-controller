@@ -135,7 +135,7 @@
                                         <div id="mentor-form" class="form-group my-2 ">
                                             <label for="role">Ментор (наставник)</label>
                                             <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">
-                                                <option value={{null}}>{{'БЕЗ НАСТАВНИКА'}}</option>
+                                                <option value={{-1}}>{{'БЕЗ НАСТАВНИКА'}}</option>
                                                 @foreach($managers as $manager)
                                                     <option {{$user->mentor_id==$manager->id?'selected':''}} value={{$manager->id}}>{{$manager->name}}</option>
                                                 @endforeach
