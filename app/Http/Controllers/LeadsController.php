@@ -1021,9 +1021,12 @@ class LeadsController extends Controller
         $studentsSalary=0;
         $norm_students=array();
 
-        if ($manager->students && count($manager->students) > 0 && $totalConfirmed >= 400000) {
+        if ($manager->students && count($manager->students) > 0) {
             $students = $manager->students;
             $students_percent = 0.01;
+            if($totalConfirmed<400000){
+                $students_percent=0;
+            }
             if ($totalConfirmed >= 600000) {
                 $students_percent = 0.02;
             }
