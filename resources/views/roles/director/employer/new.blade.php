@@ -73,15 +73,27 @@
                                         </select>
                                     </div>
 
-                                    <div id="mentor-form" class="form-group my-2 d-none">
+                                    <div id="teacher-form" class="form-group my-2 d-none">
                                         <label for="role">Ментор (наставник)</label>
-                                        <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">
-                                            <option value={{-1}}>{{'БЕЗ НАСТАВНИКА'}}</option>
+                                        <select onchange="updateSubForm()" id="teacher_id" class="form-control" name="teacher_id">
+                                            <option value={{-1}}>{{'БЕЗ НАСТАВНИКA'}}</option>
                                             @foreach($managers as $manager)
                                                 <option value={{$manager->id}}>{{$manager->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    <div id="mentor-form" class="form-group my-2 d-none">
+                                        <label for="role">Тимлидер</label>
+                                        <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">
+                                            <option value={{-1}}>{{'БЕЗ ТИМЛИДА'}}</option>
+                                            @foreach($managers as $manager)
+                                                <option value={{$manager->id}}>{{$manager->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
 
                                     {{--                                    <div id="coordinator-form" class="d-none">--}}
                                     {{--                                        <label for="coordinator_id">Закреплённый координатор</label>--}}
@@ -148,17 +160,20 @@
                                 if (select.value == 'coordinator') {
                                     document.getElementById('city-form').className = 'd-none';
                                     document.getElementById('mentor-form').className = 'd-none'
+                                    document.getElementById('teacher-form').className = 'd-none'
                                     document.getElementById('city-form-coordinator').className = 'form-group my-2';
                                 }
                                 else if(select.value=='manager'){
                                     document.getElementById('city-form').className = 'form-group my-2';
                                     document.getElementById('city-form-coordinator').className = 'd-none';
                                     document.getElementById('mentor-form').className = 'form-group my-2'
+                                    document.getElementById('teacher-form').className = 'form-group my-2'
                                 }
                                 else {
                                     document.getElementById('city-form').className = 'form-group my-2';
                                     document.getElementById('city-form-coordinator').className = 'd-none';
                                     document.getElementById('mentor-form').className = 'd-none'
+                                    document.getElementById('teacher-form').className = 'd-none'
                                 }
                             }
                             document.querySelector("#role").addEventListener('select', updateSubForm)

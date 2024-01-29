@@ -70,7 +70,7 @@
             </button>
 
             <button onclick="showStudents()"
-                    class="btn btn-primary text-white rounded-2  p-2">Стажёры
+                    class="btn btn-primary text-white rounded-2  p-2">Команда
             </button>
 
             <script>
@@ -456,7 +456,11 @@
                         <th class="fw-bold text-center" scope="col">% отказ</th>
                     @endif
                     @if($studentsSalary)
-                        <th class="fw-bold text-center" scope="col">% стажёры</th>
+                        <th class="fw-bold text-center" scope="col">% команда</th>
+                    @endif
+
+                    @if(count($manager->stagers($date))>0)
+                        <th class="fw-bold text-center" scope="col">% стажёр</th>
                     @endif
 
                     @if($conversion>=0.5)
@@ -487,7 +491,12 @@
                         <th class="fw-normal text-center" scope="col">{{$studentsSalary}}</th>
                     @endif
 
-                    @if($conversion>=0.5)
+                    @if(count($manager->stagers($date))>0)
+                        <th class="fw-normal text-center" scope="col">{{0.01*$totalConfirmed}}</th>
+                    @endif
+
+
+                @if($conversion>=0.5)
                         <th class="fw-normal text-center" scope="col">{{$conversion>=0.5?$totalConfirmed*0.01:0}}</th>
                     @endif
 

@@ -70,7 +70,7 @@ class User extends Authenticatable
     }
 
     public function stagers($date){
-        return User::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->where(["mentor_id"=>$this->id])->get();
+        return User::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->where(["teacher_id"=>$this->id])->get();
     }
 
     public function shortname(){

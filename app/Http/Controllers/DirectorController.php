@@ -1023,6 +1023,14 @@ class DirectorController extends Controller
                 $newUser->mentor_id = $data['mentor_id'];
             }
         }
+        if($data['teacher_id']){
+            if($data['teacher_id']==-1){
+                $newUser->teacher_id = null;
+            }
+            else{
+                $newUser->teacher_id = $data['teacher_id'];
+            }
+        }
 
         $newUser->save();
         switch ($data['role']) {
@@ -1110,6 +1118,15 @@ class DirectorController extends Controller
                 $user->mentor_id = $data['mentor_id'];
             }
         }
+        if($data['teacher_id']){
+            if($data['teacher_id']==-1){
+                $user->teacher_id = null;
+            }
+            else{
+                $user->teacher_id = $data['teacher_id'];
+            }
+        }
+
         if ($user->hasRole('manager')) {
             $user->chat_bot_id = $data['chat_bot_id'] ? $data['chat_bot_id'] : $user->chat_bot_id;
         }
