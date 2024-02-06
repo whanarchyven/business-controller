@@ -11,19 +11,21 @@
             @method('post')
 
             <div class="d-flex justify-content-between">
+
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.avance.operator').'?date='.$prevMonthLink}}">Предыдущий
-                        месяц</a>
+                       href="{{route('director.avance.operator')}}?date={{\Carbon\Carbon::createFromDate($date)->subWeek()->toDateString()}}&day={{$prevSaturday}}">Предыдущая
+                        неделя</a>
                 </div>
-                <div id="date-head">
-                    <p class="fs-3">{{$dateTitle}}</p>
+                <div id="date-head" {{\Carbon\Carbon::setLocale('ru')}}>
+                    <p class="fs-3">{{\Illuminate\Support\Carbon::createFromDate($prevSaturday)->translatedFormat('j F Y')}} - {{\Illuminate\Support\Carbon::createFromDate($nextSaturday)->translatedFormat('j F Y')}}</p>
                 </div>
                 <div>
                     <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                       href="{{route('director.avance.operator').'?date='.$nextMonthLink}}">Следующий
-                        месяц</a>
+                       href="{{route('director.avance.operator')}}?date={{\Carbon\Carbon::createFromDate($date)->addWeek()->toDateString()}}&day={{$nextSaturday}}">Следующая
+                        неделя</a>
                 </div>
+
             </div>
 
 {{--            <div class="mt-4">--}}
@@ -128,15 +130,23 @@
                         <tr class="table-light">
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>
-                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->payedSalary($date)}}</th>
-                            <th class="p-2 fw-bold text-left summ {{$operator->salary($date)-$operator->payedSalary($date)<0?'text-danger':'text-black'}}"
-                                scope="col">{{$operator->salary($date)-$operator->payedSalary($date)}}</th>
+                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}</th>
+                            <th class="p-2 fw-bold text-left summ {{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)<0?'text-danger':'text-black'}}"
+                                scope="col">{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <input class="form-control" required
-                                       value="{{$operator->salary($date)-$operator->payedSalary($date)<5000?$operator->salary($date)-$operator->payedSalary($date):5000}}" onchange="checkPay()" max="{{$operator->salary($date)-$operator->payedSalary($date)}}"
-                                       type="number"
-                                       name="operator{{$loop->index}}"/>
-                                <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">
+                                @if(\App\Http\Controllers\DirectorController::isMonthCrossing($prevSaturday,$nextSaturday)==false)
+                                    <input class="form-control" required
+                                           value="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)<5000?$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday):5000}}" onchange="checkPay()" max="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           type="number"
+                                           name="operator{{$loop->index}}"/>
+                                    <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">
+                                @else
+                                    <input class="form-control" required
+                                           value="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}" onchange="checkPay()" max="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           type="hidden"
+                                           name="operator{{$loop->index}}"/>
+                                    <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">
+                                @endif
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <div onclick="window.location.href='{{route('director.operatorcard',$operator)}}'"
@@ -193,8 +203,9 @@
 {{--            </div>--}}
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
-                <input type="hidden" name="date" value="{{$date}}"/>
-                <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
+                <input type="hidden" name="date_start" value="{{$prevSaturday}}"/>
+                <input type="hidden" name="date_end" value="{{$nextSaturday}}"/>
+                <input id="submit-btn" type="submit" value="Выдать авансы" class="btn btn-danger"/>
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
@@ -215,9 +226,14 @@
                         totalValue += Number(item.value)
                     })
                     console.log(totalValue);
+                    if(totalValue==0){
+                        document.getElementById('submit-btn').style='display:none'
+                    }
+                    else{
+                        document.getElementById('submit-btn').style='display:flex'
+                    }
                     document.getElementById('total').innerText = totalValue;
                 }
-
                 checkPay();
             </script>
         </form>

@@ -50,11 +50,12 @@ class RepairsController extends Controller
         return $result;
     }
 
-    public function getMonthRepairs($year, $month, $status)
+    public function getMonthRepairs($date,$status)
     {
-        $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->startOfDay()->toDateString();
+        $endDate = Carbon::createFromDate($date)->endOfMonth()->startOfDay()->toDateString();
         $user = Auth::user();
+
         $city = City::where(["id" => $user->city])->first();
 
         if ($user->isAdmin) {
@@ -76,11 +77,13 @@ class RepairsController extends Controller
                     $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->get();
                     break;
             }
+
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == Session::get('city')->name) {
                     array_push($temp, $repair);
                 }
             }
+//            dd($temp);
             return $temp;
         } else {
             $temp = array();
@@ -197,11 +200,11 @@ class RepairsController extends Controller
 
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
-        $monthRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'all');
-        $declinedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'declined');
-        $completedRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'completed');
+        $monthRepairs = $this->getMonthRepairs($date, 'all');
+        $declinedRepairs = $this->getMonthRepairs($date, 'declined');
+        $completedRepairs = $this->getMonthRepairs($date, 'completed');
 
-        $refundRepairs = $this->getMonthRepairs($dateTemp[0], $dateTemp[1], 'refund');
+        $refundRepairs = $this->getMonthRepairs($date, 'refund');
 
 
         $totalRepairs = 0;
@@ -602,10 +605,10 @@ class RepairsController extends Controller
         return $result;
     }
 
-    public function getMasterMonthLeads($year, $month, $type, $master_id)
+    public function getMasterMonthLeads($date, $type, $master_id)
     {
-        $startDate = Carbon::createFromDate(intval($year), intval($month), 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->subDay();
+        $endDate = Carbon::createFromDate($date)->endOfMonth();
         switch ($type) {
             case 'all':
                 return Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['master_id', '=', $master_id]])->get();
@@ -682,9 +685,9 @@ class RepairsController extends Controller
         $days = $this->getMasterDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
 
-        $monthRepairs = $this->getMasterMonthLeads($dateTemp[0], $dateTemp[1], 'all', $master->id);
-        $succesfull_repairs = $this->getMasterMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $master->id);
-        $declined_repairs = $this->getMasterMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $master->id);
+        $monthRepairs = $this->getMasterMonthLeads($date,'all', $master->id);
+        $succesfull_repairs = $this->getMasterMonthLeads($date,'successful', $master->id);
+        $declined_repairs = $this->getMasterMonthLeads($date,'declined', $master->id);
 
         $totalRepairs = 0;
         $totalDeclined = 0;

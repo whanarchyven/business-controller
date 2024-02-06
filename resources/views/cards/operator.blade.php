@@ -297,6 +297,7 @@
                         <th class="fw-bold text-left" scope="col">За выходы</th>
                         <th class="fw-bold text-left" scope="col">Рабочих дней</th>
                         <th class="fw-bold text-left" scope="col">Общая сумма удержаний</th>
+                        <th class="fw-bold text-left" scope="col">Конверсия</th>
                         <th class="fw-bold text-left" scope="col">Выдано</th>
                         <th class="fw-bold text-left" scope="col">Сумма к выдаче</th>
 
@@ -318,6 +319,9 @@
                         </th>
                         <th class="fw-normal text-left" scope="col">
                             {{$user->deductions($date)}}
+                        </th>
+                        <th class="fw-normal text-left" scope="col">
+                            {{round($totalSuccessful/$totalLeads*100)}} %
                         </th>
                         <th class="fw-normal text-left" scope="col">
                             {{$user->payedSalary($date)}}

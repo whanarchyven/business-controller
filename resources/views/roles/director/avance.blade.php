@@ -51,10 +51,19 @@
                             <th class="p-2 fw-bold text-left summ {{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)<0?'text-danger':'text-black'}}"
                                 scope="col">{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
-                                <input onchange="checkPay()" required class="form-control"
-                                       value="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)<5000?$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday):5000}}" max="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}" type="number"
-                                       name="master{{$loop->index}}"/>
-                                <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">
+                                @if(\App\Http\Controllers\DirectorController::isMonthCrossing($prevSaturday,$nextSaturday)==false)
+                                    <input class="form-control" required
+                                           value="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)<5000?$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday):5000}}" onchange="checkPay()" max="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           type="number"
+                                           name="master{{$loop->index}}"/>
+                                    <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">
+                                @else
+                                    <input class="form-control" required
+                                           value="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}" onchange="checkPay()" max="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           type="hidden"
+                                           name="master{{$loop->index}}"/>
+                                    <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">
+                                @endif
                             </th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <div onclick="window.location.href='{{route('director.mastercard',$master)}}'"
@@ -70,8 +79,9 @@
             </div>
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
-                <input type="hidden" name="date" value="{{$date}}"/>
-                <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
+                <input type="hidden" name="date_start" value="{{$prevSaturday}}"/>
+                <input type="hidden" name="date_end" value="{{$nextSaturday}}"/>
+                <input id="submit-btn" type="submit" value="Выдать авансы" class="btn btn-danger"/>
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
@@ -92,9 +102,14 @@
                         totalValue += Number(item.value)
                     })
                     console.log(totalValue);
+                    if(totalValue==0){
+                        document.getElementById('submit-btn').style='display:none'
+                    }
+                    else{
+                        document.getElementById('submit-btn').style='display:flex'
+                    }
                     document.getElementById('total').innerText = totalValue;
                 }
-
                 checkPay();
             </script>
         </form>

@@ -26,7 +26,7 @@ class City extends Model
 
     public function transactionsPaginate()
     {
-        return $this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->orderBy('created_at','desc');
+        return $this->hasManyThrough(Transaction::class, Budget::class, 'city_id', 'budget_id')->orderBy('id','desc');
     }
 
     public function getTransactionQuery(string $date='',string $description='',int $state=0,string $type='',int $responsible=0)

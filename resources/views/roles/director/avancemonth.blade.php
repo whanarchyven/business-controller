@@ -192,8 +192,9 @@
 {{--            </div>--}}
             <p class="fw-bold fs-2">Итого: <span id="total"></span></p>
             <div class="d-flex gap-3">
-                <input type="hidden" name="date" value="{{$date}}"/>
-                <input type="submit" value="Выдать авансы" class="btn btn-danger"/>
+                <input type="hidden" name="date_start" value="{{$date}}"/>
+                <input type="hidden" name="date_end" value="{{$date}}"/>
+                <input id="submit-btn" type="submit" value="Выдать авансы" class="btn btn-danger"/>
                 <div onclick="generatePDF()" class="btn btn-primary">Печать</div>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
@@ -214,9 +215,14 @@
                         totalValue += Number(item.value)
                     })
                     console.log(totalValue);
+                    if(totalValue==0){
+                        document.getElementById('submit-btn').style='display:none'
+                    }
+                    else{
+                        document.getElementById('submit-btn').style='display:flex'
+                    }
                     document.getElementById('total').innerText = totalValue;
                 }
-
                 checkPay();
             </script>
         </form>

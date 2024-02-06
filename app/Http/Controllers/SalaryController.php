@@ -427,10 +427,9 @@ class SalaryController extends Controller
     {
         $city = $user->city();
 //        $date = Carbon::today()->toDateString();
-        $date = explode('-', $date);
 
-        $startDate = Carbon::createFromDate($date[0], $date[1], 1)->startOfMonth();
-        $endDate = Carbon::createFromDate($date[0], $date[1], 1)->endOfMonth();
+        $startDate = Carbon::createFromDate($date)->startOfMonth()->subDay();
+        $endDate = Carbon::createFromDate($date)->endOfMonth();
         $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where(["status" => 'completed', "master_id" => $user->id])->get();
 
         $totalConfirmed = 0;
@@ -458,7 +457,9 @@ class SalaryController extends Controller
         $city = $user->city();
 //        $date = Carbon::today()->toDateString();
 
-        $repairs = Repair::whereBetween('repair_date', [$dateStart, $dateEnd])->where(["status" => 'completed', "master_id" => $user->id])->get();
+        $repairs = Repair::whereBetween('repair_date', [Carbon::createFromDate($dateStart)->toDateString(), Carbon::createFromDate($dateEnd)->toDateString()])->where(["status" => 'completed', "master_id" => $user->id])->get();
+
+//        dd($repairs);
 
         $totalConfirmed = 0;
         foreach ($repairs as $repair) {
@@ -484,7 +485,7 @@ class SalaryController extends Controller
 
     public function getMasterWeekPayedSalary(User $user,$dateStart,$dateEnd){
         $rqst='Выплата  '.$user->name;
-        $transactions=Transaction::whereBetween('updated_at', [Carbon::createFromDate($dateStart)->addDay(1)->toDateString(), $dateEnd])->where([["description","LIKE","%{$rqst}%"]])->get();
+        $transactions=Transaction::whereBetween('updated_at', [Carbon::createFromDate($dateStart)->toDateString(), Carbon::createFromDate($dateEnd)->subDay()->toDateString()])->where([["description","LIKE","%{$rqst}%"]])->get();
 //        dd($dateStart,$dateEnd,$transactions);
         $totalPayed=0;
         foreach ($transactions as $transaction){
@@ -526,6 +527,60 @@ class SalaryController extends Controller
 
         return round($totalSalary);
     }
+
+
+    public function getOperatorWeekSalary(User $user, $dateStart,$dateEnd)
+    {
+        $city = $user->city();
+
+        $leads = Lead::whereBetween('created_at', [Carbon::createFromDate($dateStart), Carbon::createFromDate($dateEnd)])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
+
+        $okna = 0;
+        $other = 0;
+
+//        dd($leads);
+
+        foreach ($leads as $lead) {
+            if ($lead->job_type == 1) {
+                $okna++;
+            } else {
+                $other++;
+            }
+        }
+//        dd($dateStart,$dateEnd);
+
+//        dd($leads);
+
+        $leadsSalary = $okna * 200 + $other * 200;
+
+        $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$dateStart, $dateEnd])->get());
+        $daysSalary = $workDays * 200;
+
+        $deductions = BonusManager::whereBetween('created_at', [$dateStart, $dateEnd])->where(["user_id" => $user->id, "type" => 'minus'])->get();
+        $totalDeduction = 0;
+        foreach ($deductions as $deduction) {
+            $totalDeduction += $deduction->amount;
+        }
+
+
+        $totalSalary = $daysSalary + $leadsSalary - $totalDeduction;
+
+
+        return round($totalSalary);
+    }
+
+    public function getOperatorWeekPayedSalary(User $user,$dateStart,$dateEnd){
+        $rqst='Выплата  '.$user->name;
+        $transactions=Transaction::whereBetween('updated_at', [Carbon::createFromDate($dateStart)->toDateString(), Carbon::createFromDate($dateEnd)->subDay()->toDateString()])->where([["description","LIKE","%{$rqst}%"]])->get();
+//        dd($dateStart,$dateEnd,$transactions);
+//        dd($transactions);
+        $totalPayed=0;
+        foreach ($transactions as $transaction){
+            $totalPayed+=$transaction->value;
+        }
+        return $totalPayed;
+    }
+
 
 
 }

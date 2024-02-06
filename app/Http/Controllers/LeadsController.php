@@ -87,7 +87,7 @@ class LeadsController extends Controller
             case 'successful':
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['entered', '!=', null], ['operator_id', '=', $operator_id]])->get();
             case 'declined':
-                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'], ['operator_id', '=', $operator_id]])->get();
+                return Lead::whereBetween('created_at', [$startDate, $endDate])->where([['status', '=', 'declined'],['entered', '=', null], ['operator_id', '=', $operator_id]])->get();
             default:
                 return Lead::whereBetween('created_at', [$startDate, $endDate])->get();
         }
@@ -381,6 +381,7 @@ class LeadsController extends Controller
         $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
 
         $monthLeads = $this->getOperatorMonthLeads($dateTemp[0], $dateTemp[1], 'all', $user->id);
+//        dd($monthLeads);
         $successful_leads = $this->getOperatorMonthLeads($dateTemp[0], $dateTemp[1], 'successful', $user->id);
         $declined_leads = $this->getOperatorMonthLeads($dateTemp[0], $dateTemp[1], 'declined', $user->id);
 

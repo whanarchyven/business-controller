@@ -347,11 +347,11 @@
                                         Аванс оператор
                                     </a>
                                 @endif
-                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)
-                                    <a class="dropdown-item" href="{{route('director.salary.pay.operator')}}">
-                                        Ведомость оператор
-                                    </a>
-                                @endif
+{{--                                @if(\Illuminate\Support\Facades\Auth::user()->isAdmin)--}}
+{{--                                    <a class="dropdown-item" href="{{route('director.salary.pay.operator')}}">--}}
+{{--                                        Ведомость оператор--}}
+{{--                                    </a>--}}
+{{--                                @endif--}}
                                 <a class="dropdown-item" href="{{route('director.salary.pay')}}">
                                     Ведомость сотрудники
                                 </a>

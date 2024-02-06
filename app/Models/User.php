@@ -123,6 +123,14 @@ class User extends Authenticatable
         return app(\App\Http\Controllers\SalaryController::class)->getMasterWeekPayedSalary($this, $dateStart,$dateEnd);
     }
 
+    public function operatorWeek($dateStart,$dateEnd){
+        return app(\App\Http\Controllers\SalaryController::class)->getOperatorWeekSalary($this, $dateStart,$dateEnd);
+    }
+
+    public function operatorWeekPayed($dateStart,$dateEnd){
+        return app(\App\Http\Controllers\SalaryController::class)->getOperatorWeekPayedSalary($this, $dateStart,$dateEnd);
+    }
+
     public function deductions($date)
     {
 //        $date = Carbon::today()->toDateString();

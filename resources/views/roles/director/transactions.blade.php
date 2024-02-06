@@ -30,16 +30,16 @@
                     <button class="btn btn-primary h-25" onclick="window.location.href='{{route('director.transactions.search')}}'">Поиск транзакций</button>
                 </div>
                 <a id="top"></a>
-                <a href="#top" style="width: 60px; height: 60px; border-radius: 9999px; right: 20px; bottom: 150px" class="d-flex p-3 justify-content-center align-items-center position-fixed bg-secondary">
+                <div onclick="scrollToTop()" style="width: 60px; height: 60px; border-radius: 9999px; right: 20px; bottom: 150px" class="d-flex p-3 justify-content-center align-items-center position-fixed bg-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="#FFFFFF" class="bi bi-arrow-up" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"></path>
                     </svg>
-                </a>
-                <a href="#bottom" style="width: 60px; height: 60px; border-radius: 9999px; right: 20px; bottom: 60px;transform: rotate(180deg)" class="d-flex p-3 justify-content-center align-items-center position-fixed bg-secondary">
+                </div>
+                <div onclick="scrollToBot()" style="width: 60px; height: 60px; border-radius: 9999px; right: 20px; bottom: 60px;transform: rotate(180deg)" class="d-flex p-3 justify-content-center align-items-center position-fixed bg-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="#FFFFFF" class="bi bi-arrow-up" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"></path>
                     </svg>
-                </a>
+                </div>
                 <table class="table table-bordered table-sm table-secondary ">
                     <thead>
                     <tr>
@@ -150,6 +150,9 @@
                         </div>
                     </form>
                 </div>
+                <div id="bottom">
+
+                </div>
             </div>
             <link rel="stylesheet" href="https://snipp.ru/cdn/select2/4.0.13/dist/css/select2.min.css">
             <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
@@ -163,6 +166,17 @@
                         language: "ru"
                     });
                 });
+            </script>
+            <script>
+                const scrollToTop=()=>{
+                    const top=0
+                    window.scrollTo({top})
+                }
+                const scrollToBot=()=>{
+                    const bot=document.getElementById('bottom').offsetTop;
+                    // alert(bot);
+                    window.scrollTo(0,bot)
+                }
             </script>
         </div>
 

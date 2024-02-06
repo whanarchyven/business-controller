@@ -1110,7 +1110,7 @@ class DirectorController extends Controller
         $user->birth_date = $data['birth_date'] ? $data['birth_date'] : $user->birth_date;
         $user->city = $data['city'] ? $data['city'] : $user->city;
         $user->phone = $data['phone'] ? $data['phone'] : $user->phone;
-        if($data['mentor_id']){
+        if(array_key_exists('mentor_id',$data)&&$data['mentor_id']){
             if($data['mentor_id']==-1){
                 $user->mentor_id = null;
             }
@@ -1118,7 +1118,7 @@ class DirectorController extends Controller
                 $user->mentor_id = $data['mentor_id'];
             }
         }
-        if($data['teacher_id']){
+        if(array_key_exists('teacher_id',$data)&&$data['teacher_id']){
             if($data['teacher_id']==-1){
                 $user->teacher_id = null;
             }
@@ -1885,6 +1885,9 @@ class DirectorController extends Controller
             $date = Carbon::now()->toDateString();
         }
 
+        $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
+        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
+
         $director = Auth::user();
 
         if ($director->isAdmin) {
@@ -1981,7 +1984,7 @@ class DirectorController extends Controller
             }
         }
 
-        return view('roles.director.avance_operator', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
+        return view('roles.director.avance_operator', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date','prevSaturday','nextSaturday'));
     }
 
 
@@ -2091,10 +2094,29 @@ class DirectorController extends Controller
         return view('roles.director.avancemonth', compact('prevMonthLink', 'nextMonthLink', 'formattedDate', 'dateTitle', 'directors', 'masters', 'managers', 'operators', 'coordinators', 'date'));
     }
 
+    static function isMonthCrossing($dateStart,$dateEnd)
+    {
+        $dateStart=Carbon::createFromDate($dateStart);
+        $dateEnd=Carbon::createFromDate($dateEnd);
+        while ($dateStart->lt($dateEnd)){
+            if($dateStart->month!=$dateEnd->month){
+                return true;
+            }
+            else{
+                $dateStart->addDay();
+            }
+        }
+        return false;
+    }
+
 
     public function payAvance(Request $request)
     {
         $data = $request->all();
+        $date_start=Carbon::createFromDate($data['date_start']);
+        $date_end=Carbon::createFromDate($data['date_end']);
+
+
         $data = array_slice($data, 2, count($data));
         $values = array();
         $users = array();
@@ -2111,9 +2133,29 @@ class DirectorController extends Controller
         $counter = 0;
 
         foreach ($users as $user) {
-            $recepient = User::where(["id" => $user])->first();
-            $recepient->addSalary($values[$counter], $data['date']);
-            $counter++;
+            $temp_user = User::where(["id" => $user])->first();
+            if($temp_user){
+                if($this->isMonthCrossing($date_start,$date_end)){
+                    if($temp_user->hasRole('operator')){
+//                        dd($temp_user->operatorWeek(Carbon::createFromDate($date_start)->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_start)->endOfMonth()->toDateTimeLocalString()));
+                        $first_period=$temp_user->operatorWeek(Carbon::createFromDate($date_start)->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_start)->endOfMonth()->toDateTimeLocalString());
+                        $second_period=$temp_user->operatorWeek(Carbon::createFromDate($date_end)->startOfMonth()->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_end)->toDateTimeLocalString());
+                        $temp_user->addSalary($first_period, Carbon::createFromDate($date_start)->endOfMonth()->toDateString());
+                        $temp_user->addSalary($second_period, Carbon::createFromDate($date_end)->startOfMonth()->toDateString());
+                    }
+                    elseif ($temp_user->hasRole('master')){
+                        $first_period=$temp_user->masterWeek(Carbon::createFromDate($date_start)->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_start)->endOfMonth()->toDateTimeLocalString());
+                        $second_period=$temp_user->masterWeek(Carbon::createFromDate($date_end)->startOfMonth()->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_end)->toDateTimeLocalString());
+//                        dd(Carbon::createFromDate($date_end)->startOfMonth()->startOfDay()->toDateTimeLocalString(),Carbon::createFromDate($date_end)->toDateTimeLocalString());
+                        $temp_user->addSalary($first_period, Carbon::createFromDate($date_start)->endOfMonth()->toDateString());
+                        $temp_user->addSalary($second_period, Carbon::createFromDate($date_end)->startOfMonth()->toDateString());
+                    }
+                }
+                else{
+                    $temp_user->addSalary($values[$counter], $date_start->toDateString());
+                    $counter++;
+                }
+            }
         }
 
 
