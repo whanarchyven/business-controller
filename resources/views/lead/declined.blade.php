@@ -59,6 +59,17 @@
                     @endforeach
                     <th class="fw-normal  text-center" scope="row">{{$totalLeads}}</th>
                 </tr>
+                <tr>
+                    <th scope="row text-center">Нулевые</th>
+                    @foreach($days as $day)
+                        @if($day['null']!=0)
+                            <th class="fw-normal text-center" scope="col">{{$day['null']}}</th>
+                        @else
+                            <th class="fw-normal text-center" scope="col"></th>
+                        @endif
+                    @endforeach
+                    <th class="fw-normal  text-center" scope="row">{{$totalNull}}</th>
+                </tr>
 
                 </tbody>
 
@@ -80,7 +91,7 @@
                     <tbody>
                     @foreach($leads as $lead)
                         <tr>
-                            <th class="fw-bold bg-{{$lead->status}} text-left" scope="col">
+                            <th class="fw-bold bg-{{$lead->exited?'in-work':$lead->status}} text-left" scope="col">
                                 <p class="mb-0">Заявка от {{$lead->created_at}}<br/></p>
                                 {{$lead->city}}<br/>
                                 c {{preg_split("/[^1234567890]/", $lead->time_period)[0]}}

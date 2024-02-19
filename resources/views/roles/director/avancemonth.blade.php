@@ -86,14 +86,14 @@
                     <tbody>
                     @foreach($managers as $manager)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->shortname()}}</th>
+                            <th class="p-2 fw-bold text-left {{$manager->deleted_at?'text-danger':''}}" scope="col">{{$manager->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$manager->salary($date)-$manager->payedSalary($date)<0?'text-danger':'text-black'}}"
                                 scope="col">{{$manager->salary($date)-$manager->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">
                                 <input class="form-control"
-                                       required value="{{$manager->salary($date)-$manager->payedSalary($date)<5000?$manager->salary($date)-$manager->payedSalary($date):5000}}" max="{{$manager->salary($date)-$manager->payedSalary($date)}}" type="number"
+                                       required value="{{$manager->salary($date)-$manager->payedSalary($date)}}" max="{{$manager->salary($date)-$manager->payedSalary($date)}}" type="number"
                                        name="manager{{$loop->index}}"/>
                                 <input type="hidden" value="{{$manager->id}}" name="managerEmployer{{$loop->index}}">
                             </th>

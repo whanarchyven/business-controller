@@ -22,8 +22,17 @@
                             <div id="docs" class="btn w-25 btn-primary">
                                 Документы
                             </div>
+                            @if($repair->status=='completed'||$repair->status=='declined'||$repair->status=='refund')
+                                <form id="restore-form" enctype="multipart/form-data"
+                                      action="{{route('repairs.restore',$repair)}}" class="d-flex"
+                                      method="post">
+                                    @csrf
+                                    @method('patch')
+                                    <input type="submit" class="btn w-100 btn-dark" value="Вернуть в работу"/>
+                                </form>
+                            @endif
                         </div>
-                        @if($repair->status!='declined')
+                        @if($repair->status!='declined'&&$repair->status!='completed')
                             <div id="status-panel" class="d-none">
                                 <div id="close-button" onclick="openForm()" class="btn h-100 btn-success">
                                     Закрыть
@@ -58,6 +67,7 @@
                                 <div id="return-button" onclick="openReturn()" class="btn mt-2 h-100 btn-warning">
                                     Возврат
                                 </div>
+
                                 <form id="return-form" enctype="multipart/form-data"
                                       action="{{route('repairs.update',$repair)}}" class="d-none"
                                       method="post">

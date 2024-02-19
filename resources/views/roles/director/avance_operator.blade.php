@@ -128,7 +128,7 @@
                     <tbody>
                     @foreach($operators as $operator)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$operator->shortname()}}</th>
+                            <th class="p-2 fw-bold text-left {{$operator->deleted_at?'text-danger':''}}" scope="col">{{$operator->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)<0?'text-danger':'text-black'}}"
@@ -136,7 +136,7 @@
                             <th class="p-2 fw-bold text-left" scope="col">
                                 @if(\App\Http\Controllers\DirectorController::isMonthCrossing($prevSaturday,$nextSaturday)==false)
                                     <input class="form-control" required
-                                           value="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)<5000?$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday):5000}}" onchange="checkPay()" max="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           value="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}" onchange="checkPay()" max="{{$operator->operatorWeek($prevSaturday,$nextSaturday)-$operator->operatorWeekPayed($prevSaturday,$nextSaturday)}}"
                                            type="number"
                                            name="operator{{$loop->index}}"/>
                                     <input type="hidden" value="{{$operator->id}}" name="operatorEmployer{{$loop->index}}">

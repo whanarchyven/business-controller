@@ -428,9 +428,13 @@ class SalaryController extends Controller
         $city = $user->city();
 //        $date = Carbon::today()->toDateString();
 
-        $startDate = Carbon::createFromDate($date)->startOfMonth()->subDay();
-        $endDate = Carbon::createFromDate($date)->endOfMonth();
-        $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where(["status" => 'completed', "master_id" => $user->id])->get();
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $end = Carbon::createFromDate($date)->toDateString();
+        } else {
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
+        }
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
+        $repairs = Repair::whereBetween('repair_date', [$start, $end])->where(["status" => 'completed', "master_id" => $user->id])->get();
 
         $totalConfirmed = 0;
         foreach ($repairs as $repair) {
@@ -441,7 +445,7 @@ class SalaryController extends Controller
 
         $totalSalary = $totalConfirmed;
 
-        $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
+        $deductions = BonusManager::whereBetween('created_at', [$start, $end])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;
         foreach ($deductions as $deduction) {
             $totalDeduction += $deduction->amount;
@@ -522,6 +526,7 @@ class SalaryController extends Controller
         $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get());
         $daysSalary = $workDays * 200;
 
+
         $totalSalary = $daysSalary + $leadsSalary - $deductions;
 
 
@@ -533,8 +538,9 @@ class SalaryController extends Controller
     {
         $city = $user->city();
 
-        $leads = Lead::whereBetween('created_at', [Carbon::createFromDate($dateStart), Carbon::createFromDate($dateEnd)])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
+        $leads = Lead::whereBetween('created_at', [Carbon::createFromDate($dateStart)->addDay()->toDateString(), $dateEnd])->where([["operator_id", '=', $user->id], ["entered", '!=', null]])->get();
 
+//        dd($leads);
         $okna = 0;
         $other = 0;
 
@@ -553,7 +559,7 @@ class SalaryController extends Controller
 
         $leadsSalary = $okna * 200 + $other * 200;
 
-        $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$dateStart, $dateEnd])->get());
+        $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [Carbon::createFromDate($dateStart)->addDay(), $dateEnd])->get());
         $daysSalary = $workDays * 200;
 
         $deductions = BonusManager::whereBetween('created_at', [$dateStart, $dateEnd])->where(["user_id" => $user->id, "type" => 'minus'])->get();
@@ -561,6 +567,8 @@ class SalaryController extends Controller
         foreach ($deductions as $deduction) {
             $totalDeduction += $deduction->amount;
         }
+
+
 
 
         $totalSalary = $daysSalary + $leadsSalary - $totalDeduction;

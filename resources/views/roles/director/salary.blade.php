@@ -39,7 +39,7 @@
                     @foreach($directors as $director)
                         @if(!$director->isAdmin)
                             <tr class="table-light">
-                                <th class="p-2 fw-bold text-left" scope="col">{{$director->shortname()}}</th>
+                                <th class="p-2 fw-bold text-left {{$director->deleted_at?'text-danger':''}}" scope="col">{{$director->shortname()}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->deductions($date)}}</th>
                                 <th class="p-2 fw-bold text-left" scope="col">{{$director->payedSalary($date)}}</th>
                                 <th class="p-2 fw-bold text-left summ {{$director->salary($date)-$director->payedSalary($date)<0?'text-danger':'text-black'}}"
@@ -79,7 +79,7 @@
                     <tbody>
                     @foreach($managers as $manager)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$manager->shortname()}}</th>
+                            <th class="p-2 fw-bold text-left {{$manager->deleted_at?'text-danger':''}}" scope="col">{{$manager->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->payedSalary($date)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$manager->salary($date)-$manager->payedSalary($date)<0?'text-danger':'text-black'}}"

@@ -50,7 +50,7 @@ class RepairsController extends Controller
         return $result;
     }
 
-    public function getMonthRepairs($date,$status)
+    public function getMonthRepairs($date, $status)
     {
         $startDate = Carbon::createFromDate($date)->startOfMonth()->startOfDay()->toDateString();
         $endDate = Carbon::createFromDate($date)->endOfMonth()->startOfDay()->toDateString();
@@ -283,13 +283,11 @@ class RepairsController extends Controller
         }
         $user = Auth::user();
 
-        if($user->isAdmin){
+        if ($user->isAdmin) {
             $city = Session::get('city');
-        }
-        else{
+        } else {
             $city = City::where(["id" => $user->city])->first();
         }
-
 
 
         if ($request->query('client_fullname')) {
@@ -333,7 +331,7 @@ class RepairsController extends Controller
             $temp = array();
 
             $suka = new Repair();
-            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status,$date);
+            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status, $date);
             foreach ($repairs as $repair) {
 
                 if ($repair->lead->city == (Session::get('city')->name)) {
@@ -346,7 +344,7 @@ class RepairsController extends Controller
         } else {
             $temp = array();
             $suka = new Repair();
-            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status,$date);
+            $repairs = $suka->getResult($client_fullname, $address, $phone, $manager_id, $master_id, $status, $date);
             foreach ($repairs as $repair) {
                 if ($repair->lead->city == $city->name) {
                     array_push($temp, $repair);
@@ -360,14 +358,12 @@ class RepairsController extends Controller
         $managers = [];
         $masters = [];
 
-        $totalCheck=0;
-        $totalAvance=0;
+        $totalCheck = 0;
+        $totalAvance = 0;
 
-        foreach ($repairs as $repair){
-            if($repair->status=='completed'){
-                $totalCheck+=$repair->check;
-            }
-            $totalAvance+=$repair->lead->avance;
+        foreach ($repairs as $repair) {
+            $totalCheck+=$repair->lead->issued;
+            $totalAvance += $repair->lead->avance;
         }
 
 //        dd($totalCheck);
@@ -381,7 +377,7 @@ class RepairsController extends Controller
         }
 
 
-        return view('repair.search', compact('repairs', 'date',  'city', 'totalCheck', 'managers', 'masters', 'client_fullname', 'address', 'phone', 'manager_id', 'master_id', 'status', 'totalAvance'));
+        return view('repair.search', compact('repairs', 'date', 'city', 'totalCheck', 'managers', 'masters', 'client_fullname', 'address', 'phone', 'manager_id', 'master_id', 'status', 'totalAvance'));
     }
 
     public function doSearch(Request $request)
@@ -621,6 +617,66 @@ class RepairsController extends Controller
         }
     }
 
+    public function getMasterWeekDays($date)
+    {
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $end = Carbon::createFromDate($date);
+        } else {
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+        }
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1);
+
+        $temp = [];
+        $weekDays = array(
+            1 => 'пн',
+            2 => 'вт',
+            3 => 'ср',
+            4 => 'чт',
+            5 => 'пт',
+            6 => 'сб',
+            0 => 'вс'
+        );
+
+        while ($start <= $end) {
+            $temp[$start->day] = array(
+                'day' => $start->day,
+                'weekDay' => $weekDays[$start->weekday()],
+                'repairs' => 0,
+                'successful' => 0,
+                'declined' => 0,
+                'workDay' => false,
+                'repairs_confirmed' => 0,
+                'link' => $start->toDateString(),
+            );
+            $start->addDay();
+        }
+        return $temp;
+    }
+
+
+    public function getMasterWeekLeads($date, $type, $master_id)
+    {
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $end = Carbon::createFromDate($date)->toDateString();
+        } else {
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
+        }
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1)->toDateString();
+
+//        dd($start,$end);
+
+        switch ($type) {
+            case 'all':
+                return Repair::whereBetween('repair_date', [$start, $end])->where([['master_id', '=', $master_id]])->get();
+            case 'successful':
+                return Repair::where([['status', '=', 'completed'], ['master_id', '=', $master_id]])->whereBetween('repair_date', [$start, $end])->get();
+            case 'declined':
+                return Repair::whereBetween('repair_date', [$start, $end])->where([['status', '=', 'declined'], ['master_id', '=', $master_id]])->get();
+            default:
+                return Repair::whereBetween('repair_date', [$start, $end])->get();
+        }
+    }
+
 
     public function masterCard(User $master, Request $request)
     {
@@ -630,9 +686,11 @@ class RepairsController extends Controller
             $date = Carbon::now()->toDateString();
         }
 
+
         if (!$master->id) {
             $master = Auth::user();
         }
+
 
         $dateTemp = preg_split("/[^1234567890]/", $date);
         $dateTitle = '';
@@ -675,6 +733,13 @@ class RepairsController extends Controller
                 break;
         }
 
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $end = Carbon::createFromDate($date);
+        } else {
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+        }
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
+
 
         $dateTitle = $dateTitle . $dateTemp[0];
 
@@ -682,59 +747,40 @@ class RepairsController extends Controller
 
         $city = Auth::user()->city;
 
-        $days = $this->getMasterDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+        $days = $this->getMasterWeekDays($date);
 
+//        dd($days);
 
-        $monthRepairs = $this->getMasterMonthLeads($date,'all', $master->id);
-        $succesfull_repairs = $this->getMasterMonthLeads($date,'successful', $master->id);
-        $declined_repairs = $this->getMasterMonthLeads($date,'declined', $master->id);
+        $monthRepairs = $this->getMasterWeekLeads($date, 'all', $master->id);
+        $succesfull_repairs = $this->getMasterWeekLeads($date, 'successful', $master->id);
+        $declined_repairs = $this->getMasterWeekLeads($date, 'declined', $master->id);
 
         $totalRepairs = 0;
         $totalDeclined = 0;
         $totalSuccessful = 0;
 
         foreach ($monthRepairs as $repair) {
-            $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
-            $days[$day - 1]['repairs'] += 1;
-
+            $day = Carbon::createFromDate($repair->repair_date)->day;
+            $days[$day]['repairs'] += 1;
             $totalRepairs++;
         }
 
         foreach ($declined_repairs as $repair) {
-            $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
-            $days[$day - 1]['declined'] += 1;
+            $day = Carbon::createFromDate($repair->repair_date)->day;
+            $days[$day]['declined'] += 1;
             $totalDeclined++;
         }
 
         foreach ($succesfull_repairs as $repair) {
-            $day = intval(preg_split("/[^1234567890]/", $repair['repair_date'])[2]);
-            $days[$day - 1]['successful'] += 1;
-            $days[$day - 1]['repairs_confirmed'] += $repair->check;
+            $day = Carbon::createFromDate($repair->repair_date)->day;
+            $days[$day]['successful'] += 1;
+            $days[$day]['repairs_confirmed'] += $repair->check;
             $totalSuccessful++;
         }
 
 
-        $lexems = preg_split("/[^1234567890]/", $date);
-
-        if (intval($lexems[1]) + 1 < 10) {
-            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
-        } else {
-            if (intval($lexems[1]) + 1 > 12) {
-                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
-            } else {
-                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
-            }
-        }
-
-        if (intval($lexems[1]) - 1 >= 10) {
-            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
-        } else {
-            if (intval(intval($lexems[1]) - 1 <= 0)) {
-                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
-            } else {
-                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
-            }
-        }
+        $nextMonthLink=$end->toDateString();
+        $prevMonthLink=$start->toDateString();
 
         $totalWorkDays = 0;
         $totalConfirmed = 0;
@@ -768,6 +814,13 @@ class RepairsController extends Controller
         $newRepair->status = 'in-work';
         $newRepair->lead_id = $newLead->id;
         $newRepair->save();
+        return redirect()->back();
+    }
+
+    public function restore(Repair $repair)
+    {
+        $repair->status = 'in-work';
+        $repair->save();
         return redirect()->back();
     }
 

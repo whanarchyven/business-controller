@@ -169,6 +169,12 @@ class DirectorController extends Controller
 
         $leads = $this->getMonthLeads(false, $city);
         $declined = $this->getMonthLeads(true, $city);
+        $null_leads=[];
+        foreach ($declined as $dec){
+            if($dec->exited){
+                array_push($null_leads,$dec);
+            }
+        }
         $month = $this->getMonth();
 //        dd($leads);
 
@@ -228,7 +234,7 @@ class DirectorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings', 'meetings', 'managers_leads'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings', 'meetings', 'managers_leads','null_leads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
@@ -1612,6 +1618,7 @@ class DirectorController extends Controller
         $monthLeads = $suka;
 
 
+
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['repair_date'])[2]);
             if ($lead->status == 'completed') {
@@ -1619,8 +1626,14 @@ class DirectorController extends Controller
             }
 //            echo $lead->check;
 //            echo array_search($lead->getManagerId->id, $days[$day - 1]['managers']);
-            if (in_array($lead->lead->getManagerId->id, $days[$day - 1]['managers']) == false) {
-                array_push($days[$day - 1]['managers'], $lead->lead->getManagerId->id);
+        }
+
+        $managersLeads=Lead::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->where([["manager_id","!=",null]])->get();
+
+        foreach ($managersLeads as $manLead){
+            $day = intval(preg_split("/[^1234567890]/", $manLead['created_at'])[2]);
+            if (in_array($manLead->getManagerId->id, $days[$day - 1]['managers']) == false) {
+                array_push($days[$day - 1]['managers'], $manLead->getManagerId->id);
 //                echo $lead->getManagerId->id;
 //                echo '------------';
             }
@@ -1635,6 +1648,7 @@ class DirectorController extends Controller
             $day = intval(preg_split("/[^1234567890]/", $workDay['created_at'])[2]);
             $days[$day - 1]['workDay'] = $workDay->id;
         }
+
 
 
         $lexems = preg_split("/[^1234567890]/", $date);
@@ -1834,8 +1848,13 @@ class DirectorController extends Controller
             $day_start = Carbon::createFromDate(date('Y-m-d', strtotime('saturday this week')))->toDateString();
         }
 
-        $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
-        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $nextSaturday = Carbon::createFromDate($date);
+        } else {
+            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+        }
+        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
+
 
 //        dd($day_start,$nextSaturday,$prevSaturday);
 
@@ -1865,7 +1884,7 @@ class DirectorController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
-        $employers = User::where(["city" => $city->id])->get();
+        $employers = User::where(["city" => $city->id])->withTrashed()->get();
         $masters = array();
         foreach ($employers as $employer) {
             if ($employer->hasRole('master')) {
@@ -1885,8 +1904,12 @@ class DirectorController extends Controller
             $date = Carbon::now()->toDateString();
         }
 
-        $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
-        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
+        if (Carbon::createFromDate($date)->weekday() == 6) {
+            $nextSaturday = Carbon::createFromDate($date);
+        } else {
+            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+        }
+        $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
         $director = Auth::user();
 
@@ -1964,7 +1987,7 @@ class DirectorController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
-        $employers = User::where(["city" => $city->id])->get();
+        $employers = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         $directors = array();
         $operators = array();
@@ -2071,7 +2094,7 @@ class DirectorController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
-        $employers = User::where(["city" => $city->id])->get();
+        $employers = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         $directors = array();
         $operators = array();
@@ -2133,7 +2156,7 @@ class DirectorController extends Controller
         $counter = 0;
 
         foreach ($users as $user) {
-            $temp_user = User::where(["id" => $user])->first();
+            $temp_user = User::where(["id" => $user])->withTrashed()->first();
             if($temp_user){
                 if($this->isMonthCrossing($date_start,$date_end)){
                     if($temp_user->hasRole('operator')){
@@ -2157,8 +2180,6 @@ class DirectorController extends Controller
                 }
             }
         }
-
-
         return redirect()->back();
     }
 
@@ -2246,7 +2267,7 @@ class DirectorController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
-        $employers = User::where(["city" => $city->id])->get();
+        $employers = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         $directors = array();
         $operators = array();
@@ -2353,7 +2374,7 @@ class DirectorController extends Controller
                 $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
             }
         }
-        $employers = User::where(["city" => $city->id])->get();
+        $employers = User::where(["city" => $city->id])->withTrashed()->get();
         $managers = array();
         $directors = array();
         $operators = array();
@@ -2388,6 +2409,7 @@ class DirectorController extends Controller
 
         $salary = $user->salary($date) - $payedSalary;
 //        dd($user->salary($date));
+
 
         $user->addSalary($salary, $date);
 

@@ -22,16 +22,15 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.mastercard',$master->id).'?date='.$prevMonthLink}}">Предыдущий
-                    месяц</a>
+                   href="{{route('director.mastercard',$master->id).'?date='.$prevMonthLink}}">Предыдущая неделя</a>
             </div>
-            <div id="date-head">
-                <p class="fs-3">{{$dateTitle}}</p>
+            <div id="date-head" {{\Carbon\Carbon::setLocale('ru')}}>
+                <p class="fs-3">{{\Illuminate\Support\Carbon::createFromDate($prevMonthLink)->translatedFormat('j F Y')}}
+                    - {{\Illuminate\Support\Carbon::createFromDate($nextMonthLink)->translatedFormat('j F Y')}}</p>
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.mastercard',$master->id).'?date='.$nextMonthLink}}">Следующий
-                    месяц</a>
+                   href="{{route('director.mastercard',$master->id).'?date='.\Carbon\Carbon::createFromDate($nextMonthLink)->addDay()->toDateString()}}">Следующая неделя</a>
             </div>
         </div>
         @endrole
@@ -167,16 +166,15 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.mastercard',$master->id).'?date='.$prevMonthLink}}">Предыдущий
-                    месяц</a>
+                   href="{{route('director.mastercard',$master->id).'?date='.$prevMonthLink}}">Предыдущая неделя</a>
             </div>
-            <div id="date-head">
-                <p class="fs-3">{{$dateTitle}}</p>
+            <div id="date-head" {{\Carbon\Carbon::setLocale('ru')}}>
+                <p class="fs-3">{{\Illuminate\Support\Carbon::createFromDate($prevMonthLink)->translatedFormat('j F Y')}}
+                    - {{\Illuminate\Support\Carbon::createFromDate($nextMonthLink)->translatedFormat('j F Y')}}</p>
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.mastercard',$master->id).'?date='.$nextMonthLink}}">Следующий
-                    месяц</a>
+                   href="{{route('director.mastercard',$master->id).'?date='.\Carbon\Carbon::createFromDate($nextMonthLink)->addDay()->toDateString()}}">Следующая неделя</a>
             </div>
         </div>
         <script>
@@ -302,12 +300,14 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <th class="fw-normal text-center" scope="col">{{$master->salary($date)}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{$master->masterWeek($prevMonthLink,$nextMonthLink)}}</th>
                     <th class="fw-normal text-center" scope="col">{{$totalWorkDays}}</th>
                     <th class="fw-normal text-center" scope="col">{{$master->deductions($date)}}</th>
-                    <th class="fw-normal text-center" scope="col">{{$master->payedSalary($date)}}</th>
                     <th class="fw-normal text-center"
-                        scope="col">{{$master->salary($date)}}</th>
+                        scope="col">{{$master->masterWeekPayed($prevMonthLink,$nextMonthLink)}}</th>
+                    <th class="fw-normal text-center"
+                        scope="col">{{$master->masterWeek($prevMonthLink,$nextMonthLink) - $master->masterWeekPayed($prevMonthLink,$nextMonthLink)}}</th>
                 </tr>
                 </tbody>
 

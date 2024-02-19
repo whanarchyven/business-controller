@@ -72,12 +72,19 @@ Route::get('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 
 Route::patch('/repairs/{repair}', [App\Http\Controllers\RepairsController::class, 'update'])->name('repairs.update');
 Route::patch('/repairs/{repair}/update', [App\Http\Controllers\RepairsController::class, 'editRepairViaLead'])->name('repairs.leads.update');
 Route::post('/repairs/{repair}/duplicate', [App\Http\Controllers\RepairsController::class, 'duplicate'])->name('repairs.duplicate');
+Route::patch('/repairs/{repair}/restore', [App\Http\Controllers\RepairsController::class, 'restore'])->name('repairs.restore');
 
 
 Route::get('/card/manager/{manager}', [App\Http\Controllers\LeadsController::class, 'managerCard'])->name('director.managercard');
 Route::get('/card/operator/{user}', [App\Http\Controllers\LeadsController::class, 'getLeadsByOperatorId'])->name('director.operatorcard');
 Route::get('/card/master/{master}', [App\Http\Controllers\RepairsController::class, 'masterCard'])->name('director.mastercard');
 Route::get('/card/director/{director}', [App\Http\Controllers\DirectorController::class, 'directorCard'])->name('director.directorcard');
+
+
+
+Route::get('/avance/week/operator', [App\Http\Controllers\DirectorController::class, 'avanceOperatorView'])->name('director.avance.operator');
+Route::post('/avance/week/pay', [App\Http\Controllers\DirectorController::class, 'payAvance'])->name('director.avance.pay');
+
 
 Route::patch('/director/leads/{lead}/sendPhone', [App\Http\Controllers\DirectorController::class, 'sendPhone'])->name('director.leads.sendPhone');
 Route::patch('/director/leads/{lead}/sendAddress', [App\Http\Controllers\DirectorController::class, 'sendAddress'])->name('director.leads.sendAddress');
@@ -176,10 +183,10 @@ Route::group(['middleware' => 'role:director'], function () {
 
     Route::get('/avance/week/', [App\Http\Controllers\DirectorController::class, 'avanceView'])->name('director.avance.week');
 
-    Route::get('/avance/week/operator', [App\Http\Controllers\DirectorController::class, 'avanceOperatorView'])->name('director.avance.operator');
+
 
     Route::get('/avance/month/', [App\Http\Controllers\DirectorController::class, 'avanceMonthView'])->name('director.avance.month');
-    Route::post('/avance/week/pay', [App\Http\Controllers\DirectorController::class, 'payAvance'])->name('director.avance.pay');
+
 
     Route::get('/salary/avance/pay', [App\Http\Controllers\DirectorController::class, 'salaryView'])->name('director.salary.pay');
 

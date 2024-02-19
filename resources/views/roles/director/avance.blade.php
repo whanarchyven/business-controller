@@ -45,7 +45,7 @@
                     <tbody>
                     @foreach($masters as $master)
                         <tr class="table-light">
-                            <th class="p-2 fw-bold text-left" scope="col">{{$master->shortname()}}</th>
+                            <th class="p-2 fw-bold text-left {{$master->deleted_at?'text-danger':''}}" scope="col">{{$master->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->masterWeekPayed($prevSaturday,$nextSaturday)}}</th>
                             <th class="p-2 fw-bold text-left summ {{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)<0?'text-danger':'text-black'}}"
@@ -53,7 +53,7 @@
                             <th class="p-2 fw-bold text-left" scope="col">
                                 @if(\App\Http\Controllers\DirectorController::isMonthCrossing($prevSaturday,$nextSaturday)==false)
                                     <input class="form-control" required
-                                           value="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)<5000?$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday):5000}}" onchange="checkPay()" max="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}"
+                                           value="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}" onchange="checkPay()" max="{{$master->masterWeek($prevSaturday,$nextSaturday)-$master->masterWeekPayed($prevSaturday,$nextSaturday)}}"
                                            type="number"
                                            name="master{{$loop->index}}"/>
                                     <input type="hidden" value="{{$master->id}}" name="masterEmployer{{$loop->index}}">

@@ -177,16 +177,15 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.operatorcard',$user->id).'?date='.$prevMonthLink}}">Предыдущий
-                    месяц</a>
+                   href="{{route('director.operatorcard',$user->id).'?date='.$prevMonthLink}}">Предыдущая неделя</a>
             </div>
-            <div id="date-head">
-                <p class="fs-3">{{$dateTitle}}</p>
+            <div id="date-head" {{\Carbon\Carbon::setLocale('ru')}}>
+                <p class="fs-3">{{\Illuminate\Support\Carbon::createFromDate($prevMonthLink)->translatedFormat('j F Y')}}
+                    - {{\Illuminate\Support\Carbon::createFromDate($nextMonthLink)->translatedFormat('j F Y')}}</p>
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.operatorcard',$user->id).'?date='.$nextMonthLink}}">Следующий
-                    месяц</a>
+                   href="{{route('director.operatorcard',$user->id).'?date='.\Carbon\Carbon::createFromDate($nextMonthLink)->addDay()->toDateString()}}">Следующая неделя</a>
             </div>
         </div>
 
@@ -309,7 +308,7 @@
                             0
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$other*150 + $okna*200}}
+                            {{$other*200 + $okna*200}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
                             {{$totalWorkDays*200}}
@@ -321,13 +320,13 @@
                             {{$user->deductions($date)}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{round($totalSuccessful/$totalLeads*100)}} %
+                            {{$totalLeads>0?round($totalSuccessful/$totalLeads*100):0}} %
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->payedSalary($date)}}
+                            {{$user->operatorWeekPayed($prevMonthLink,$nextMonthLink)}}
                         </th>
                         <th class="fw-normal text-left" scope="col">
-                            {{$user->salary($date)}}
+                            {{$user->operatorWeek($prevMonthLink,$nextMonthLink)-$user->operatorWeekPayed($prevMonthLink,$nextMonthLink)}}
                         </th>
 
                     </tr>

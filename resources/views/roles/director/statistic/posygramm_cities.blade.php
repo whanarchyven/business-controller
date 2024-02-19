@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.statistic.posygramm')}}?date={{$prevMonthLink}}">Предыдущий
+                   href="{{route('director.statistic.posygramm.cities')}}?date={{$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -18,7 +18,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="{{route('director.statistic.posygramm')}}?date={{$nextMonthLink}}">Следующий
+                   href="{{route('director.statistic.posygramm.cities')}}?date={{$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>

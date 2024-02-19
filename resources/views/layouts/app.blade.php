@@ -128,6 +128,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item mx-3">
+                        <a class="dropdown-item" href="{{route('director.avance.operator')}}">
+                            Аванс оператор
+                        </a>
+                    </li>
+
+
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

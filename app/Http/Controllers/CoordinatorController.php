@@ -135,6 +135,12 @@ class CoordinatorController extends Controller
 
         $leads = $this->getMonthLeads(false, $city);
         $declined = $this->getMonthLeads(true, $city);
+        $null_leads=[];
+        foreach ($declined as $dec){
+            if($dec->exited){
+                array_push($null_leads,$dec);
+            }
+        }
         $month = $this->getMonth();
 
         $products_selled = 0;
@@ -192,7 +198,7 @@ class CoordinatorController extends Controller
         $plan = Plan::where([['year', '=', $yearTemp], ['month', '=', $monthTemp], ['city_id', '=', $city_id]])->first();
 
 
-        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings','meetings','managers_leads'));
+        return view('roles.coordinator.control', compact('cities', 'managers', 'city_id', 'leads', 'declined', 'month', 'products_selled', 'todayLeads', 'todayProductsSelled', 'todayDeclined', 'plan', 'city_id', 'user', 'products_issued', 'todayProductsIssued', 'todayMeetings','meetings','managers_leads','null_leads'));
     }
 
     public function manageLead(Lead $lead, Request $request)
