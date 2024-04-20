@@ -44,7 +44,7 @@
                         @foreach($days as $day)
                             <th class="fw-normal table-light text-center" scope="col">{{$day['day']}}</th>
                         @endforeach
-                        <th class="fw-normal table-light text-center" scope="col">Итого</th>
+                        <th class="fw-bold table-light text-center" scope="col">Итого за месяц</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -54,9 +54,19 @@
                             @foreach($manager[1] as $day)
                                 <th class="fw-normal table-light text-center" scope="col">{{round($day['productsSelled']/1000,2)}}<br/>{{round($day['productsConfirmed']/1000,2)}}</th>
                             @endforeach
-                            <th class="fw-normal table-light text-center" scope="col">{{round($manager[2]['productsSelled']/1000,2)}}<br/>{{round($manager[2]['productsConfirmed']/1000,2)}}</th>
+                            <th class="fw-bold table-light text-center" scope="col">{{round($manager[2]['productsSelled']/1000,2)}}<br/>{{round($manager[2]['productsConfirmed']/1000,2)}}</th>
                         </tr>
                     @endforeach
+                    @foreach($totalCalendar as $manager)
+                        <tr>
+                            <th class="fw-bold table-light text-center" scope="col">Итого за день</th>
+                            @foreach($manager[0] as $day)
+                                <th class="fw-bold table-light text-center" scope="col">{{round($day['productsSelled']/1000,2)}}<br/>{{round($day['productsConfirmed']/1000,2)}}</th>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                    
+
                     </tbody>
 
                 </table>

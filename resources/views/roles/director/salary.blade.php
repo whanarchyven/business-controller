@@ -78,6 +78,7 @@
                     </thead>
                     <tbody>
                     @foreach($managers as $manager)
+                    @if($manager->deleted_at==null||(\Carbon\Carbon::createFromDate($manager->deleted_at)->between(\Carbon\Carbon::createFromDate($date)->startOfMonth(),\Carbon\Carbon::createFromDate($date)->endOfMonth())))
                         <tr class="table-light">
                             <th class="p-2 fw-bold text-left {{$manager->deleted_at?'text-danger':''}}" scope="col">{{$manager->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$manager->deductions($date)}}</th>
@@ -98,6 +99,7 @@
 
                             </th>
                         </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

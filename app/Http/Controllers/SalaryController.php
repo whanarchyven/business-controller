@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\DirectorWorkday;
 use App\Models\EmployeerWorkDay;
 use App\Models\Lead;
+use App\Models\ManagerBoost;
 use App\Models\Plan;
 use App\Models\Repair;
 use App\Models\Salary;
@@ -147,19 +148,18 @@ class SalaryController extends Controller
 //            dd($confirmed);
 
 
-        $totalProductsPercent = 0.09;
+        $totalProductsPercent = 0.00;
 
-        if ($totalConfirmed < 1000000) {
+        if ($totalConfirmed < 500000) {
+            $totalSalary =0;
+        } elseif ($totalConfirmed >= 500000 && $totalConfirmed < 1000000) {
             $totalSalary = round(50000 / $monthWorkDays * count($workDays));
         } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 2000000) {
+            $totalSalary = round($totalConfirmed * 0.08);
+            $totalProductsPercent = 0.08;
+        } else {
             $totalSalary = round($totalConfirmed * 0.09);
             $totalProductsPercent = 0.09;
-        } elseif ($totalConfirmed >= 2000000 && $totalConfirmed < 3000000) {
-            $totalSalary = round($totalConfirmed * 0.10);
-            $totalProductsPercent = 0.1;
-        } else {
-            $totalSalary = round($totalConfirmed * 0.10);
-            $totalProductsPercent = 0.1;
         }
         $deductions = BonusManager::whereBetween('created_at', [$startDate, $endDate])->where(["user_id" => $user->id, "type" => 'minus'])->get();
         $totalDeduction = 0;
@@ -198,6 +198,8 @@ class SalaryController extends Controller
         $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
 
+
+        $boost=ManagerBoost::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth(), Carbon::createFromDate($date)->endOfMonth()])->where(["user_id"=>$user->id])->get()->count()!=0;
 
         $leads = app('\App\Http\Controllers\LeadsController')->getManagerMonthLeads($dateTemp[0], $dateTemp[1], 'all', $user->id);
 //        dd($leads);
@@ -305,7 +307,7 @@ class SalaryController extends Controller
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
         } elseif ($totalConfirmed >= 200000 && $totalConfirmed < 300000) {
-            $oklad = 15000;
+            $oklad = 10000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
         } elseif ($totalConfirmed >= 300000 && $totalConfirmed < 400000) {
@@ -325,14 +327,19 @@ class SalaryController extends Controller
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
         } elseif ($totalConfirmed >= 900000 && $totalConfirmed < 1000000) {
-            $oklad = 80000;
+            $oklad = 90000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
-        } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 1500000) {
+        } elseif ($totalConfirmed >= 1000000 && $totalConfirmed < 1300000) {
             $oklad = 100000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
-        } elseif ($totalConfirmed >= 1500000 && $totalConfirmed < 2000000) {
+        } 
+        elseif ($totalConfirmed >= 1300000 && $totalConfirmed < 1500000) {
+            $oklad = 120000;
+            $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
+
+        }elseif ($totalConfirmed >= 1500000 && $totalConfirmed < 2000000) {
             $oklad = 120000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
@@ -346,7 +353,7 @@ class SalaryController extends Controller
 //        dd($totalWorkDays);
 //        dd($conversion);
 
-        $totalProductsPercent = 0.1;
+        $totalProductsPercent = $boost?0.15:0.1;
 
 //        dd($conversion,$totalEnter ,$totalNullLeads + $totalEnter );
 
@@ -521,7 +528,7 @@ class SalaryController extends Controller
             }
         }
 
-        $leadsSalary = $okna * 200 + $other * 200;
+        $leadsSalary = $okna * 300 + $other * 200;
 
         $workDays = count(EmployeerWorkDay::where([['user_id', '=', $user->id]])->whereBetween('created_at', [$startDate, $endDate])->get());
         $daysSalary = $workDays * 200;

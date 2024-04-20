@@ -234,16 +234,16 @@
                         <table class="table table-bordered table-sm table-secondary">
                             <thead class="table-light">
                             <tr class="bg-light">
-                                <th class="fw-bold text-left" scope="col">Встречи</th>
-                                <th class="fw-bold text-left" scope="col">Отказы (нулевые)</th>
+                                <th class="fw-bold text-left" scope="col">Встречи (успешные)</th>
+                                <th class="fw-bold text-left" scope="col">Отказы </th>
                                 <th class="fw-bold text-left" scope="col">Т.О Продано</th>
                                 <th class="fw-bold text-left" scope="col">Т.О Зачёт</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <th class="fw-bold text-left" scope="col">{{$meetings}}</th>
-                                <th class="fw-bold text-left" scope="col">{{count($declined)}} ({{count($null_leads)}})</th>
+                                <th class="fw-bold text-left" scope="col">{{count($null_leads)+$meetings}} ({{$meetings}})</th>
+                                <th class="fw-bold text-left" scope="col">{{count($declined)}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_selled}}</th>
                                 <th class="fw-bold text-left" scope="col">{{$products_issued}}</th>
 

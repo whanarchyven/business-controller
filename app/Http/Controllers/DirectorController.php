@@ -9,6 +9,7 @@ use App\Models\DirectorWorkday;
 use App\Models\EmployeerWorkDay;
 use App\Models\Expense;
 use App\Models\Lead;
+use App\Models\ManagerBoost;
 use App\Models\ManagerCoordinator;
 use App\Models\Nomenclature;
 use App\Models\NomenclatureExpense;
@@ -1849,9 +1850,9 @@ class DirectorController extends Controller
         }
 
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $nextSaturday = Carbon::createFromDate($date);
+            $nextSaturday = Carbon::createFromDate($date)->subDay();
         } else {
-            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
         $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
@@ -1905,9 +1906,9 @@ class DirectorController extends Controller
         }
 
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $nextSaturday = Carbon::createFromDate($date);
+            $nextSaturday = Carbon::createFromDate($date)->subDay();
         } else {
-            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $nextSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
         $prevSaturday = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
@@ -2550,6 +2551,10 @@ class DirectorController extends Controller
 
         $leads = Lead::whereBetween("created_at", [$startDate, $endDate])->where([["city", '=', $city->name], ["manager_id", "!=", null]])->get();
 
+        $totalCalendar=array();
+        array_push($totalCalendar, [$this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]), ['productsSelled' => 0, 'productsConfirmed' => 0]]);
+        // dd($totalCalendar[0][0]);
+
         $logs = array();
         foreach ($leads as $lead) {
             $manager = $lead->getManagerId->id;
@@ -2569,7 +2574,9 @@ class DirectorController extends Controller
 //            dd(array_key_first($neededDay));
             $neededDay = array_key_first($neededDay);
             $managersCalendar[$neededObject][1][$neededDay]['productsSelled'] += $lead->check;
+            $totalCalendar[0][0][$neededDay]['productsSelled'] += $lead->check;
             $managersCalendar[$neededObject][1][$neededDay]['productsConfirmed'] += $lead->repair ? $lead->repair->check : 0;
+            $totalCalendar[0][0][$neededDay]['productsConfirmed'] += $lead->repair ? $lead->repair->check : 0;
             $managersCalendar[$neededObject][2]['productsSelled'] += intval($lead->check);
 //            if($manager==34){
 //                array_push($logs,[$lead,$lead->check]);
@@ -2577,10 +2584,11 @@ class DirectorController extends Controller
             $managersCalendar[$neededObject][2]['productsConfirmed'] += $lead->repair ? intval($lead->repair->check) : 0;
         }
 
+        // dd($totalCalendar);
 //        dd($logs);
 
 
-        return view('roles.director.statistic.sells', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'days', 'managersCalendar'));
+        return view('roles.director.statistic.sells', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'city', 'date', 'days', 'managersCalendar','totalCalendar'));
     }
 
 
@@ -2828,6 +2836,25 @@ class DirectorController extends Controller
 //        dd($managersCalendar);
 
         return view('roles.director.statistic.posygramm_cities', compact('dateTitle', 'nextMonthLink', 'prevMonthLink', 'cities', 'date', 'citiesCalendar', 'totalConfirmed', 'totalSelled'));
+    }
+
+    public function toggleManagerBoost(Request $request){
+
+        $data=$request->all();
+        $user=$data['user'];
+        $date=$data['date'];
+
+        if(ManagerBoost::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth(), Carbon::createFromDate($date)->endOfMonth()])->where(["user_id"=>$user])->get()->count()==0){
+            $new_boost=new ManagerBoost();
+            $new_boost->user_id = $user;
+            $new_boost->created_at = $date;
+            $new_boost->save();
+        }
+        else{
+            $boost=ManagerBoost::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth(), Carbon::createFromDate($date)->endOfMonth()])->where(["user_id"=>$user])->first();
+            $boost->delete();
+        }
+        return back()->with("success","");
     }
 
 

@@ -6,6 +6,7 @@ use App\Models\BonusManager;
 use App\Models\City;
 use App\Models\DirectorWorkday;
 use App\Models\EmployeerWorkDay;
+use App\Models\ManagerBoost;
 use App\Models\Salary;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -100,11 +101,11 @@ class LeadsController extends Controller
     {
 
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $end = Carbon::createFromDate($date);
+            $end = Carbon::createFromDate($date)->subDay();
         } else {
-            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
-        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1);
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
         $temp = [];
         $weekDays = array(
@@ -138,11 +139,11 @@ class LeadsController extends Controller
     public function getOperatorWeekLeads($date, $type, $operator_id)
     {
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $end = Carbon::createFromDate($date);
+            $end = Carbon::createFromDate($date)->subDay();
         } else {
-            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
-        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1);
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
 //        dd($start->toDateString(),$end->toDateString());
 
@@ -387,6 +388,128 @@ class LeadsController extends Controller
         return view('lead.declined', compact('leads', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink','totalNull'));
     }
 
+
+
+    public function getNullLeads(Request $request)
+    {
+        if ($request->query('date')) {
+            $date = $request->query('date');
+        } else {
+            $date = Carbon::now()->toDateString();
+        }
+        $user = Auth::user();
+        $city = $user->city;
+        $city = City::where(["id" => $city])->first();
+
+
+        if ($user->hasRole('operator')) {
+            $leads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['operator_id', '=', $user->id]])->whereDate('created_at', $date)->get();
+        } else if ($user->isAdmin || $user->hasRole('coordinator')) {
+            $leads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereDate('created_at', $date)->get();
+        } else {
+            $leads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['city', '=', $city->name]])->whereDate('created_at', $date)->get();
+        }
+
+        if ($user->hasRole('operator')) {
+            $monthLeads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['operator_id', '=', $user->id]])->whereBetween('created_at',  [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
+        } else if ($user->isAdmin || $user->hasRole('coordinator')) {
+            $monthLeads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['city', '=', \Illuminate\Support\Facades\Session::get('city')->name]])->whereBetween('created_at',  [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
+        } else {
+            $monthLeads = Lead::where([['entered', '!=', 'null'],["check","=","0"] ,['city', '=', $city->name]])->whereBetween('created_at',  [Carbon::createFromDate($date)->startOfMonth()->toDateString(), Carbon::createFromDate($date)->endOfMonth()->toDateString()])->get();
+        }
+
+
+        $dateTemp = preg_split("/[^1234567890]/", $date);
+//            dd($dateTemp);
+        $dateTitle = '';
+        switch ($dateTemp[1]) {
+            case '01':
+                $dateTitle = 'Январь ';
+                break;
+            case '02':
+                $dateTitle = 'Февраль ';
+                break;
+            case '03':
+                $dateTitle = 'Март ';
+                break;
+            case '04':
+                $dateTitle = 'Апрель ';
+                break;
+            case '05':
+                $dateTitle = 'Май ';
+                break;
+            case '06':
+                $dateTitle = 'Июнь ';
+                break;
+            case '07':
+                $dateTitle = 'Июль ';
+                break;
+            case '08':
+                $dateTitle = 'Август ';
+                break;
+            case '09':
+                $dateTitle = 'Сентябрь ';
+                break;
+            case '10':
+                $dateTitle = 'Октябрь ';
+                break;
+            case '11':
+                $dateTitle = 'Ноябрь ';
+                break;
+            case '12':
+                $dateTitle = 'Декабрь ';
+                break;
+        }
+        $dateTitle = $dateTitle . $dateTemp[0];
+
+        $formattedDate = $dateTemp[2] . '.' . $dateTemp[1] . '.' . $dateTemp[0];
+
+        $city = Auth::user()->city;
+
+        $days = $this->getDaysInMonthWithWeekdays($dateTemp[1], $dateTemp[0]);
+
+
+        $totalCheck=0;
+        $totalAvance=0;
+        $totalLeads = 0;
+        $totalNull=0;
+
+        foreach ($monthLeads as $lead) {
+            $day = intval(preg_split("/[^1234567890]/", $lead['created_at'])[2]);
+            $days[$day - 1]['leads'] += 1;
+            if($lead->exited){
+                $days[$day - 1]['null'] += 1;
+                $totalNull++;
+            }
+            $totalLeads++;
+        }
+
+        $lexems = preg_split("/[^1234567890]/", $date);
+
+        if (intval($lexems[1]) + 1 < 10) {
+            $nextMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) + 1)) . '-01';
+        } else {
+            if (intval($lexems[1]) + 1 > 12) {
+                $nextMonthLink = intval($lexems[0]) + 1 . '-01' . '-01';
+            } else {
+                $nextMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) + 1)) . '-01';
+            }
+        }
+
+        if (intval($lexems[1]) - 1 >= 10) {
+            $prevMonthLink = $lexems[0] . ('-' . (intval($lexems[1]) - 1)) . '-01';
+        } else {
+            if (intval(intval($lexems[1]) - 1 <= 0)) {
+                $prevMonthLink = intval($lexems[0]) - 1 . '-12' . '-01';
+            } else {
+                $prevMonthLink = $lexems[0] . ('-0' . (intval($lexems[1]) - 1)) . '-01';
+            }
+        }
+
+        return view('lead.null', compact('leads', 'date', 'dateTitle', 'formattedDate', 'city', 'days', 'totalLeads', 'nextMonthLink', 'prevMonthLink','totalNull','totalCheck','totalAvance'));
+    }
+
+
     public function create()
     {
         $user = Auth::user();
@@ -513,12 +636,12 @@ class LeadsController extends Controller
 
 
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $end = Carbon::createFromDate($date);
+            $end = Carbon::createFromDate($date)->subDay();
         } else {
-            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
         $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
-        $nextMonthLink=$end->toDateString();
+        $nextMonthLink=$end->addDay()->toDateString();
         $prevMonthLink=$start->toDateString();
 
 
@@ -906,6 +1029,8 @@ class LeadsController extends Controller
         $totalDeclinedRepairs = 0;
 
 
+        $boost=ManagerBoost::whereBetween('created_at', [Carbon::createFromDate($date)->startOfMonth(), Carbon::createFromDate($date)->endOfMonth()])->where(["user_id"=>$manager->id])->get()->count()!=0;
+
         foreach ($monthLeads as $lead) {
             $day = intval(preg_split("/[^1234567890]/", $lead['meeting_date'])[2]);
             $days[$day - 1]['meetings'] += 1;
@@ -1056,7 +1181,7 @@ class LeadsController extends Controller
             }
         }
 
-        $totalProductsPercent = 0.1;
+        $totalProductsPercent = $boost?0.15:0.1;
         if ($totalEnter != 0) {
             $conversion = ($totalEnter - $totalNull) / ($totalEnter);
         } else {
@@ -1067,18 +1192,18 @@ class LeadsController extends Controller
 
 //        dd($conversion,$totalEnter ,$totalNull + $totalEnter );
 
-        if ($conversion >= 0.5) {
-            $totalProductsPercent += 0.01;
-        }
-        if ($totalDeclinedRepairs < 3) {
-            $totalProductsPercent += 0.01;
-        }
-        if (count($manager->stagers($date)) >= 1) {
-            $totalProductsPercent += 0.01;
-        }
-        if ($totalConfirmed >= 400000) {
-            $totalProductsPercent += 0.01;
-        }
+        // if ($conversion >= 0.5) {
+        //     $totalProductsPercent += 0.01;
+        // }
+        // if ($totalDeclinedRepairs < 3) {
+        //     $totalProductsPercent += 0.01;
+        // }
+        // if (count($manager->stagers($date)) >= 1) {
+        //     $totalProductsPercent += 0.01;
+        // }
+        // if ($totalConfirmed >= 400000) {
+        //     $totalProductsPercent += 0.01;
+        // }
 
 //        dd($totalProductsPercent);
 
@@ -1130,7 +1255,7 @@ class LeadsController extends Controller
 //        dd($totalProductsPercent,$totalConfirmed);
 
         if ($manager->hasRole('manager')) {
-            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary', 'lowMargeChecksDeduction', 'lowMargeChecks', 'totalDeclinedRepairs', 'conversion', 'studentsSalary', 'norm_students'));
+            return view('cards.manager', compact('date', 'dateTitle', 'formattedDate', 'city', 'manager', 'manager_statuses', 'days', 'totalMeetings', 'nextMonthLink', 'prevMonthLink', 'totalSuccessful', 'totalDeclined', 'totalWorkDays', 'totalSelled', 'totalIssued', 'totalConfirmed', 'documents', 'oklad', 'okladSallary', 'weekends', 'bonuses', 'deductions', 'totalDeduction', 'totalBonus', 'totalProductsPercent', 'totalSalary', 'lowMargeChecksDeduction', 'lowMargeChecks', 'totalDeclinedRepairs', 'conversion', 'studentsSalary', 'norm_students','boost'));
         }
 
 

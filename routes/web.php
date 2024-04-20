@@ -21,6 +21,7 @@ Auth::routes();
 Auth::routes();
 
 Route::get('/leads/', [App\Http\Controllers\LeadsController::class, 'indexOperator'])->name('leads.index');
+Route::get('/leads/null', [App\Http\Controllers\LeadsController::class, 'getNullLeads'])->name('leads.null');
 Route::get('/leads/create', [App\Http\Controllers\LeadsController::class, 'create'])->name('leads.create');
 Route::get('/leads/{lead}/edit', [App\Http\Controllers\LeadsController::class, 'edit'])->name('leads.edit');
 Route::patch('/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'update'])->name('leads.update');
@@ -105,6 +106,8 @@ Route::group(['middleware' => 'role:director'], function () {
     Route::patch('/director/manager/leads/{lead}', [App\Http\Controllers\LeadsController::class, 'changeLeadStatus'])->name('director.manager.leads.status');
     Route::patch('/director/manager/leads/close/{lead}', [App\Http\Controllers\LeadsController::class, 'closeLeadMeeting'])->name('director.manager.leads.close');
     Route::get('/director/manager/{manager}/operative', [App\Http\Controllers\LeadsController::class, 'managerOperative'])->name('director.manager.operative');
+
+    Route::post('/director/manager/toggleboost', [App\Http\Controllers\DirectorController::class, 'toggleManagerBoost'])->name('director.manager.toggleboost');
 
 
     Route::patch('/director/plan/change', [App\Http\Controllers\DirectorController::class, 'changePlan'])->name('director.changeplan');

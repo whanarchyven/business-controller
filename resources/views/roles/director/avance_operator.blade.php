@@ -127,6 +127,7 @@
                     </thead>
                     <tbody>
                     @foreach($operators as $operator)
+                        @if($operator->deleted_at==null||(\Carbon\Carbon::createFromDate($operator->deleted_at)->between(\Carbon\Carbon::createFromDate($date)->startOfMonth(),\Carbon\Carbon::createFromDate($date)->endOfMonth())))
                         <tr class="table-light">
                             <th class="p-2 fw-bold text-left {{$operator->deleted_at?'text-danger':''}}" scope="col">{{$operator->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$operator->deductions($date)}}</th>
@@ -155,6 +156,7 @@
                                 </div>
                             </th>
                         </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

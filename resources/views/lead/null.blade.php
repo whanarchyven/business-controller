@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/leads?date={{$prevMonthLink}}">Предыдущий
+                   href="/leads/nullnull?date={{$prevMonthLink}}">Предыдущий
                     месяц</a>
             </div>
             <div id="date-head">
@@ -18,7 +18,7 @@
             </div>
             <div>
                 <a class="bg-secondary px-4 rounded-2 py-2 text-white"
-                   href="/leads?date={{$nextMonthLink}}">Следующий
+                   href="/leads/nullnull?date={{$nextMonthLink}}">Следующий
                     месяц</a>
             </div>
         </div>
@@ -43,7 +43,7 @@
                     <th class="fw-normal text-center" scope="row">Число</th>
                     @foreach($days as $day)
                         <th class="text-primary text-center" scope="col"><a
-                                href="/leads/?date={{$day['link']}}">{{$day['day']}}</a>
+                                href="/leads/null?date={{$day['link']}}">{{$day['day']}}</a>
                         </th>
                     @endforeach
                     <th class="fw-normal text-center" scope="row">Итого</th>
@@ -67,9 +67,7 @@
             <div class="bd-cyan-500">
                 <div class="d-flex justify-content-between">
                     <p class="fs-3 text-indigo">Заявки {{$formattedDate}}</p>
-                    @if(!\Illuminate\Support\Facades\Auth::user()->hasRole('operator'))
                     <p class="fs-3 text-indigo">Суммарный чек: {{$totalCheck}} ({{$totalAvance}})</p>
-                    @endif
                 </div>
 {{--                <div class="flex gap-3 mb-4">--}}
 {{--                    <button class="bg-not-managed btn-outline-info border-0 p-2 text-white rounded-3">Не назначено--}}

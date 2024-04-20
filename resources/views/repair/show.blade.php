@@ -91,7 +91,6 @@
             <div class="bd-cyan-500">
                 <div class="d-flex mb-3 gap-3 align-items-center">
                     <p class="fs-3 m-0 text-indigo">Ремонты {{$formattedDate}}</p>
-                    <button onclick="window.location='{{route('repairs.search')}}'" class="btn m-0 btn-primary">Поиск по ремонтам</button>
                 </div>
                 <div class="w-100 d-flex flex-row justify-content-between">
                     <div class="d-flex gap-3 mb-4">

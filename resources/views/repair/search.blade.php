@@ -92,7 +92,6 @@
             <div class="bd-cyan-500">
                 <div class="d-flex mb-3 gap-3 align-items-center">
                     <p class="fs-3 m-0 text-indigo">Поиск по ремонтам</p>
-                    <button onclick="window.location='{{route('repairs.index')}}'" class="btn m-0 btn-primary">Таблица ремонтов</button>
                 </div>
                 <form method="post" action="{{route('repairs.do.search')}}" class="my-3 mb-6 d-grid gap-2">
                     @csrf

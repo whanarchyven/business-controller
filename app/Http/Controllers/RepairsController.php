@@ -620,11 +620,11 @@ class RepairsController extends Controller
     public function getMasterWeekDays($date)
     {
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $end = Carbon::createFromDate($date);
+            $end = Carbon::createFromDate($date)->subDay();
         } else {
-            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))));
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay();
         }
-        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1);
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))));
 
         $temp = [];
         $weekDays = array(
@@ -657,11 +657,11 @@ class RepairsController extends Controller
     public function getMasterWeekLeads($date, $type, $master_id)
     {
         if (Carbon::createFromDate($date)->weekday() == 6) {
-            $end = Carbon::createFromDate($date)->toDateString();
+            $end = Carbon::createFromDate($date)->subDay()->toDateString();
         } else {
-            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->toDateString();
+            $end = Carbon::createFromDate(date('Y-m-d', strtotime('next saturday', strtotime($date))))->subDay()->toDateString();
         }
-        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->addDay(1)->toDateString();
+        $start = Carbon::createFromDate(date('Y-m-d', strtotime('previous saturday', strtotime($date))))->toDateString();
 
 //        dd($start,$end);
 
@@ -748,6 +748,7 @@ class RepairsController extends Controller
         $city = Auth::user()->city;
 
         $days = $this->getMasterWeekDays($date);
+        // dd($days);
 
 //        dd($days);
 
@@ -808,6 +809,7 @@ class RepairsController extends Controller
     {
         $temp = $repair->lead;
         $newLead = Lead::where(["id" => $temp->id])->first()->replicate();
+        $newLead->created_at=$repair->lead->created_at;
         $newLead->save();
 //        dd($newLead);
         $newRepair = $repair->replicate();

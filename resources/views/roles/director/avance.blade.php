@@ -44,6 +44,7 @@
                     </thead>
                     <tbody>
                     @foreach($masters as $master)
+                    @if($master->deleted_at==null||(\Carbon\Carbon::createFromDate($master->deleted_at)->between(\Carbon\Carbon::createFromDate($date)->startOfMonth(),\Carbon\Carbon::createFromDate($date)->endOfMonth())))
                         <tr class="table-light">
                             <th class="p-2 fw-bold text-left {{$master->deleted_at?'text-danger':''}}" scope="col">{{$master->shortname()}}</th>
                             <th class="p-2 fw-bold text-left" scope="col">{{$master->deductions($date)}}</th>
@@ -72,6 +73,7 @@
                                 </div>
                             </th>
                         </tr>
+                        @endif
                     @endforeach
                     </tbody>
 

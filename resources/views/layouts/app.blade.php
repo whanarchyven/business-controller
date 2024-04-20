@@ -89,6 +89,10 @@
                                href="{{route('leads.declined')}}">
                                 Отклонённые заявки
                             </a>
+                            <a class="dropdown-item"
+                               href="{{route('leads.null')}}">
+                                Нулевые заявки
+                            </a>
                         </div>
                     </li>
 
@@ -149,6 +153,10 @@
                                href="{{route('leads.declined')}}">
                                 Отклонённые заявки
                             </a>
+                            <a class="dropdown-item"
+                               href="{{route('leads.null')}}">
+                                Нулевые заявки
+                            </a>
                         </div>
                     </li>
 
@@ -175,6 +183,10 @@
                             <a class="dropdown-item"
                                href="{{route('leads.declined')}}">
                                 Отклонённые заявки
+                            </a>
+                            <a class="dropdown-item"
+                               href="{{route('leads.null')}}">
+                                Нулевые заявки
                             </a>
                             <a class="dropdown-item"
                                href="{{route('director.daily')}}">
@@ -234,6 +246,7 @@
                             <a class="dropdown-item" href="{{ route('repairs.index') }}">
                                 Таблица ремонтов
                             </a>
+                            <a class="dropdown-item" href="{{ route('repairs.search') }}">Поиск по ремонтам</a>
                             {{--                            <a class="dropdown-item" href="{{route('leads.index')}}">--}}
                             {{--                                Таблица маржинальности--}}
                             {{--                            </a>--}}
@@ -337,9 +350,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('director.bonuses') }}">
-                                    Бонусы
-                                </a>
+                                
                                 <a class="dropdown-item" href="{{ route('director.deductions') }}">
                                     Удержания
                                 </a>
@@ -379,6 +390,9 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ route('director.bonuses') }}">
+                                    Бонусы
+                                </a>
                             <a class="dropdown-item" href="{{ route('director.statistic.sells') }}">
                                 Продажи
                             </a>

@@ -14,7 +14,7 @@
                         <p>Ремонт от {{$repair->repair_date}}
                             на {{$repair->lead->issued}}/{{$repair->lead->avance}}</p>
                         <div class="d-flex gap-2 w-100 col-2">
-                            @if($repair->status!='completed')
+                            @if($repair->status!='completed'&&$repair->status!='refund')
                                 <div id="status" class="btn w-25 btn-secondary">
                                     Статус
                                 </div>

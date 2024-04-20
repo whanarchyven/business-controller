@@ -57,6 +57,34 @@
                        value="Изменить статус"/>
             </form>
 
+            @if($boost)
+                <form id="toggle-boost-form" method="post" action="{{route('director.manager.toggleboost')}}"
+                  class="d-flex flex-row gap-2">
+                @csrf
+                @method('post')
+                <input type='hidden' name="user" value="{{$manager->id}}"/>
+                <input type='hidden' name="date" value="{{$date}}"/>
+                
+                <input type="submit"
+                       class="btn btn-danger text-white w-100 rounded-2  p-2"
+                       value="Отозвать буст"/>
+            </form>
+            @else
+            <form id="toggle-boost-form" method="post" action="{{route('director.manager.toggleboost')}}"
+                  class="d-flex flex-row gap-2">
+                @csrf
+                @method('post')
+                <input type='hidden' name="user" value="{{$manager->id}}"/>
+                <input type='hidden' name="date" value="{{$date}}"/>
+                
+                <input type="submit"
+                       class="btn btn-success text-white w-100 rounded-2  p-2"
+                       value="Выдать буст"/>
+            </form>
+            @endif
+
+        
+
             {{--            <button id="change-status"--}}
             {{--                    class="btn btn-primary text-white rounded-2  p-2">Изменить статус--}}
             {{--            </button>--}}
@@ -452,7 +480,7 @@
                 <thead>
                 <tr>
                     <th class="fw-bold text-center" scope="col">% ТО</th>
-                    @if($totalDeclinedRepairs<3)
+                    <!-- @if($totalDeclinedRepairs<3)
                         <th class="fw-bold text-center" scope="col">% отказ</th>
                     @endif
                     @if($studentsSalary)
@@ -469,7 +497,7 @@
 
                     @if($totalConfirmed>400000)
                         <th class="fw-bold text-center" scope="col">{{'% >400 000'}}</th>
-                    @endif
+                    @endif -->
                     <th class="fw-bold text-center" scope="col">Оклад</th>
                     <th class="fw-bold text-center" scope="col">Рабочих дней</th>
                     <th class="fw-bold text-center" scope="col">Факт. оклад</th>
@@ -482,8 +510,8 @@
                 <tbody>
                 <tr>
                     <th class="fw-normal text-center"
-                        scope="col">{{$totalConfirmed*0.1}}</th>
-                    @if($totalDeclinedRepairs<3)
+                        scope="col">{{$totalConfirmed*($boost?0.15:0.1)}}</th>
+                    <!-- @if($totalDeclinedRepairs<3)
                         <th class="fw-normal text-center"
                             scope="col">{{$totalDeclinedRepairs<3?$totalConfirmed*0.01:0}}</th>
                     @endif
@@ -503,7 +531,7 @@
                     @if($totalConfirmed>400000)
                         <th class="fw-normal text-center"
                             scope="col">{{$totalConfirmed>400000?$totalConfirmed*0.01:0}}</th>
-                    @endif
+                    @endif -->
 
                     <th class="fw-normal text-center"
                         scope="col">{{$oklad}}</th>
