@@ -132,7 +132,7 @@
                                     {{--                                           name="documents[]"--}}
                                     {{--                                           placeholder="Документы" multiple>--}}
                                     @if($user->hasRole('manager'))
-                                        <div id="teacher-form" class="form-group my-2 ">
+                                        <!-- <div id="teacher-form" class="form-group my-2 ">
                                             <label for="role">Ментор (наставник)</label>
                                             <select onchange="updateSubForm()" id="teacher_id" class="form-control" name="teacher_id">
                                                 <option value={{-1}}>{{'БЕЗ НАСТАВНИКA'}}</option>
@@ -140,7 +140,7 @@
                                                     <option {{$user->teacher_id==$manager->id?'selected':''}} value={{$manager->id}}>{{$manager->name}}</option>
                                                 @endforeach
                                             </select>
-                                        </div>
+                                        </div> -->
                                         <div id="mentor-form" class="form-group my-2 ">
                                             <label for="role">Тимлид</label>
                                             <select onchange="updateSubForm()" id="mentor_id" class="form-control" name="mentor_id">

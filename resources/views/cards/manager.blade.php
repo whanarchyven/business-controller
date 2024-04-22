@@ -67,7 +67,7 @@
                 
                 <input type="submit"
                        class="btn btn-danger text-white w-100 rounded-2  p-2"
-                       value="Отозвать буст"/>
+                       value="Доп процент -"/>
             </form>
             @else
             <form id="toggle-boost-form" method="post" action="{{route('director.manager.toggleboost')}}"
@@ -79,7 +79,7 @@
                 
                 <input type="submit"
                        class="btn btn-success text-white w-100 rounded-2  p-2"
-                       value="Выдать буст"/>
+                       value="Доп процент +"/>
             </form>
             @endif
 
@@ -480,6 +480,10 @@
                 <thead>
                 <tr>
                     <th class="fw-bold text-center" scope="col">% ТО</th>
+
+                    @if($boost)
+                    <th class="fw-bold text-center" scope="col">Доп 5%</th>
+                    @endif
                     <!-- @if($totalDeclinedRepairs<3)
                         <th class="fw-bold text-center" scope="col">% отказ</th>
                     @endif
@@ -510,7 +514,11 @@
                 <tbody>
                 <tr>
                     <th class="fw-normal text-center"
-                        scope="col">{{$totalConfirmed*($boost?0.15:0.1)}}</th>
+                        scope="col">{{$totalConfirmed*(0.1)}}</th>
+                        @if($boost)
+                        <th class="fw-normal text-center"
+                        scope="col">{{$totalConfirmed*(0.05)}}</th>
+                        @endif
                     <!-- @if($totalDeclinedRepairs<3)
                         <th class="fw-normal text-center"
                             scope="col">{{$totalDeclinedRepairs<3?$totalConfirmed*0.01:0}}</th>

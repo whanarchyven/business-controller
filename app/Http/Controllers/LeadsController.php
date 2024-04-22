@@ -816,8 +816,10 @@ class LeadsController extends Controller
             $manager->save();
         } else if ($data['status'] == 'entered') {
             $lead->update(['status' => 'in-work']);
-            if (!EmployeerWorkDay::whereDate('created_at', Carbon::today()->toDateString())->where(["user_id" => $operator->id])->first()) {
+            if (!EmployeerWorkDay::whereDate('created_at',$lead->created_at)->where(["user_id" => $operator->id])->first()) {
                 $workDay = new EmployeerWorkDay(["user_id" => $operator->id]);
+                $workDay->created_at=$lead->created_at;
+                $workDay->updated_at=$lead->created_at;
                 $workDay->save();
             }
 

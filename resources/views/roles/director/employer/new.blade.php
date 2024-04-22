@@ -166,7 +166,7 @@
                                 else if(select.value=='manager'){
                                     document.getElementById('city-form').className = 'form-group my-2';
                                     document.getElementById('city-form-coordinator').className = 'd-none';
-                                    document.getElementById('mentor-form').className = 'form-group my-2'
+                                    // document.getElementById('mentor-form').className = 'form-group my-2'
                                     document.getElementById('teacher-form').className = 'form-group my-2'
                                 }
                                 else {

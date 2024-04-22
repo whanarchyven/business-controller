@@ -523,10 +523,10 @@ class DirectorController extends Controller
             $director_workday->save();
         }
 
-        if (EmployeerWorkDay::whereDate('created_at', $lead->meeting_date)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
+        if (EmployeerWorkDay::whereDate('created_at', $lead->created_at)->where(["user_id" => $lead->getManagerId->id])->first() == null) {
             $workDay = new EmployeerWorkDay(["user_id" => $lead->getManagerId->id]);
-            $workDay->created_at = $lead->meeting_date . ' 08:00:00';
-            $workDay->updated_at = $lead->meeting_date . ' 08:00:00';
+            $workDay->created_at = $lead->created_at;
+            $workDay->updated_at = $lead->created_at;
             $workDay->save();
         }
 
