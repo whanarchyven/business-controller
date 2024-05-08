@@ -43,7 +43,9 @@ class Lead extends Model
         $lead=$this;
         $marge=$this->profit();
 
-        $marge_percent=round($marge/$lead->issued*100);
+
+
+        $marge_percent=round($marge/($lead->issued?$lead->issued:1)*100);
 //        dd($marge);
         return $marge_percent;
     }
