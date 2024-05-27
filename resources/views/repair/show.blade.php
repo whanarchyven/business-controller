@@ -65,6 +65,8 @@
                     @foreach($days as $day)
                         @if($day['declined']!=0)
                             <th class="fw-normal text-center" scope="col">{{$day['declined']}}</th>
+                        @elseif($day['refund']!=0)
+                            <th class="fw-normal text-center" scope="col">{{$day['refund']}}</th>
                         @else
                             <th class="fw-normal text-center" scope="col"></th>
                         @endif

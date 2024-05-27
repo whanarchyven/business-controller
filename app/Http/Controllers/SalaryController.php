@@ -95,15 +95,20 @@ class SalaryController extends Controller
 
         $startDate = Carbon::createFromDate($date)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromDate($date)->endOfMonth()->toDateString();
-        $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'completed']])->get();
+//        $repairs = Repair::whereBetween('repair_date', [$startDate, $endDate])->where([['status', '=', 'completed']])->get();
+        // поменять модель зп
+
+
+        $repairs=Lead::whereBetween('created_at', [$startDate, $endDate])->where(["city"=>$city->name])->get();
+
 
         $date = explode('-', $date);
 
         $temp = [];
 
         foreach ($repairs as $repair) {
-            if ($repair->lead->city == $city->name) {
-                array_push($temp, $repair);
+            if ($repair->repair&&$repair->status="completed") {
+                array_push($temp, $repair->repair);
             }
         }
 
@@ -334,7 +339,7 @@ class SalaryController extends Controller
             $oklad = 100000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;
 
-        } 
+        }
         elseif ($totalConfirmed >= 1300000 && $totalConfirmed < 1500000) {
             $oklad = 120000;
             $okladSallary = $oklad * $totalWorkDays / $monthWorkDays;

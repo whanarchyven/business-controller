@@ -207,6 +207,8 @@ class RepairsController extends Controller
         $refundRepairs = $this->getMonthRepairs($date, 'refund');
 
 
+
+
         $totalRepairs = 0;
         $totalDeclined = 0;
         $totalCompleted = 0;
